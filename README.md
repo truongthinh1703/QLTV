@@ -1,6 +1,6 @@
 # ĐỒ ÁN MÔN HỌC: CÔNG NGHỆ PHẦN MỀM
 ## ĐỀ TÀI: HỆ THỐNG QUẢN LÝ THƯ VIỆN - TRƯỜNG ĐẠI HỌC SƯ PHẠM TP. HỒ CHÍ MINH (HCMUE)
-.
+..
 > **Đơn vị đào tạo:** Trường Đại học Sư phạm TP. Hồ Chí Minh (HCMUE)  
 > **Khoa:** Công nghệ Thông tin & Khoa Toán - Tin học  
 > **Học phần:** Công nghệ Phần mềm (Software Engineering)  
