@@ -1,0 +1,19 @@
+{
+  "name": "hcmue-library-management",
+  "version": "1.0.0",
+  "description": "Hệ thống Quản lý Thư viện Đại học Sư phạm TP.HCM (HCMUE) chuẩn HTML5, CSS3, ES6+ và PostgreSQL",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "keywords": [
+    "hcmue",
+    "library",
+    "management",
+    "spa",
+    "postgresql"
+  ],
+  "author": "HCMUE",
+  "license": "MIT"
+}
+
