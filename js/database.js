@@ -82,7 +82,7 @@ export const INITIAL_DB = {
       className: "50.01.SPTIN.A",
       department: "Khoa CNTT - SPTIN.A",
       departmentKey: "CNTT",
-      status: "KHOA",
+      status: "KICH_HOAT",
       cardStatus: "TAM_KHOA_NO",
       cardExpiry: "30/06/2027",
       issueDate: "15/09/2023",
@@ -102,7 +102,7 @@ export const INITIAL_DB = {
       className: "50.01.SPTIN.C",
       department: "Khoa CNTT - SPTIN.C",
       departmentKey: "CNTT",
-      status: "KHOA",
+      status: "KICH_HOAT",
       cardStatus: "TAM_KHOA_NO",
       cardExpiry: "30/06/2027",
       issueDate: "15/09/2023",
@@ -122,7 +122,7 @@ export const INITIAL_DB = {
       className: "50.01.SPTIN.B",
       department: "Khoa Toán - Tin học - Lớp 50.01.SPTIN.B",
       departmentKey: "TOAN_TIN",
-      status: "KHOA",
+      status: "KICH_HOAT",
       cardStatus: "TAM_KHOA_NO",
       cardExpiry: "30/06/2027",
       issueDate: "15/09/2023",
@@ -492,9 +492,11 @@ export const INITIAL_DB = {
     }
   ],
 
-  // 6. Lịch sử mượn trả sinh viên Nguyễn Ngọc Hồng An
+  // 6. Lịch sử mượn trả sinh viên (Hoàn tất giao dịch)
   studentHistory: [
     {
+      readerCard: "THE-5001102",
+      readerName: "Nguyễn Ngọc Hồng An",
       code: "PM-2026-041 · CTDL-003",
       title: "Cấu trúc dữ liệu",
       borrowDate: "10/09/2026",
@@ -505,6 +507,8 @@ export const INITIAL_DB = {
       paymentStatus: "Đã hoàn tất"
     },
     {
+      readerCard: "THE-5001102",
+      readerName: "Nguyễn Ngọc Hồng An",
       code: "PM-2026-065 · OOP-002",
       title: "Lập trình hướng đối tượng",
       borrowDate: "01/10/2026",
@@ -513,6 +517,30 @@ export const INITIAL_DB = {
       statusBadge: "badge-red",
       fee: "4,000 đ",
       paymentStatus: "Đã tất toán biên lai"
+    },
+    {
+      readerCard: "THE-50011065",
+      readerName: "Nguyễn Đức Anh Tài",
+      code: "PM-2026-012 · GT1-001",
+      title: "Giải tích 1",
+      borrowDate: "05/09/2026",
+      returnDate: "19/09/2026",
+      status: "Trả đúng hạn",
+      statusBadge: "badge-green",
+      fee: "0 đ",
+      paymentStatus: "Đã hoàn tất"
+    },
+    {
+      readerCard: "THE-5001106",
+      readerName: "Lê Nguyễn Thanh Phương",
+      code: "PM-2026-028 · XSTK-001",
+      title: "Xác suất thống kê",
+      borrowDate: "12/09/2026",
+      returnDate: "26/09/2026",
+      status: "Trả đúng hạn",
+      statusBadge: "badge-green",
+      fee: "0 đ",
+      paymentStatus: "Đã hoàn tất"
     }
   ],
 

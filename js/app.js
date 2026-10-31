@@ -414,6 +414,10 @@ function registerGlobalEvents() {
   window.renderDashboard = renderDashboard;
   window.lookupReturnLoan = lookupReturnLoan;
   window.renewLoanAtDashboard = renewLoanAtDashboard;
+  window.renderStudentLoansScreen = renderStudentLoansScreen;
+  window.renderStudentSearchScreen = renderStudentSearchScreen;
+  window.executeStudentRenew = executeStudentRenew;
+  window.executeReturnBook = executeReturnBook;
 
   // Xử lý Quick Login Chip 1-click
   window.quickLogin = function(username, pass) {

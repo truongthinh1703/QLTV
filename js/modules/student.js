@@ -154,34 +154,90 @@ function renderPdfViewer() {
  */
 export function renderStudentLoansScreen() {
   const db = getDB();
-  const sessionUser = typeof sessionStorage !== 'undefined' ? JSON.parse(sessionStorage.getItem('HCMUE_CURRENT_USER') || 'null') : null;
+  const curUser = getCurrentUser();
   
-  // Lấy toàn bộ sách đang mượn của độc giả đang đăng nhập (hoặc Nguyễn Ngọc Hồng An THE-5001102)
+  // Lấy dữ liệu mới nhất của người dùng từ CSDL db.accounts
+  let dbUser = null;
+  if (curUser) {
+    dbUser = db.accounts.find(a => 
+      a.username === curUser.username || 
+      (a.staffId && a.staffId === curUser.username) ||
+      (a.cardId && a.cardId === curUser.cardId) ||
+      a.name === curUser.name
+    ) || curUser;
+  } else {
+    // Mặc định sinh viên mẫu nếu chưa đăng nhập
+    dbUser = db.accounts.find(a => a.cardId === 'THE-5001102') || {
+      name: "Nguyễn Ngọc Hồng An",
+      staffId: "50.01.103.002",
+      cardId: "THE-5001102",
+      className: "50.01.SPTIN.B",
+      debt: 0
+    };
+  }
+
+  // 1. Cập nhật thông tin độc giả trên subheader dưới ribbon (Sửa lỗi hiển thị tên An khi đăng nhập Tài)
+  const readerInfoEl = document.getElementById('student-loans-reader-info');
+  if (readerInfoEl && dbUser) {
+    const mssv = dbUser.staffId || dbUser.username || '50.01.103.002';
+    const card = dbUser.cardId || 'THE-5001102';
+    const cls = dbUser.className ? ` · Lớp: ${dbUser.className}` : '';
+    readerInfoEl.textContent = `${dbUser.name} · MSSV: ${mssv} · Thẻ: ${card}${cls}`;
+  }
+
+  // 2. Lọc danh sách sách đang mượn CHÍNH XÁC của độc giả này
   let studentLoans = [];
-  if (sessionUser && sessionUser.role === 'DOC_GIA') {
-    studentLoans = db.activeLoans.filter(l => 
-      (l.readerCard && l.readerCard === (sessionUser.cardId || sessionUser.staffId || sessionUser.username)) ||
-      (l.readerName && l.readerName === sessionUser.name)
-    );
-  }
-  
-  if (studentLoans.length === 0) {
-    // Mặc định cho sinh viên mẫu Nguyễn Ngọc Hồng An
-    studentLoans = db.activeLoans.filter(l => 
-      l.readerCard === 'THE-5001102' || 
-      l.readerName === 'Nguyễn Ngọc Hồng An'
-    );
+  if (dbUser) {
+    const userCard = (dbUser.cardId || '').toUpperCase();
+    const userMssv = (dbUser.staffId || dbUser.username || '').toUpperCase();
+    const userName = (dbUser.name || '').trim().toLowerCase();
+
+    studentLoans = db.activeLoans.filter(l => {
+      const loanCard = (l.readerCard || '').toUpperCase();
+      const loanName = (l.readerName || '').trim().toLowerCase();
+      return (userCard && loanCard === userCard) ||
+             (userMssv && loanCard === userMssv) ||
+             (userName && loanName === userName);
+    });
   }
 
-  // Fallback nếu chưa có sách nào thì hiển thị WEB-001
-  if (studentLoans.length === 0 && db.activeLoans.some(l => l.copyCode === 'WEB-001')) {
-    studentLoans = db.activeLoans.filter(l => l.copyCode === 'WEB-001');
+  // Lưu ý: Tuyệt đối KHÔNG fallback sang sách của Hồng An nếu sinh viên này không mượn cuốn nào!
+  // Chỉ fallback nếu hệ thống hoàn toàn không có phiên người dùng đăng nhập nào.
+  if (!curUser && studentLoans.length === 0) {
+    studentLoans = db.activeLoans.filter(l => l.readerCard === 'THE-5001102' || l.readerName === 'Nguyễn Ngọc Hồng An');
   }
 
-  const currentTbody = document.getElementById('student-current-loans-tbody');
+  // 3. Tính toán các chỉ số động để hiển thị Banner điều kiện (3 Condition check badges)
+  const overdueLoans = studentLoans.filter(l => l.overdueDays > 0 || (l.statusBadge && l.statusBadge.includes('red')));
+  const isOverdue = overdueLoans.length > 0;
+  const debtAmt = Number(dbUser ? dbUser.debt : 0) || 0;
+  const hasDebt = debtAmt > 0;
+  const hasRenewed = studentLoans.some(l => l.renewed || (l.renewCount && l.renewCount >= 1));
+
+  const statusBannerEl = document.getElementById('student-loans-status-banner');
+  if (statusBannerEl) {
+    const hasIssue = isOverdue || hasDebt;
+    statusBannerEl.className = hasIssue ? 'alert-banner' : 'alert-banner alert-banner-success';
+    statusBannerEl.style.cssText = `display: flex; gap: 32px; background: ${hasIssue ? '#fef2f2' : '#f0fdf4'}; border: 1px solid ${hasIssue ? '#fecaca' : '#bbf7d0'}; margin-bottom: 24px; padding: 12px 18px; border-radius: 8px;`;
+
+    statusBannerEl.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: ${isOverdue ? '#dc2626' : '#16a34a'};">
+        <i class="fa-solid ${isOverdue ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i>
+        <span>${isOverdue ? `Có ${overdueLoans.length} cuốn quá hạn (${overdueLoans.map(o => o.copyCode).join(', ')})` : 'Sách còn hạn'}</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: ${hasDebt ? '#dc2626' : '#16a34a'};">
+        <i class="fa-solid ${hasDebt ? 'fa-circle-xmark' : 'fa-circle-check'}"></i>
+        <span>${hasDebt ? `Công nợ: ${debtAmt.toLocaleString()} đ (Thẻ tạm khóa)` : 'Công nợ: 0 đ'}</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: ${hasRenewed ? '#0284c7' : '#16a34a'};">
+        <i class="fa-solid ${hasRenewed ? 'fa-clock-rotate-left' : 'fa-circle-check'}"></i>
+        <span>${hasRenewed ? 'Đã gia hạn (1/1 lần)' : 'Chưa quá 1 lần gia hạn'}</span>
+      </div>
+    `;
+  }
+
+  // 4. Banner thông báo gia hạn thành công (Ảnh 20b)
   const alertContainer = document.getElementById('student-renew-success-alert');
-
-  // Kiểm tra xem có cuốn nào đã gia hạn không để hiện Alert banner (Ảnh 20b)
   const lastRenewedLoan = studentLoans.find(l => l.renewed);
   if (lastRenewedLoan) {
     if (alertContainer) {
@@ -192,29 +248,74 @@ export function renderStudentLoansScreen() {
       `;
     }
   } else {
-    if (alertContainer) {
-      alertContainer.style.display = 'none';
-    }
+    if (alertContainer) alertContainer.style.display = 'none';
   }
 
-  // Cập nhật số lượng sách đang giữ
+  // 5. Cập nhật số lượng sách đang giữ
   const descEl = document.querySelector('#screen-student-loans .hcmue-card-desc');
   if (descEl) {
     descEl.textContent = `Bạn đang giữ ${studentLoans.length}/3 cuốn. Gia hạn trực tuyến tối đa 1 lần cho mỗi lượt mượn.`;
   }
 
+  // 6. Bảng sách đang mượn hiện tại
+  const currentTbody = document.getElementById('student-current-loans-tbody');
   if (currentTbody) {
     if (studentLoans.length === 0) {
       currentTbody.innerHTML = `
         <tr>
-          <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">
-            Bạn hiện không có sách nào đang mượn.
+          <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px 16px;">
+            <i class="fa-solid fa-book-open" style="font-size: 28px; color: #cbd5e1; margin-bottom: 8px; display: block;"></i>
+            Bạn hiện không có sách nào đang mượn tại thư viện.
           </td>
         </tr>
       `;
     } else {
       currentTbody.innerHTML = studentLoans.map(loan => {
-        const isRenewed = !!loan.renewed;
+        const isRenewed = !!loan.renewed || (loan.renewCount && loan.renewCount >= 1);
+        const isLoanOverdue = loan.overdueDays > 0 || (loan.statusBadge && loan.statusBadge.includes('red'));
+
+        // Logic nút thao tác chuẩn nghiệp vụ & phòng chống lỗi
+        let actionBtnHtml = '';
+        if (isRenewed) {
+          actionBtnHtml = `
+            <button class="btn btn-sm" disabled style="background: #e2e8f0; color: #94a3b8; border-color: #cbd5e1; cursor: not-allowed;">
+              <i class="fa-solid fa-check"></i> Đã gia hạn
+            </button>
+          `;
+        } else if (isLoanOverdue) {
+          actionBtnHtml = `
+            <button class="btn btn-sm" disabled style="background: #fee2e2; color: #dc2626; border-color: #fca5a5; cursor: not-allowed;" title="Sách đã quá hạn, vui lòng mang sách đến quầy thư viện trả và nộp phạt!">
+              <i class="fa-solid fa-ban"></i> Quá hạn (Đến quầy)
+            </button>
+          `;
+        } else if (hasDebt) {
+          actionBtnHtml = `
+            <button class="btn btn-sm" disabled style="background: #fee2e2; color: #dc2626; border-color: #fca5a5; cursor: not-allowed;" title="Thẻ đang có công nợ tồn đọng (${debtAmt.toLocaleString()} đ). Vui lòng thanh toán tại quầy trước khi gia hạn!">
+              <i class="fa-solid fa-lock"></i> Thẻ nợ phạt
+            </button>
+          `;
+        } else {
+          actionBtnHtml = `
+            <button class="btn btn-primary btn-sm btn-student-renew" 
+              data-code="${escapeHTML(loan.copyCode)}"
+              onclick="window.handleStudentRenewBook('${escapeHTML(loan.copyCode)}')">
+              <i class="fa-solid fa-clock-rotate-left"></i> Gia hạn +7 ngày
+            </button>
+          `;
+        }
+
+        let badgeClass = 'badge-green';
+        let badgeText = loan.statusText || 'Còn trong hạn';
+        if (isRenewed) {
+          badgeClass = 'badge-green';
+          badgeText = 'Đã gia hạn +7 ngày';
+        } else if (isLoanOverdue) {
+          badgeClass = 'badge-red';
+          badgeText = `Quá hạn ${loan.overdueDays || 1} ngày`;
+        } else if (loan.statusBadge) {
+          badgeClass = loan.statusBadge;
+        }
+
         return `
           <tr>
             <td>
@@ -224,43 +325,53 @@ export function renderStudentLoansScreen() {
             <td>${escapeHTML(loan.borrowDate || '25/10/2026')}</td>
             <td><span class="cell-bold">${escapeHTML(loan.dueDate)}</span></td>
             <td>
-              <span class="badge ${isRenewed ? 'badge-green' : (loan.statusBadge || 'badge-green')}">
-                ${escapeHTML(isRenewed ? 'Đã gia hạn +7 ngày' : (loan.statusText || 'Còn trong hạn'))}
-              </span>
+              <span class="badge ${badgeClass}">${escapeHTML(badgeText)}</span>
             </td>
             <td>
               <span>${isRenewed ? '1/1 lần (Đã hết lượt)' : '0/1 lần'}</span>
             </td>
-            <td>
-              <button class="btn btn-primary btn-sm btn-student-renew" 
-                data-code="${escapeHTML(loan.copyCode)}"
-                ${isRenewed ? 'disabled style="background: #e2e8f0; color: #94a3b8; border-color: #cbd5e1; cursor: not-allowed;"' : ''} 
-                onclick="window.handleStudentRenewBook('${escapeHTML(loan.copyCode)}')">
-                ${isRenewed ? '<i class="fa-solid fa-check"></i> Đã gia hạn' : 'Gia hạn +7 ngày'}
-              </button>
-            </td>
+            <td>${actionBtnHtml}</td>
           </tr>
         `;
       }).join('');
     }
   }
 
-  // Render Lịch sử hoàn tất
+  // 7. Bảng Lịch sử mượn trả đã hoàn tất (Lọc chính xác theo độc giả này)
   const historyTbody = document.getElementById('student-history-tbody');
   if (historyTbody) {
-    historyTbody.innerHTML = db.studentHistory.map(h => `
-      <tr>
-        <td>
-          <div class="cell-bold">${escapeHTML(h.code)}</div>
-          <div class="cell-sub">${escapeHTML(h.title)}</div>
-        </td>
-        <td>${escapeHTML(h.borrowDate)}</td>
-        <td>${escapeHTML(h.returnDate)}</td>
-        <td><span class="badge ${h.statusBadge}">${escapeHTML(h.status)}</span></td>
-        <td>${escapeHTML(h.fee)}</td>
-        <td><span class="badge badge-gray">${escapeHTML(h.paymentStatus)}</span></td>
-      </tr>
-    `).join('');
+    const userHistory = (db.studentHistory || []).filter(h => {
+      if (!dbUser) return true;
+      const userCard = (dbUser.cardId || '').toUpperCase();
+      const hCard = (h.readerCard || '').toUpperCase();
+      const userName = (dbUser.name || '').trim().toLowerCase();
+      const hName = (h.readerName || '').trim().toLowerCase();
+      return (userCard && hCard === userCard) || (userName && hName === userName);
+    });
+
+    if (userHistory.length === 0) {
+      historyTbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px 16px;">
+            Độc giả chưa có giao dịch mượn trả nào hoàn tất trong lịch sử.
+          </td>
+        </tr>
+      `;
+    } else {
+      historyTbody.innerHTML = userHistory.map(h => `
+        <tr>
+          <td>
+            <div class="cell-bold">${escapeHTML(h.code)}</div>
+            <div class="cell-sub">${escapeHTML(h.title)}</div>
+          </td>
+          <td>${escapeHTML(h.borrowDate)}</td>
+          <td>${escapeHTML(h.returnDate)}</td>
+          <td><span class="badge ${h.statusBadge}">${escapeHTML(h.status)}</span></td>
+          <td>${escapeHTML(h.fee)}</td>
+          <td><span class="badge badge-gray">${escapeHTML(h.paymentStatus)}</span></td>
+        </tr>
+      `).join('');
+    }
   }
 }
 
@@ -272,7 +383,7 @@ export function executeStudentRenew(copyCode = 'WEB-001', onSuccess) {
   const db = getDB();
   const curUser = getCurrentUser();
   const acc = db.accounts.find(a => 
-    (curUser && (a.username === curUser.username || a.staffId === curUser.username)) ||
+    (curUser && (a.username === curUser.username || a.staffId === curUser.username || a.cardId === curUser.cardId || a.name === curUser.name)) ||
     a.cardId === 'THE-5001102'
   );
 
@@ -285,45 +396,32 @@ export function executeStudentRenew(copyCode = 'WEB-001', onSuccess) {
   }
 
   const existingLoan = db.activeLoans.find(l => l.copyCode.toUpperCase() === targetCode.toUpperCase());
-  if (existingLoan) {
-    // 2. Kiểm tra số lần gia hạn hiện tại: bắt buộc < 1 lần
-    if (existingLoan.renewed || (existingLoan.renewCount && existingLoan.renewCount >= 1)) {
-      if (window.showToast) {
-        window.showToast(`⛔ Cuốn sách [${targetCode}] đã gia hạn tối đa 1/1 lần quy định!`, 'warning');
-      }
-      return;
+  if (!existingLoan) {
+    if (window.showToast) {
+      window.showToast(`⚠️ Không tìm thấy bản ghi mượn của cuốn sách [${targetCode}]!`, 'warning');
     }
+    return;
+  }
 
-    // 3. Kiểm tra quá hạn: Nếu sách đã quá hạn -> từ chối gia hạn, yêu cầu nộp phạt tại quầy
-    if (existingLoan.overdueDays > 0 || (existingLoan.statusBadge && existingLoan.statusBadge.includes('red'))) {
-      if (window.showToast) {
-        window.showToast(`⛔ Không thể gia hạn: Cuốn sách [${targetCode}] đã quá hạn ${existingLoan.overdueDays} ngày. Vui lòng mang sách đến quầy trả và nộp phạt!`, 'error');
-      }
-      return;
+  // 2. Kiểm tra số lần gia hạn hiện tại: bắt buộc < 1 lần
+  if (existingLoan.renewed || (existingLoan.renewCount && existingLoan.renewCount >= 1)) {
+    if (window.showToast) {
+      window.showToast(`⛔ Cuốn sách [${targetCode}] đã gia hạn tối đa 1/1 lần quy định!`, 'warning');
     }
+    return;
+  }
+
+  // 3. Kiểm tra quá hạn: Nếu sách đã quá hạn -> từ chối gia hạn, yêu cầu nộp phạt tại quầy
+  if (existingLoan.overdueDays > 0 || (existingLoan.statusBadge && existingLoan.statusBadge.includes('red'))) {
+    if (window.showToast) {
+      window.showToast(`⛔ Không thể gia hạn: Cuốn sách [${targetCode}] đã quá hạn ${existingLoan.overdueDays} ngày. Vui lòng mang sách đến quầy trả và nộp phạt!`, 'error');
+    }
+    return;
   }
 
   mutateDB(draft => {
     let loan = draft.activeLoans.find(l => l.copyCode.toUpperCase() === targetCode.toUpperCase());
-    if (!loan) {
-      loan = {
-        id: "LOAN-004",
-        copyCode: targetCode,
-        titleName: "Lập trình Web nâng cao",
-        readerName: "Nguyễn Ngọc Hồng An",
-        readerCard: "THE-5001102",
-        readerClass: "50.01.SPTIN.B",
-        borrowDate: "25/10/2026",
-        dueDate: "08/11/2026",
-        overdueDays: 0,
-        statusBadge: "badge-green",
-        statusText: "Trong hạn",
-        actionText: "Xem lượt mượn"
-      };
-      draft.activeLoans.push(loan);
-    }
-
-    if (!loan.renewed) {
+    if (loan && !loan.renewed) {
       let nextDateStr = '15/11/2026';
       try {
         const parts = loan.dueDate.split('/');

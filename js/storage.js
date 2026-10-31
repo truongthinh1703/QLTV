@@ -160,13 +160,23 @@ export function sanitizeDB(dbData) {
 
   // 4. Tự động đồng bộ chuẩn MSSV / Mã thẻ Chương 4 (THE-5001108 -> THE-50011065, THE-5001104 -> THE-50011077)
   if (Array.isArray(dbData.accounts)) {
+    dbData.accounts.forEach(a => {
+      // Đảm bảo sinh viên có thể đăng nhập xem lịch sử cá nhân (cardStatus vẫn là TAM_KHOA_NO)
+      if (a.role === 'DOC_GIA' && a.status === 'KHOA' && a.cardStatus === 'TAM_KHOA_NO') {
+        a.status = 'KICH_HOAT';
+        modified = true;
+      }
+    });
+
     const tai = dbData.accounts.find(a => a.name === "Nguyễn Đức Anh Tài");
-    if (tai && (tai.cardId === "THE-5001108" || tai.username === "50.01.103.108")) {
+    if (tai && (tai.cardId === "THE-5001108" || tai.username === "50.01.103.108" || tai.status === "KHOA")) {
       tai.id = "50.01.103.065";
       tai.username = "50.01.103.065";
       tai.staffId = "50.01.103.065";
       tai.cardId = "THE-50011065";
       tai.className = "50.01.SPTIN.B";
+      tai.status = "KICH_HOAT";
+      tai.cardStatus = "TAM_KHOA_NO";
       modified = true;
     }
     const tran = dbData.accounts.find(a => a.name === "Huỳnh Nguyễn Huyền Trân");
@@ -176,6 +186,35 @@ export function sanitizeDB(dbData) {
       tran.staffId = "50.01.103.077";
       tran.cardId = "THE-50011077";
       tran.className = "50.01.SPTIN.B";
+      modified = true;
+    }
+  }
+
+  // 5. Tự động cập nhật readerCard cho studentHistory
+  if (Array.isArray(dbData.studentHistory)) {
+    dbData.studentHistory.forEach(h => {
+      if (!h.readerCard) {
+        if (h.code && (h.code.includes('CTDL-003') || h.code.includes('OOP-002'))) {
+          h.readerCard = "THE-5001102";
+          h.readerName = "Nguyễn Ngọc Hồng An";
+          modified = true;
+        }
+      }
+    });
+    // Đảm bảo có lịch sử cho Tài nếu chưa có
+    if (!dbData.studentHistory.some(h => h.readerCard === "THE-50011065")) {
+      dbData.studentHistory.push({
+        readerCard: "THE-50011065",
+        readerName: "Nguyễn Đức Anh Tài",
+        code: "PM-2026-012 · GT1-001",
+        title: "Giải tích 1",
+        borrowDate: "05/09/2026",
+        returnDate: "19/09/2026",
+        status: "Trả đúng hạn",
+        statusBadge: "badge-green",
+        fee: "0 đ",
+        paymentStatus: "Đã hoàn tất"
+      });
       modified = true;
     }
   }

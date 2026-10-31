@@ -1619,6 +1619,21 @@ export function executeReturnBook(asDebt = false, onDone) {
         }
       }
     }
+
+    // 5. Đồng bộ vào Lịch sử mượn - trả cá nhân của độc giả (Screen 20)
+    draft.studentHistory = draft.studentHistory || [];
+    draft.studentHistory.unshift({
+      readerCard: loan.readerCard,
+      readerName: loan.readerName,
+      code: `${loan.id || 'PM-2026-' + Math.floor(100 + Math.random() * 900)} · ${loan.copyCode}`,
+      title: loan.titleName,
+      borrowDate: loan.borrowDate || "13/10/2026",
+      returnDate: "28/10/2026",
+      status: selectedConditionIndex === 0 ? (loan.overdueDays > 0 ? `Quá hạn ${loan.overdueDays} ngày` : "Trả đúng hạn") : (selectedConditionIndex === 1 ? "Hư hỏng" : "Đã mất"),
+      statusBadge: selectedConditionIndex === 0 ? (loan.overdueDays > 0 ? "badge-red" : "badge-green") : "badge-purple",
+      fee: `${totalFee.toLocaleString()} đ`,
+      paymentStatus: asDebt ? "Ghi nhận công nợ" : "Đã tất toán biên lai"
+    });
   }, 'RETURN_BOOK');
 
   if (onDone) onDone(totalFee, asDebt);

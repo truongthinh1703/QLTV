@@ -112,8 +112,8 @@
 
               <!-- Phím tắt đăng nhập nhanh (Quick Login Chips - UC01) -->
               <div class="quick-login-chips">
-                <div class="quick-login-title"><i class="fa-solid fa-bolt" style="color: var(--hcmue-orange);"></i> Đăng nhập nhanh 1-Click đối soát:</div>
-                <div class="chips-container">
+                <div class="quick-login-title"><i class="fa-solid fa-bolt" style="color: var(--hcmue-orange);"></i> Đăng nhập nhanh 1-Click đối soát mọi vai trò:</div>
+                <div class="chips-container" style="display: flex; flex-wrap: wrap; gap: 8px;">
                   <div class="quick-chip" onclick="window.quickLogin('thuthu01', '123456')">
                     <span><strong>Thủ thư:</strong> thuthu01 (Nguyễn Trường Thịnh)</span>
                     <span class="badge badge-blue">Ca 1</span>
@@ -123,8 +123,16 @@
                     <span class="badge badge-purple">Admin</span>
                   </div>
                   <div class="quick-chip" onclick="window.quickLogin('50.01.103.002', '123456')">
-                    <span><strong>Sinh viên:</strong> 50.01.103.002 (Nguyễn Ngọc Hồng An)</span>
-                    <span class="badge badge-green">Sinh viên</span>
+                    <span><strong>Sinh viên:</strong> 50.01.103.002 (Hồng An)</span>
+                    <span class="badge badge-green">Còn hạn · Nợ 0đ</span>
+                  </div>
+                  <div class="quick-chip" onclick="window.quickLogin('50.01.103.065', '123456')">
+                    <span><strong>Sinh viên:</strong> 50.01.103.065 (Anh Tài)</span>
+                    <span class="badge badge-red">Quá hạn · Nợ 180k</span>
+                  </div>
+                  <div class="quick-chip" onclick="window.quickLogin('50.01.103.077', '123456')">
+                    <span><strong>Sinh viên:</strong> 50.01.103.077 (Huyền Trân)</span>
+                    <span class="badge badge-yellow">Còn 1 ngày</span>
                   </div>
                 </div>
               </div>
@@ -1408,10 +1416,10 @@
           <!-- --------------------------------------------------------------- -->
           <div id="screen-student-loans" class="app-screen">
             <div class="page-title-ribbon">SÁCH ĐANG MƯỢN & LỊCH SỬ CÁ NHÂN</div>
-            <div class="page-subtitle">Nguyễn Ngọc Hồng An · MSSV: 50.01.103.002 · Thẻ: THE-5001102</div>
+            <div class="page-subtitle" id="student-loans-reader-info">Nguyễn Ngọc Hồng An · MSSV: 50.01.103.002 · Thẻ: THE-5001102</div>
 
             <!-- 3 Condition check badges -->
-            <div class="alert-banner alert-banner-success" style="display: flex; gap: 32px; background: #f0fdf4; border-color: #bbf7d0;">
+            <div id="student-loans-status-banner" class="alert-banner alert-banner-success" style="display: flex; gap: 32px; background: #f0fdf4; border-color: #bbf7d0;">
               <div style="display: flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-circle-check"></i> <span>Sách còn hạn</span>
               </div>

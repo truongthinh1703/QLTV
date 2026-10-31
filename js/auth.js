@@ -78,9 +78,9 @@ export function handleLogin(username, password, callbacks) {
     return;
   }
 
-  // 3. Kiểm tra trạng thái khóa tài khoản hoặc thẻ nợ phạt
-  if (user.status === 'KHOA' || user.cardStatus === 'TAM_KHOA_NO') {
-    onError(`⚠️ Tài khoản ${user.name} đang bị tạm khóa do vi phạm hoặc nợ phạt quá hạn (${Number(user.debt).toLocaleString()} đ). Vui lòng liên hệ Quầy Thủ thư để được hỗ trợ mở khóa thẻ!`);
+  // 3. Kiểm tra trạng thái khóa tài khoản hệ thống bởi Quản trị viên (UC04)
+  if (user.status === 'KHOA') {
+    onError(`⚠️ Tài khoản ${user.name} đã bị Quản trị viên vô hiệu hóa. Vui lòng liên hệ Trung tâm Thư viện để được hỗ trợ!`);
     return;
   }
 
