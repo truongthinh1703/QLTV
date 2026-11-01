@@ -188,4 +188,97 @@ Chỉ cần bổ sung các thẻ script CDN vào thẻ `<head>` của `index.htm
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 ```
 
-> **Ghi chú an toàn:** File prompt này được tạo độc lập tại thư mục `prompt web/`. Bạn có thể gửi kèm file này cho Antigravity IDE khi cần bật các tính năng nâng cao mà không làm ảnh hưởng đến bất kỳ dòng code hoặc cấu trúc nào đã hoàn thiện trước đó.
+---
+
+### V. ĐẶC TẢ CHI TIẾT MODAL CẤP THẺ ĐỘC GIẢ MỚI (UC11) & TỰ ĐỘNG ĐỒNG BỘ TÀI KHOẢN ADMIN (UC04)
+
+Khắc phục lỗi hiện tại: Nút `[ + CẤP THẺ ĐỘC GIẢ MỚI ]` ở Màn hình 14 (UC11) đang gọi hàm toast tĩnh (`window.showToast('Mo form cap the moi', 'info')`) mà chưa bật popup modal thực tế. Yêu cầu hệ thống phải xây dựng Modal cấp thẻ đầy đủ và kích hoạt cơ chế đồng bộ nguyên tử (Atomic Synchronization) giữa **Thẻ độc giả của Thủ thư** và **Tài khoản người dùng của Quản trị viên**:
+
+#### 1. Giao diện Modal Cấp Thẻ Độc Giả Mới (Modal ID: `#modal-create-reader-card`):
+* **Cấu trúc khung Modal:**
+  - Khung modal rộng 600px, bo góc 14px, đổ bóng sâu, viền nhẹ `#E2E8F0`.
+  - Header (Nền xanh Navy `#16375C`, chữ trắng):
+    + Tiêu đề: `🪪 CẤP THẺ ĐỘC GIẢ MỚI & KHỞI TẠO TÀI KHOẢN (UC11)`
+    + Nút `✕` màu trắng ở góc phải trên cùng để đóng modal (`closeModal('modal-create-reader-card')`).
+  - Dòng mô tả nhỏ: *"Nhập thông tin độc giả tại quầy. Hệ thống sẽ tự động cấp Mã thẻ thư viện và đồng bộ Tài khoản Cổng sinh viên."*
+
+* **Các trường nhập liệu trong Form (`<form id="form-create-reader-card">`):**
+  1. **Mã số sinh viên / Cán bộ (MSSV):** (Bắt buộc, `input type="text"`, placeholder: `50.01.103.xxx`). Có kiểm tra chống trùng lặp dữ liệu.
+  2. **Họ và tên độc giả:** (Bắt buộc, `input type="text"`, placeholder: `Nguyễn Văn A`).
+  3. **Khoa / Đơn vị:** (Thẻ `<select>` gồm các tùy chọn: Khoa Công nghệ Thông tin, Khoa Toán - Tin học, Khoa Ngoại ngữ, Khoa Ngữ văn, Khoa Vật lý, Khoa Hóa học...).
+  4. **Lớp sinh hoạt:** (`input type="text"`, placeholder: `50.01.SPTIN.A`).
+  5. **Email liên hệ:** (`input type="email"`, tự động gợi ý theo cú pháp `[mssv]@student.hcmue.edu.vn`).
+  6. **Số điện thoại:** (`input type="tel"`, placeholder: `09xxxxxxxx`).
+  7. **Thời hạn thẻ:**
+     - Ngày cấp: Tự động điền ngày hiện tại (Read-only, VD: `28/10/2026`).
+     - Ngày hết hạn: Mặc định cộng thêm 4 năm theo niên khóa đại học (VD: `30/06/2030`), cho phép thủ thư tùy chỉnh.
+
+* **Khung Tự Động Khởi Tạo Tài Khoản (Auto-provisioning Info Box):**
+  - Khung box màu xanh nhạt (`background: #EFF6FF; border: 1px dashed #3B82F6; padding: 12px; border-radius: 8px; margin-top: 15px;`):
+    * 🔑 **Tên đăng nhập Cổng sinh viên:** Tự động lấy theo MSSV (Read-only).
+    * 🔒 **Mật khẩu khởi tạo:** Mặc định `123456` (Sinh viên sẽ được nhắc đổi mật khẩu ở lần đăng nhập đầu tiên theo UC03).
+    * 🪪 **Mã thẻ thư viện tự sinh:** `THE-[MSSV]` (hoặc số thứ tự tự tăng tiếp theo).
+    * 🛡️ **Quyền hạn hệ thống:** `DOC_GIA` (Chỉ truy cập Cổng tra cứu & Tự gia hạn).
+
+* **Footer Modal:**
+  - Nút 1: `[ Hủy bỏ ]` (Viền xám, click vào đóng modal).
+  - Nút 2: `[ 💾 XÁC NHẬN CẤP THẺ & TẠO TÀI KHOẢN ]` (Nền xanh Navy `#16375C`, icon check, chữ in hoa đậm).
+
+#### 2. Logic Đồng Bộ Dữ Liệu Đồng Thời (Two-Way Reactivity & State Consistency):
+Khi Thủ thư bấm **`[ 💾 XÁC NHẬN CẤP THẺ & TẠO TÀI KHOẢN ]`**, hàm `handleCreateReaderCardSubmit()` bắt buộc thực thi tuần tự các bước:
+
+1. **Kiểm tra hợp lệ & Chống trùng (Validation):**
+   - Kiểm tra các trường MSSV, Họ tên, Email không được rỗng.
+   - Kiểm tra trong `HCMUE_DB.data.readers` và `HCMUE_DB.data.accounts`: Nếu `username` hoặc `mssv` này đã tồn tại $\rightarrow$ Hiển thị thông báo lỗi màu đỏ: `"❌ Mã sinh viên này đã được cấp thẻ trước đó!"` và dừng xử lý.
+
+2. **Thực thi Giao tác Nguyên tử (Atomic Transaction):**
+   - **Tạo Thẻ độc giả (Lưu vào `HCMUE_DB.data.readers`):**
+     ```javascript
+     const newCard = {
+         cardId: `THE-${mssv.slice(-7)}`, // Ví dụ THE-5001188
+         name: hoTen,
+         staffId: mssv,
+         email: email,
+         className: lop,
+         department: khoa,
+         issueDate: currentDateStr,
+         expiryDate: expiryDateStr,
+         statusBadge: 'badge-green',
+         cardStatus: 'HOAT_DONG', // Trạng thái thẻ sẵn sàng mượn sách
+         borrowCount: 0,
+         totalDebt: 0
+     };
+     HCMUE_DB.data.readers.unshift(newCard);
+     ```
+   - **Tự động Khởi tạo Tài khoản Web (Lưu vào `HCMUE_DB.data.accounts` - ĐỒNG BỘ SANG ADMIN):**
+     ```javascript
+     const newAccount = {
+         id: mssv,
+         username: mssv,
+         password: '123456', // Mật khẩu mặc định khởi tạo
+         name: hoTen,
+         email: email,
+         role: 'DOC_GIA',    // Gán vai trò Độc giả sinh viên
+         status: 'KICH_HOAT',// Tài khoản hoạt động bình thường
+         cardId: newCard.cardId,
+         createdAt: new Date().toISOString()
+     };
+     HCMUE_DB.data.accounts.unshift(newAccount);
+     ```
+
+3. **Lưu Bền Vững & Phát Tín Hiệu Đồng Bộ Toàn Cục:**
+   - Ghi vào LocalStorage: `localStorage.setItem('HCMUE_LIBRARY_DB', JSON.stringify(HCMUE_DB.data));`
+   - Kích hoạt sự kiện:
+     ```javascript
+     window.dispatchEvent(new CustomEvent('hcmue:data-changed', {
+         detail: { action: 'READER_CARD_CREATED', payload: { card: newCard, account: newAccount } }
+     }));
+     ```
+
+4. **Hiệu ứng Đồng Bộ Đa Màn Hình:**
+   - **Tại Màn hình 14 (Thủ thư):** Danh sách thẻ độc giả tự động re-render, dòng thẻ mới của sinh viên xuất hiện ngay trên đầu với trạng thái badge xanh lá `[Hoạt động]`.
+   - **Tại Màn hình 15 (Quản trị viên - UC04):** Bảng Quản trị tài khoản tự động xuất hiện tài khoản mới của sinh viên đó với vai trò `DOC_GIA`, Admin có thể xem, đổi mật khẩu hoặc giám sát.
+   - **Tại Màn hình Đăng nhập (UC01):** Sinh viên có thể dùng ngay `MSSV` vừa tạo và mật khẩu `123456` để đăng nhập thẳng vào Cổng sinh viên (Màn hình 19, 20) mà không gặp bất kỳ lỗi nào.
+   - **Tại Quầy mượn sách (UC12):** Quét mã thẻ mới tạo `THE-xxxx` hệ thống nhận diện được ngay lập tức với 4 tích xanh hợp lệ!
+   - Đóng modal, phát hiệu ứng pháo giấy confetti và hiển thị toast: `"🎉 Đã cấp thẻ [MÃ_THẺ] và kích hoạt tài khoản sinh viên thành công!"`.
+

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cổng Thông Tin Quản Lý Thư Viện - Trường Đại học Sư phạm TP.HCM (HCMUE)</title>
-  
+
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/logo-hcmue.png">
 
@@ -26,6 +27,7 @@
   <!-- Canvas Confetti CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 </head>
+
 <body>
 
   <div id="app-root">
@@ -35,29 +37,31 @@
     <!-- ===================================================================== -->
     <div id="auth-fullscreen-layout" class="fullscreen-view">
       <div class="auth-split-layout">
-        
+
         <!-- Left Side: Campus Banner & HCMUE Branding -->
         <div class="auth-banner-side">
           <div class="auth-banner-overlay"></div>
           <div class="auth-banner-content">
             <div class="auth-banner-tag">THƯ VIỆN HCMUE</div>
             <h1 class="auth-banner-title">Tri thức mở đường.<br>Kết nối tương lai.</h1>
-            <p class="auth-banner-desc">Không gian học tập và nghiên cứu của cộng đồng Trường Đại học Sư phạm Thành phố Hồ Chí Minh.</p>
+            <p class="auth-banner-desc">Không gian học tập và nghiên cứu của cộng đồng Trường Đại học Sư phạm Thành phố
+              Hồ Chí Minh.</p>
             <div class="auth-banner-address">280 An Dương Vương, Phường 4, Quận 5, TP. Hồ Chí Minh</div>
           </div>
         </div>
 
         <!-- Right Side: Forms Container -->
         <div class="auth-form-side">
-          
+
           <!-- Header Brand -->
           <div class="auth-header-brand">
             <div class="auth-logo-badge">
               <img src="assets/logo-hcmue.png" alt="HCMUE Logo" class="logo-img">
               <div class="vn-flag" title="Quốc kỳ Việt Nam">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600">
-                  <rect width="900" height="600" fill="#DA251D"/>
-                  <polygon fill="#FFFF00" points="450,120 490.4,244.4 621.2,244.4 515.4,321.2 555.8,445.6 450,368.8 344.2,445.6 384.6,321.2 278.8,244.4 409.6,244.4"/>
+                  <rect width="900" height="600" fill="#DA251D" />
+                  <polygon fill="#FFFF00"
+                    points="450,120 490.4,244.4 621.2,244.4 515.4,321.2 555.8,445.6 450,368.8 344.2,445.6 384.6,321.2 278.8,244.4 409.6,244.4" />
                 </svg>
               </div>
             </div>
@@ -72,14 +76,16 @@
               <div class="login-card-desc">Nhập tài khoản định danh thư viện</div>
 
               <!-- Alert error message -->
-              <div id="login-error-alert" class="alert-banner alert-banner-danger" style="display: none; margin-bottom: 16px;"></div>
+              <div id="login-error-alert" class="alert-banner alert-banner-danger"
+                style="display: none; margin-bottom: 16px;"></div>
 
               <form id="login-form">
                 <!-- Username -->
                 <div class="form-group">
                   <div class="floating-input-wrap">
                     <span class="floating-label">Tên đăng nhập / Mã thẻ</span>
-                    <input type="text" id="login-username-input" class="floating-input" placeholder="Ví dụ thuthu01, admin01, 50.01.103.002" required autocomplete="username">
+                    <input type="text" id="login-username-input" class="floating-input"
+                      placeholder="Ví dụ thuthu01, admin01, 50.01.103.002" required autocomplete="username">
                     <i class="fa-regular fa-user input-icon-right"></i>
                   </div>
                 </div>
@@ -88,7 +94,8 @@
                 <div class="form-group" style="margin-top: 18px;">
                   <div class="floating-input-wrap">
                     <span class="floating-label">Mật khẩu</span>
-                    <input type="password" id="login-password-input" class="floating-input" placeholder="Nhập mật khẩu" required autocomplete="current-password">
+                    <input type="password" id="login-password-input" class="floating-input" placeholder="Nhập mật khẩu"
+                      required autocomplete="current-password">
                     <i class="fa-regular fa-eye-slash input-icon-right" id="toggle-login-pass" onclick="
                       const p = document.getElementById('login-password-input');
                       p.type = p.type === 'password' ? 'text' : 'password';
@@ -102,17 +109,20 @@
                   <label class="checkbox-label">
                     <input type="checkbox" checked style="accent-color: var(--hcmue-navy);"> Ghi nhớ phiên đăng nhập
                   </label>
-                  <a href="javascript:void(0)" class="forgot-link" onclick="window.switchScreen('screen-forgot')">Quên mật khẩu?</a>
+                  <a href="javascript:void(0)" class="forgot-link" onclick="window.switchScreen('screen-forgot')">Quên
+                    mật khẩu?</a>
                 </div>
 
-                <button type="submit" id="btn-submit-login" class="btn btn-primary btn-block btn-lg" style="letter-spacing: 0.5px;">
+                <button type="submit" id="btn-submit-login" class="btn btn-primary btn-block btn-lg"
+                  style="letter-spacing: 0.5px;">
                   ĐĂNG NHẬP
                 </button>
               </form>
 
               <!-- Phím tắt đăng nhập nhanh (Quick Login Chips - UC01) -->
               <div class="quick-login-chips">
-                <div class="quick-login-title"><i class="fa-solid fa-bolt" style="color: var(--hcmue-orange);"></i> Đăng nhập nhanh 1-Click đối soát mọi vai trò:</div>
+                <div class="quick-login-title"><i class="fa-solid fa-bolt" style="color: var(--hcmue-orange);"></i> Đăng
+                  nhập nhanh 1-Click đối soát mọi vai trò:</div>
                 <div class="chips-container" style="display: flex; flex-wrap: wrap; gap: 8px;">
                   <div class="quick-chip" onclick="window.quickLogin('thuthu01', '123456')">
                     <span><strong>Thủ thư:</strong> thuthu01 (Nguyễn Trường Thịnh)</span>
@@ -144,7 +154,8 @@
           <div id="screen-forgot" class="app-screen">
             <div class="login-card-container">
               <div class="login-card-title">QUÊN MẬT KHẨU</div>
-              <div class="login-card-desc">Vui lòng nhập Mã số định danh và Email trường cấp để nhận liên kết khôi phục mật khẩu</div>
+              <div class="login-card-desc">Vui lòng nhập Mã số định danh và Email trường cấp để nhận liên kết khôi phục
+                mật khẩu</div>
 
               <form onsubmit="
                 event.preventDefault();
@@ -210,7 +221,9 @@
 
         <div class="topbar-right">
           <!-- Nút Reset Dữ Liệu Đối Soát Gốc Chuẩn -->
-          <button class="btn btn-sm btn-outline" style="border-color: rgba(255,255,255,0.3); color: #fff; background: rgba(255,255,255,0.08);" onclick="window.handleResetSeedData()" title="Khôi phục trạng thái chuẩn ban đầu lúc chấm bài">
+          <button class="btn btn-sm btn-outline"
+            style="border-color: rgba(255,255,255,0.3); color: #fff; background: rgba(255,255,255,0.08);"
+            onclick="window.handleResetSeedData()" title="Khôi phục trạng thái chuẩn ban đầu lúc chấm bài">
             <i class="fa-solid fa-arrows-rotate"></i> Reset CSDL Chuẩn
           </button>
 
@@ -240,10 +253,12 @@
 
       <!-- Student 2-Tab Navigation Bar (Chỉ hiển thị khi vai trò DOC_GIA) -->
       <nav id="student-subnav-bar" class="student-subnav-bar" style="display: none;">
-        <a href="javascript:void(0)" class="student-nav-tab active" data-target="screen-student-search" onclick="window.switchScreen('screen-student-search')">
+        <a href="javascript:void(0)" class="student-nav-tab active" data-target="screen-student-search"
+          onclick="window.switchScreen('screen-student-search')">
           <i class="fa-solid fa-magnifying-glass"></i> Tra cứu tài liệu
         </a>
-        <a href="javascript:void(0)" class="student-nav-tab" data-target="screen-student-loans" onclick="window.switchScreen('screen-student-loans')">
+        <a href="javascript:void(0)" class="student-nav-tab" data-target="screen-student-loans"
+          onclick="window.switchScreen('screen-student-loans')">
           <i class="fa-solid fa-clock-rotate-left"></i> Sách đang mượn & Lịch sử cá nhân
         </a>
       </nav>
@@ -255,7 +270,7 @@
         <!-- 2A. SIDEBAR THỦ THƯ (9 MENU TÁC NGHIỆP - ẨN MENU ADMIN)           -->
         <!-- ================================================================= -->
         <aside id="sidebar-librarian" class="app-sidebar">
-          
+
           <div class="sidebar-profile-card">
             <div class="sidebar-profile-row">
               <div class="sidebar-avatar-circle">TT</div>
@@ -270,47 +285,56 @@
           <div class="sidebar-section-title">TÁC NGHIỆP THỦ THƯ</div>
           <ul class="sidebar-menu">
             <li>
-              <a href="javascript:void(0)" class="sidebar-menu-item active" data-target="screen-dashboard" onclick="window.switchScreen('screen-dashboard')">
+              <a href="javascript:void(0)" class="sidebar-menu-item active" data-target="screen-dashboard"
+                onclick="window.switchScreen('screen-dashboard')">
                 <i class="fa-solid fa-gauge"></i> <span>Bảng điều khiển</span>
               </a>
             </li>
             <li>
-              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-borrow" onclick="window.switchScreen('screen-borrow')">
+              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-borrow"
+                onclick="window.switchScreen('screen-borrow')">
                 <i class="fa-solid fa-file-circle-plus"></i> <span>Lập phiếu mượn</span>
               </a>
             </li>
             <li>
-              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-return" onclick="window.switchScreen('screen-return')">
+              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-return"
+                onclick="window.switchScreen('screen-return')">
                 <i class="fa-solid fa-file-import"></i> <span>Tiếp nhận trả</span>
               </a>
             </li>
             <li>
-              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-debts" onclick="window.switchScreen('screen-debts')">
+              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-debts"
+                onclick="window.switchScreen('screen-debts')">
                 <i class="fa-solid fa-hand-holding-dollar"></i> <span>Thu nợ phạt</span>
               </a>
             </li>
             <li>
-              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-titles" onclick="window.switchScreen('screen-titles')">
+              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-titles"
+                onclick="window.switchScreen('screen-titles')">
                 <i class="fa-solid fa-book-bookmark"></i> <span>Đầu sách mẹ</span>
               </a>
             </li>
             <li>
-              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-copies" onclick="window.switchScreen('screen-copies')">
+              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-copies"
+                onclick="window.switchScreen('screen-copies')">
                 <i class="fa-solid fa-barcode"></i> <span>Bản sao vật lý</span>
               </a>
             </li>
             <li>
-              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-categories" onclick="window.switchScreen('screen-categories')">
+              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-categories"
+                onclick="window.switchScreen('screen-categories')">
                 <i class="fa-solid fa-layer-group"></i> <span>Thể loại sách</span>
               </a>
             </li>
             <li>
-              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-inventory" onclick="window.switchScreen('screen-inventory')">
+              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-inventory"
+                onclick="window.switchScreen('screen-inventory')">
                 <i class="fa-solid fa-boxes-stacked"></i> <span>Kiểm kê kho</span>
               </a>
             </li>
             <li>
-              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-readers" onclick="window.switchScreen('screen-readers')">
+              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-readers"
+                onclick="window.switchScreen('screen-readers')">
                 <i class="fa-solid fa-id-card"></i> <span>Thẻ độc giả</span>
               </a>
             </li>
@@ -327,7 +351,7 @@
         <!-- 2B. SIDEBAR QUẢN TRỊ VIÊN (4 MENU ADMIN + GIÁM SÁT)               -->
         <!-- ================================================================= -->
         <aside id="sidebar-admin" class="app-sidebar" style="display: none;">
-          
+
           <div class="sidebar-profile-card">
             <div class="sidebar-profile-row">
               <div class="sidebar-avatar-circle admin">AD</div>
@@ -342,22 +366,26 @@
           <div class="sidebar-section-title">QUẢN TRỊ HỆ THỐNG</div>
           <ul class="sidebar-menu">
             <li>
-              <a href="javascript:void(0)" class="sidebar-menu-item active" data-target="screen-accounts" onclick="window.switchScreen('screen-accounts')">
+              <a href="javascript:void(0)" class="sidebar-menu-item active" data-target="screen-accounts"
+                onclick="window.switchScreen('screen-accounts')">
                 <i class="fa-solid fa-users-gear"></i> <span>Quản lý tài khoản</span>
               </a>
             </li>
             <li>
-              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-config" onclick="window.switchScreen('screen-config')">
+              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-config"
+                onclick="window.switchScreen('screen-config')">
                 <i class="fa-solid fa-sliders"></i> <span>Cấu hình tham số</span>
               </a>
             </li>
             <li>
-              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-backup" onclick="window.switchScreen('screen-backup')">
+              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-backup"
+                onclick="window.switchScreen('screen-backup')">
                 <i class="fa-solid fa-database"></i> <span>Sao lưu CSDL</span>
               </a>
             </li>
             <li>
-              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-reports" onclick="window.switchScreen('screen-reports')">
+              <a href="javascript:void(0)" class="sidebar-menu-item" data-target="screen-reports"
+                onclick="window.switchScreen('screen-reports')">
                 <i class="fa-solid fa-chart-column"></i> <span>Báo cáo & Thống kê</span>
               </a>
             </li>
@@ -462,7 +490,8 @@
             <!-- Truy cập nhanh Bar -->
             <div class="quick-action-bar">
               <span class="quick-action-title">TRUY CẬP NHANH</span>
-              <button class="btn btn-primary" style="background: var(--hcmue-navy);" onclick="window.switchScreen('screen-borrow')">
+              <button class="btn btn-primary" style="background: var(--hcmue-navy);"
+                onclick="window.switchScreen('screen-borrow')">
                 <i class="fa-solid fa-plus"></i> Lập phiếu mượn
               </button>
               <button class="btn btn-outline" onclick="window.switchScreen('screen-return')">
@@ -484,11 +513,11 @@
             <div class="page-subtitle">Xác thực độc giả và kiểm tra bản sao trước khi lập phiếu mượn.</div>
 
             <div class="borrow-grid-layout">
-              
+
               <!-- Left Column: Xác thực thẻ độc giả -->
               <div class="hcmue-card">
                 <div class="hcmue-card-title" style="margin-bottom: 16px;">XÁC THỰC THẺ ĐỘC GIẢ</div>
-                
+
                 <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                   <div class="floating-input-wrap" style="flex: 1;">
                     <span class="floating-label">Mã thẻ độc giả</span>
@@ -502,7 +531,8 @@
 
                 <!-- Checklist 4 quy tắc -->
                 <div style="margin-top: 24px;">
-                  <div class="cell-bold" style="margin-bottom: 12px; font-size: 13px;">KIỂM ĐỊNH 4 QUY TẮC NGHIỆP VỤ</div>
+                  <div class="cell-bold" style="margin-bottom: 12px; font-size: 13px;">KIỂM ĐỊNH 4 QUY TẮC NGHIỆP VỤ
+                  </div>
                   <div id="borrow-rules-checklist" class="reader-rule-checklist"></div>
                 </div>
               </div>
@@ -514,7 +544,8 @@
                 <div class="form-group">
                   <div class="floating-input-wrap">
                     <span class="floating-label">Nhập mã bản sao</span>
-                    <input type="text" id="borrow-copy-input" class="floating-input" placeholder="CNPM-002 hoặc CSDL-004">
+                    <input type="text" id="borrow-copy-input" class="floating-input"
+                      placeholder="CNPM-002 hoặc CSDL-004">
                   </div>
                 </div>
 
@@ -549,9 +580,11 @@
                     </div>
                   </div>
 
-                  <div id="borrow-eligible-banner" class="alert-banner alert-banner-success" style="margin-bottom: 20px;"></div>
+                  <div id="borrow-eligible-banner" class="alert-banner alert-banner-success"
+                    style="margin-bottom: 20px;"></div>
 
-                  <button class="btn btn-primary btn-block btn-lg" id="btn-confirm-borrow" onclick="window.handleConfirmBorrowSubmit()">
+                  <button class="btn btn-primary btn-block btn-lg" id="btn-confirm-borrow"
+                    onclick="window.handleConfirmBorrowSubmit()">
                     XÁC NHẬN TẠO PHIẾU MƯỢN
                   </button>
                 </div>
@@ -572,14 +605,13 @@
             <div class="return-search-bar-wrap">
               <div class="return-search-input-box">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="return-copy-input" class="return-search-input" 
-                       placeholder="Nhập mã bản sao / Mã thẻ / Tên độc giả / Tên sách..." 
-                       value=""
-                       autocomplete="off"
-                       oninput="window.handleReturnSearchInput(this.value)"
-                       onfocus="window.handleReturnSearchInput(this.value)">
+                <input type="text" id="return-copy-input" class="return-search-input"
+                  placeholder="Nhập mã bản sao / Mã thẻ / Tên độc giả / Tên sách..." value="" autocomplete="off"
+                  oninput="window.handleReturnSearchInput(this.value)"
+                  onfocus="window.handleReturnSearchInput(this.value)">
               </div>
-              <button class="btn btn-primary" id="btn-search-return-loan" style="background: var(--hcmue-navy);" onclick="window.handleLookupReturnCopy()">
+              <button class="btn btn-primary" id="btn-search-return-loan" style="background: var(--hcmue-navy);"
+                onclick="window.handleLookupReturnCopy()">
                 <i class="fa-solid fa-magnifying-glass"></i> Tra cứu lượt mượn
               </button>
 
@@ -652,7 +684,8 @@
                 </table>
               </div>
 
-              <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-top: 2px solid var(--border-color); margin-top: 10px;">
+              <div
+                style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-top: 2px solid var(--border-color); margin-top: 10px;">
                 <span class="cell-bold" style="font-size: 15px; text-transform: uppercase;">TỔNG CỘNG</span>
                 <span class="cell-amount" style="font-size: 20px;" id="debts-total-sum">600,000 đ</span>
               </div>
@@ -669,7 +702,8 @@
 
             <div class="alert-banner alert-banner-info">
               <i class="fa-solid fa-circle-info"></i>
-              <span id="debts-banner-sync-info">Tổng công nợ khớp với Bảng điều khiển và Báo cáo tài chính theo khoa: 600,000 đ.</span>
+              <span id="debts-banner-sync-info">Tổng công nợ khớp với Bảng điều khiển và Báo cáo tài chính theo khoa:
+                600,000 đ.</span>
             </div>
           </div>
 
@@ -685,7 +719,8 @@
             <div class="catalog-filter-bar">
               <div class="floating-input-wrap" style="flex: 1;">
                 <span class="floating-label">Tìm kiếm tên sách / ISBN</span>
-                <input type="text" id="search-titles-input" class="floating-input" placeholder="Nhập tên sách hoặc mã ISBN" oninput="window.handleSearchMasterTitles()">
+                <input type="text" id="search-titles-input" class="floating-input"
+                  placeholder="Nhập tên sách hoặc mã ISBN" oninput="window.handleSearchMasterTitles()">
                 <i class="fa-solid fa-magnifying-glass input-icon-right"></i>
               </div>
 
@@ -701,7 +736,7 @@
               </div>
 
               <button class="btn btn-primary" onclick="window.openModal('modal-add-title')">
-                <i class="fa-solid fa-plus"></i> + THÊM ĐẦU SÁCH MỚI
+                <i class="fa-solid fa-plus"></i> THÊM ĐẦU SÁCH MỚI
               </button>
             </div>
 
@@ -742,13 +777,15 @@
             <div class="kpi-grid-2">
               <div class="hcmue-card">
                 <div class="hcmue-card-title">Đầu sách mẹ</div>
-                <p class="cell-sub" style="margin-top: 8px;">ISBN, tựa sách, tác giả, thể loại, nhà xuất bản, năm xuất bản và PDF mẫu.</p>
+                <p class="cell-sub" style="margin-top: 8px;">ISBN, tựa sách, tác giả, thể loại, nhà xuất bản, năm xuất
+                  bản và PDF mẫu.</p>
               </div>
 
               <div class="hcmue-card" style="display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
                   <div class="hcmue-card-title">Bản sao vật lý</div>
-                  <p class="cell-sub" style="margin-top: 8px;">Mỗi cuốn sách có mã riêng, vị trí kệ, giá bìa và tình trạng lưu hành độc lập.</p>
+                  <p class="cell-sub" style="margin-top: 8px;">Mỗi cuốn sách có mã riêng, vị trí kệ, giá bìa và tình
+                    trạng lưu hành độc lập.</p>
                 </div>
                 <div style="margin-top: 14px;">
                   <button class="btn btn-outline" onclick="window.switchScreen('screen-copies')">
@@ -779,7 +816,8 @@
                 <!-- Metadata Badges & Dropdown -->
                 <div class="master-book-hero-info">
                   <div class="master-book-select-wrap">
-                    <select id="copies-title-select" class="hero-select" onchange="window.handleSelectCopiesTitle(this.value)">
+                    <select id="copies-title-select" class="hero-select"
+                      onchange="window.handleSelectCopiesTitle(this.value)">
                       <!-- Dynamically populated -->
                     </select>
                     <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -850,9 +888,10 @@
             <div class="page-subtitle">Tổ chức tài liệu theo lĩnh vực để biên mục và tra cứu thống nhất.</div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-              <span class="cell-bold" style="font-size: 13px; color: var(--text-muted);">4 thể loại · 1,248 đầu sách đang sử dụng</span>
+              <span class="cell-bold" style="font-size: 13px; color: var(--text-muted);">4 thể loại · 1,248 đầu sách
+                đang sử dụng</span>
               <button class="btn btn-primary" onclick="window.showToast('Mở form thêm thể loại mới', 'info')">
-                <i class="fa-solid fa-plus"></i> + THÊM THỂ LOẠI MỚI
+                <i class="fa-solid fa-plus"></i> THÊM THỂ LOẠI MỚI
               </button>
             </div>
 
@@ -896,21 +935,27 @@
             <div class="content-breadcrumb">Thư viện HCMUE / Kiểm kê kho</div>
             <div class="page-title-ribbon">KIỂM KÊ KHO SÁCH ĐỊNH KỲ & ĐỐI SOÁT TỒN KHO</div>
 
-            <div class="inventory-header-card" style="margin-top: 14px; background: #ffffff; border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 18px 24px; display: grid; grid-template-columns: 1fr 1fr 1fr auto; align-items: center; gap: 20px;">
+            <div class="inventory-header-card"
+              style="margin-top: 14px; background: #ffffff; border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 18px 24px; display: grid; grid-template-columns: 1fr 1fr 1fr auto; align-items: center; gap: 20px;">
               <div class="inventory-meta-item">
-                <div style="font-weight: 700; font-size: 15px; color: var(--text-main);" id="inv-batch-code">Đợt KK-2026-Q4</div>
+                <div style="font-weight: 700; font-size: 15px; color: var(--text-main);" id="inv-batch-code">Đợt
+                  KK-2026-Q4</div>
                 <div style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Ngày bắt đầu: 25/10/2026</div>
               </div>
               <div class="inventory-meta-item">
-                <div style="font-weight: 700; font-size: 15px; color: var(--text-main);" id="inv-lead-name">Nguyễn Trường Thịnh (Thủ thư ca 1)</div>
+                <div style="font-weight: 700; font-size: 15px; color: var(--text-main);" id="inv-lead-name">Nguyễn
+                  Trường Thịnh (Thủ thư ca 1)</div>
                 <div style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Người chủ trì</div>
               </div>
               <div class="inventory-meta-item">
-                <div style="font-weight: 700; font-size: 15px; color: var(--text-main);" id="inv-scope">Dãy kệ K01 - K05</div>
+                <div style="font-weight: 700; font-size: 15px; color: var(--text-main);" id="inv-scope">Dãy kệ K01 - K05
+                </div>
                 <div style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Phạm vi kiểm kê</div>
               </div>
               <div>
-                <span class="badge badge-blue" id="inv-batch-status" style="font-size: 12px; padding: 6px 14px; background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; font-weight: 600; border-radius: 6px;">Đang kiểm kê</span>
+                <span class="badge badge-blue" id="inv-batch-status"
+                  style="font-size: 12px; padding: 6px 14px; background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; font-weight: 600; border-radius: 6px;">Đang
+                  kiểm kê</span>
               </div>
             </div>
 
@@ -918,15 +963,24 @@
             <div style="margin-top: 16px; margin-bottom: 24px;">
               <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 16px; align-items: flex-end;">
                 <div>
-                  <label style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px; display: block;">Mã bản sao</label>
-                  <input type="text" id="inventory-barcode-input" placeholder="Ví dụ: CNPM-002" onkeydown="if(event.key==='Enter') window.handleInventoryScan();" style="width: 100%; height: 42px; padding: 0 14px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; background: #ffffff;">
+                  <label
+                    style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px; display: block;">Mã
+                    bản sao</label>
+                  <input type="text" id="inventory-barcode-input" placeholder="Ví dụ: CNPM-002"
+                    onkeydown="if(event.key==='Enter') window.handleInventoryScan();"
+                    style="width: 100%; height: 42px; padding: 0 14px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; background: #ffffff;">
                 </div>
                 <div>
-                  <label style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px; display: block;">Vị trí kiểm kê thực tế</label>
-                  <input type="text" id="inventory-shelf-input" placeholder="Ví dụ: Kệ K03 - Ngăn 2" onkeydown="if(event.key==='Enter') window.handleInventoryScan();" style="width: 100%; height: 42px; padding: 0 14px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; background: #ffffff;">
+                  <label
+                    style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px; display: block;">Vị
+                    trí kiểm kê thực tế</label>
+                  <input type="text" id="inventory-shelf-input" placeholder="Ví dụ: Kệ K03 - Ngăn 2"
+                    onkeydown="if(event.key==='Enter') window.handleInventoryScan();"
+                    style="width: 100%; height: 42px; padding: 0 14px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; background: #ffffff;">
                 </div>
                 <div>
-                  <button type="button" class="btn btn-primary" onclick="window.handleInventoryScan()" style="background: #102a43; color: #ffffff; height: 42px; padding: 0 22px; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+                  <button type="button" class="btn btn-primary" onclick="window.handleInventoryScan()"
+                    style="background: #102a43; color: #ffffff; height: 42px; padding: 0 22px; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap;">
                     Ghi nhận kiểm đếm
                   </button>
                 </div>
@@ -937,35 +991,51 @@
             </div>
 
             <!-- 4 Stat Cards -->
-            <div class="kpi-grid-4" style="margin-bottom: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
-              <div class="kpi-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 20px;">
-                <div class="kpi-title" style="font-size: 13px; color: #64748b; font-weight: 500;">Tổng số bản sao theo CSDL</div>
-                <div class="kpi-value" id="inv-kpi-system" style="font-size: 32px; font-weight: 800; color: #0f172a; margin: 8px 0 4px 0;">3,892</div>
+            <div class="kpi-grid-4"
+              style="margin-bottom: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+              <div class="kpi-card"
+                style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 20px;">
+                <div class="kpi-title" style="font-size: 13px; color: #64748b; font-weight: 500;">Tổng số bản sao theo
+                  CSDL</div>
+                <div class="kpi-value" id="inv-kpi-system"
+                  style="font-size: 32px; font-weight: 800; color: #0f172a; margin: 8px 0 4px 0;">3,892</div>
                 <div class="kpi-subtext" style="font-size: 12px; color: #94a3b8;">cuốn theo dữ liệu hệ thống</div>
               </div>
 
-              <div class="kpi-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 20px;">
-                <div class="kpi-title" style="font-size: 13px; color: #64748b; font-weight: 500;">Đã ghi nhận thực tế</div>
-                <div class="kpi-value" id="inv-kpi-scanned" style="font-size: 32px; font-weight: 800; color: #0f172a; margin: 8px 0 4px 0;">3,889</div>
+              <div class="kpi-card"
+                style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 20px;">
+                <div class="kpi-title" style="font-size: 13px; color: #64748b; font-weight: 500;">Đã ghi nhận thực tế
+                </div>
+                <div class="kpi-value" id="inv-kpi-scanned"
+                  style="font-size: 32px; font-weight: 800; color: #0f172a; margin: 8px 0 4px 0;">3,889</div>
                 <div class="kpi-subtext" style="font-size: 12px; color: #94a3b8;">cuốn đã ghi nhận</div>
               </div>
 
-              <div class="kpi-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 20px;">
-                <div class="kpi-title" style="font-size: 13px; color: #64748b; font-weight: 500;">Trùng khớp dữ liệu</div>
-                <div class="kpi-value" id="inv-kpi-matched" style="font-size: 32px; font-weight: 800; color: #0f172a; margin: 8px 0 4px 0;">3,887</div>
+              <div class="kpi-card"
+                style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 20px;">
+                <div class="kpi-title" style="font-size: 13px; color: #64748b; font-weight: 500;">Trùng khớp dữ liệu
+                </div>
+                <div class="kpi-value" id="inv-kpi-matched"
+                  style="font-size: 32px; font-weight: 800; color: #0f172a; margin: 8px 0 4px 0;">3,887</div>
                 <div class="kpi-subtext" style="font-size: 12px; color: #94a3b8;">99.87%</div>
               </div>
 
-              <div class="kpi-card anomaly-card" style="background: #fef2f2 !important; border: 1.5px solid #fca5a5 !important; border-radius: 8px; padding: 18px 20px;">
-                <div class="kpi-title" style="font-size: 13px; color: #dc2626; font-weight: 600;">Chênh lệch cần xử lý</div>
-                <div class="kpi-value" id="inv-kpi-diff" style="font-size: 32px; font-weight: 800; color: #dc2626; margin: 8px 0 4px 0;">3 cuốn</div>
-                <div class="kpi-subtext" style="font-size: 12px; color: #b91c1c;">2 thiếu/nghi mất · 1 sai vị trí kệ</div>
+              <div class="kpi-card anomaly-card"
+                style="background: #fef2f2 !important; border: 1.5px solid #fca5a5 !important; border-radius: 8px; padding: 18px 20px;">
+                <div class="kpi-title" style="font-size: 13px; color: #dc2626; font-weight: 600;">Chênh lệch cần xử lý
+                </div>
+                <div class="kpi-value" id="inv-kpi-diff"
+                  style="font-size: 32px; font-weight: 800; color: #dc2626; margin: 8px 0 4px 0;">3 cuốn</div>
+                <div class="kpi-subtext" style="font-size: 12px; color: #b91c1c;">2 thiếu/nghi mất · 1 sai vị trí kệ
+                </div>
               </div>
             </div>
 
             <!-- Anomalies Table (Untitled 3 Table Card) -->
-            <div class="hcmue-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px 24px;">
-              <div style="font-size: 14px; font-weight: 800; color: #0f172a; letter-spacing: 0.2px; margin-bottom: 16px;">
+            <div class="hcmue-card"
+              style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px 24px;">
+              <div
+                style="font-size: 14px; font-weight: 800; color: #0f172a; letter-spacing: 0.2px; margin-bottom: 16px;">
                 DANH SÁCH BẢN SAO BẤT THƯỜNG CẦN XỬ LÝ (3 CUỐN):
               </div>
 
@@ -973,11 +1043,21 @@
                 <table class="hcmue-table" style="width: 100%; border-collapse: collapse;">
                   <thead>
                     <tr style="border-bottom: 1.5px solid #e2e8f0; background: #f8fafc;">
-                      <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: #475569;">Mã / Tựa sách</th>
-                      <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: #475569;">Vị trí lý thuyết</th>
-                      <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: #475569;">Kết quả kiểm đếm</th>
-                      <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: #475569;">Kết luận</th>
-                      <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: #475569;">Thao tác xử lý nghiệp vụ</th>
+                      <th
+                        style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: #475569;">
+                        Mã / Tựa sách</th>
+                      <th
+                        style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: #475569;">
+                        Vị trí lý thuyết</th>
+                      <th
+                        style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: #475569;">
+                        Kết quả kiểm đếm</th>
+                      <th
+                        style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: #475569;">
+                        Kết luận</th>
+                      <th
+                        style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: #475569;">
+                        Thao tác xử lý nghiệp vụ</th>
                     </tr>
                   </thead>
                   <tbody id="inventory-anomalies-tbody"></tbody>
@@ -986,11 +1066,15 @@
             </div>
 
             <!-- Bottom Bar: Export Excel & Commit Sync (Untitled 3) -->
-            <div class="inventory-bottom-bar" style="display: flex; align-items: center; justify-content: space-between; margin-top: 24px;">
-              <button type="button" class="btn btn-outline" onclick="window.handleExportInventoryExcel()" style="background: #ffffff; color: #334155; border: 1.5px solid #cbd5e1; padding: 10px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                <i class="fa-regular fa-file-excel" style="color: #107c41; font-size: 15px;"></i> Xuất Excel Biên bản kiểm kê
+            <div class="inventory-bottom-bar"
+              style="display: flex; align-items: center; justify-content: space-between; margin-top: 24px;">
+              <button type="button" class="btn btn-outline" onclick="window.handleExportInventoryExcel()"
+                style="background: #ffffff; color: #334155; border: 1.5px solid #cbd5e1; padding: 10px 20px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-regular fa-file-excel" style="color: #107c41; font-size: 15px;"></i> Xuất Excel Biên bản
+                kiểm kê
               </button>
-              <button type="button" class="btn btn-primary" onclick="window.handleCommitInventorySync()" style="background: #102a43; color: #ffffff; padding: 11px 26px; border-radius: 6px; font-weight: 700; font-size: 13px; border: none; cursor: pointer; letter-spacing: 0.3px;">
+              <button type="button" class="btn btn-primary" onclick="window.handleCommitInventorySync()"
+                style="background: #102a43; color: #ffffff; padding: 11px 26px; border-radius: 6px; font-weight: 700; font-size: 13px; border: none; cursor: pointer; letter-spacing: 0.3px;">
                 LẬP BIÊN BẢN KIỂM KÊ & ĐỒNG BỘ CSDL
               </button>
             </div>
@@ -1008,7 +1092,8 @@
             <div class="catalog-filter-bar">
               <div class="floating-input-wrap" style="flex: 1;">
                 <span class="floating-label">Tìm kiếm MSSV / Họ tên</span>
-                <input type="text" id="readers-search-input" class="floating-input" placeholder="Nhập MSSV hoặc họ tên độc giả" oninput="window.renderReadersScreen()">
+                <input type="text" id="readers-search-input" class="floating-input"
+                  placeholder="Nhập MSSV hoặc họ tên độc giả" oninput="window.renderReadersScreen()">
                 <i class="fa-solid fa-magnifying-glass input-icon-right"></i>
               </div>
 
@@ -1021,8 +1106,8 @@
                 </select>
               </div>
 
-              <button class="btn btn-primary" onclick="window.showToast('Mở form cấp thẻ mới', 'info')">
-                <i class="fa-solid fa-plus"></i> + CẤP THẺ ĐỘC GIẢ MỚI
+              <button class="btn btn-primary" id="btn-open-create-reader" onclick="window.openCreateReaderCardModal()">
+                <i class="fa-solid fa-plus"></i> CẤP THẺ ĐỘC GIẢ MỚI
               </button>
             </div>
 
@@ -1061,7 +1146,8 @@
 
             <div class="alert-banner alert-banner-info">
               <i class="fa-solid fa-circle-info"></i>
-              <span>Thẻ bị tạm khóa do công nợ chỉ được khôi phục quyền mượn sau khi hoàn tất thu nợ. Xem Thu công nợ tồn đọng.</span>
+              <span>Thẻ bị tạm khóa do công nợ chỉ được khôi phục quyền mượn sau khi hoàn tất thu nợ. Xem Thu công nợ
+                tồn đọng.</span>
             </div>
           </div>
 
@@ -1072,11 +1158,12 @@
           <div id="screen-accounts" class="app-screen">
             <div class="content-breadcrumb">Thư viện HCMUE / Tài khoản & Phân quyền</div>
             <div class="page-title-ribbon">PHÂN QUYỀN & QUẢN LÝ TÀI KHOẢN NGƯỜI DÙNG</div>
-            
+
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-              <div class="page-subtitle" style="margin-bottom: 0;">Quản lý định danh và quyền truy cập theo vai trò.</div>
+              <div class="page-subtitle" style="margin-bottom: 0;">Quản lý định danh và quyền truy cập theo vai trò.
+              </div>
               <button class="btn btn-primary" onclick="window.showToast('Mở form tạo tài khoản mới', 'info')">
-                <i class="fa-solid fa-plus"></i> + TẠO TÀI KHOẢN MỚI
+                <i class="fa-solid fa-plus"></i> TẠO TÀI KHOẢN MỚI
               </button>
             </div>
 
@@ -1149,7 +1236,7 @@
               </div>
 
               <div class="params-grid-4">
-                
+
                 <!-- Param 1 -->
                 <div class="param-box">
                   <div class="param-header">
@@ -1212,7 +1299,8 @@
 
               <div class="alert-banner alert-banner-info">
                 <i class="fa-solid fa-circle-info"></i>
-                <span>Mọi thay đổi tham số sẽ áp dụng ngay cho các giao dịch mượn/trả mới từ thời điểm lưu cấu hình, không thay đổi hồi tố các giao dịch đã đóng trong quá khứ</span>
+                <span>Mọi thay đổi tham số sẽ áp dụng ngay cho các giao dịch mượn/trả mới từ thời điểm lưu cấu hình,
+                  không thay đổi hồi tố các giao dịch đã đóng trong quá khứ</span>
               </div>
 
               <div style="text-align: right; margin-top: 20px;">
@@ -1234,7 +1322,8 @@
             <div class="page-subtitle">Quản lý bản sao lưu dữ liệu và kiểm tra tính toàn vẹn của tệp lưu trữ.</div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-              <span class="badge badge-gray" style="padding: 6px 12px; font-size: 13px;">PostgreSQL · Sao lưu dữ liệu</span>
+              <span class="badge badge-gray" style="padding: 6px 12px; font-size: 13px;">PostgreSQL · Sao lưu dữ
+                liệu</span>
               <button class="btn btn-primary" id="btn-create-backup" onclick="window.handleCreateNewBackup()">
                 <i class="fa-solid fa-database"></i> + TẠO BẢN SAO LƯU MỚI (PG_DUMP)
               </button>
@@ -1264,7 +1353,8 @@
 
             <div class="alert-banner alert-banner-warning">
               <i class="fa-solid fa-triangle-exclamation"></i>
-              <span>Phục hồi dữ liệu là thao tác nhạy cảm: toàn bộ dữ liệu CSDL hiện tại sẽ bị ghi đè bởi bản sao lưu được chọn.</span>
+              <span>Phục hồi dữ liệu là thao tác nhạy cảm: toàn bộ dữ liệu CSDL hiện tại sẽ bị ghi đè bởi bản sao lưu
+                được chọn.</span>
             </div>
           </div>
 
@@ -1292,10 +1382,12 @@
               </div>
 
               <div style="display: flex; gap: 10px;">
-                <button class="btn btn-outline" onclick="window.showToast('Đang xuất tệp Excel Báo cáo tháng 10/2026...', 'success')">
+                <button class="btn btn-outline"
+                  onclick="window.showToast('Đang xuất tệp Excel Báo cáo tháng 10/2026...', 'success')">
                   <i class="fa-regular fa-file-excel"></i> Xuất Excel
                 </button>
-                <button class="btn btn-outline" onclick="window.showToast('Đang tạo bản in PDF Báo cáo tài chính...', 'success')">
+                <button class="btn btn-outline"
+                  onclick="window.showToast('Đang tạo bản in PDF Báo cáo tài chính...', 'success')">
                   <i class="fa-regular fa-file-pdf"></i> Xuất PDF
                 </button>
               </div>
@@ -1338,7 +1430,7 @@
 
             <!-- Two Panels: Top Books & Fines by Department -->
             <div class="report-split-grid">
-              
+
               <!-- Left: Top 3 Books -->
               <div class="hcmue-card">
                 <div class="hcmue-card-header">
@@ -1374,7 +1466,8 @@
 
             <div class="alert-banner alert-banner-success">
               <i class="fa-solid fa-circle-check"></i>
-              <span id="rep-banner-debt-val">TỔNG CÔNG NỢ TỒN ĐỌNG: 600,000 đ · Khớp chính xác với Dashboard và Quản lý nợ phạt.</span>
+              <span id="rep-banner-debt-val">TỔNG CÔNG NỢ TỒN ĐỌNG: 600,000 đ · Khớp chính xác với Dashboard và Quản lý
+                nợ phạt.</span>
             </div>
           </div>
 
@@ -1384,16 +1477,19 @@
           <!-- --------------------------------------------------------------- -->
           <div id="screen-student-search" class="app-screen">
             <div class="page-title-ribbon">TRA CỨU DANH MỤC TÀI LIỆU</div>
-            <div class="page-subtitle">Tìm sách, kiểm tra số cuốn sẵn sàng và đọc thử tài liệu trước khi đến thư viện.</div>
+            <div class="page-subtitle">Tìm sách, kiểm tra số cuốn sẵn sàng và đọc thử tài liệu trước khi đến thư viện.
+            </div>
 
             <!-- Search Bar -->
             <div class="student-search-bar">
               <div class="floating-input-wrap">
                 <span class="floating-label">Tên sách, tác giả hoặc ISBN</span>
-                <input type="text" id="student-search-input" class="floating-input" value="Kỹ nghệ phần mềm" oninput="window.handleSearchStudentBooks()">
+                <input type="text" id="student-search-input" class="floating-input" value="Kỹ nghệ phần mềm"
+                  oninput="window.handleSearchStudentBooks()">
                 <i class="fa-solid fa-magnifying-glass input-icon-right"></i>
               </div>
-              <div class="cell-sub" style="margin-top: 8px;">Tra cứu tài liệu học tập · Giáo trình · Sách tham khảo</div>
+              <div class="cell-sub" style="margin-top: 8px;">Tra cứu tài liệu học tập · Giáo trình · Sách tham khảo
+              </div>
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -1406,7 +1502,8 @@
 
             <div class="alert-banner alert-banner-info">
               <i class="fa-solid fa-circle-info"></i>
-              <span>Đến quầy thư viện với thẻ độc giả còn hiệu lực. Mỗi độc giả được mượn tối đa 3 cuốn trong 14 ngày và gia hạn trực tuyến 1 lần (+7 ngày).</span>
+              <span>Đến quầy thư viện với thẻ độc giả còn hiệu lực. Mỗi độc giả được mượn tối đa 3 cuốn trong 14 ngày và
+                gia hạn trực tuyến 1 lần (+7 ngày).</span>
             </div>
           </div>
 
@@ -1416,10 +1513,12 @@
           <!-- --------------------------------------------------------------- -->
           <div id="screen-student-loans" class="app-screen">
             <div class="page-title-ribbon">SÁCH ĐANG MƯỢN & LỊCH SỬ CÁ NHÂN</div>
-            <div class="page-subtitle" id="student-loans-reader-info">Nguyễn Ngọc Hồng An · MSSV: 50.01.103.002 · Thẻ: THE-5001102</div>
+            <div class="page-subtitle" id="student-loans-reader-info">Nguyễn Ngọc Hồng An · MSSV: 50.01.103.002 · Thẻ:
+              THE-5001102</div>
 
             <!-- 3 Condition check badges -->
-            <div id="student-loans-status-banner" class="alert-banner alert-banner-success" style="display: flex; gap: 32px; background: #f0fdf4; border-color: #bbf7d0;">
+            <div id="student-loans-status-banner" class="alert-banner alert-banner-success"
+              style="display: flex; gap: 32px; background: #f0fdf4; border-color: #bbf7d0;">
               <div style="display: flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-circle-check"></i> <span>Sách còn hạn</span>
               </div>
@@ -1432,13 +1531,15 @@
             </div>
 
             <!-- Alert banner sau gia hạn thành công (Ảnh 20b) -->
-            <div id="student-renew-success-alert" class="alert-banner alert-banner-success" style="display: none; margin-bottom: 24px;"></div>
+            <div id="student-renew-success-alert" class="alert-banner alert-banner-success"
+              style="display: none; margin-bottom: 24px;"></div>
 
             <!-- Bảng Sách đang mượn hiện tại -->
             <div class="hcmue-card">
               <div class="hcmue-card-header">
                 <div class="hcmue-card-title">SÁCH ĐANG MƯỢN HIỆN TẠI</div>
-                <div class="hcmue-card-desc">Bạn đang giữ 1/3 cuốn. Gia hạn trực tuyến tối đa 1 lần cho mỗi lượt mượn.</div>
+                <div class="hcmue-card-desc">Bạn đang giữ 1/3 cuốn. Gia hạn trực tuyến tối đa 1 lần cho mỗi lượt mượn.
+                </div>
               </div>
 
               <div class="table-responsive">
@@ -1511,7 +1612,8 @@
             <div class="form-group">
               <div class="floating-input-wrap">
                 <span class="floating-label">Mật khẩu hiện tại (*)</span>
-                <input type="password" id="cp-current-pass" class="floating-input" placeholder="Nhập mật khẩu hiện tại" required>
+                <input type="password" id="cp-current-pass" class="floating-input" placeholder="Nhập mật khẩu hiện tại"
+                  required>
                 <i class="fa-regular fa-eye-slash input-icon-right" onclick="
                   const p = document.getElementById('cp-current-pass');
                   p.type = p.type === 'password' ? 'text' : 'password';
@@ -1528,7 +1630,8 @@
                   p.type = p.type === 'password' ? 'text' : 'password';
                 "></i>
               </div>
-              <div class="cell-sub" style="margin-top: 6px;">Tối thiểu 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.</div>
+              <div class="cell-sub" style="margin-top: 6px;">Tối thiểu 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự
+                đặc biệt.</div>
             </div>
 
             <div class="password-strength-wrap">
@@ -1547,7 +1650,8 @@
             <div class="form-group" style="margin-top: 18px;">
               <div class="floating-input-wrap">
                 <span class="floating-label">Xác nhận mật khẩu mới (*)</span>
-                <input type="password" id="cp-confirm-pass" class="floating-input" placeholder="Nhập lại mật khẩu mới" required>
+                <input type="password" id="cp-confirm-pass" class="floating-input" placeholder="Nhập lại mật khẩu mới"
+                  required>
                 <i class="fa-regular fa-eye-slash input-icon-right" onclick="
                   const p = document.getElementById('cp-confirm-pass');
                   p.type = p.type === 'password' ? 'text' : 'password';
@@ -1557,7 +1661,8 @@
           </div>
 
           <div class="modal-footer">
-            <button type="button" class="btn btn-outline" onclick="window.closeModal('modal-change-password')">Hủy bỏ</button>
+            <button type="button" class="btn btn-outline" onclick="window.closeModal('modal-change-password')">Hủy
+              bỏ</button>
             <button type="submit" class="btn btn-primary">Cập nhật mật khẩu</button>
           </div>
         </form>
@@ -1568,9 +1673,11 @@
     <!-- Modal 2: Xác nhận đăng xuất UC02 (Ảnh 04) -->
     <div id="modal-confirm-logout" class="modal-overlay">
       <div class="modal-container" style="max-width: 480px;">
-        <div class="modal-header" style="background: #ffffff; color: var(--text-main); border-bottom: 1px solid var(--border-color);">
+        <div class="modal-header"
+          style="background: #ffffff; color: var(--text-main); border-bottom: 1px solid var(--border-color);">
           <div class="modal-title" style="font-size: 15px; font-weight: 700;">XÁC NHẬN ĐĂNG XUẤT</div>
-          <button class="modal-close-btn" style="color: var(--text-muted);" onclick="window.closeModal('modal-confirm-logout')">&times;</button>
+          <button class="modal-close-btn" style="color: var(--text-muted);"
+            onclick="window.closeModal('modal-confirm-logout')">&times;</button>
         </div>
         <div class="modal-body" style="text-align: center; padding-top: 36px;">
           <div class="logout-icon-circle">
@@ -1580,7 +1687,8 @@
             Bạn có chắc chắn muốn kết thúc phiên làm việc hiện tại và hủy toàn bộ phiên xác thực trên máy này?
           </p>
         </div>
-        <div class="modal-footer" style="flex-direction: column; gap: 10px; background: #ffffff; border: none; padding-bottom: 24px;">
+        <div class="modal-footer"
+          style="flex-direction: column; gap: 10px; background: #ffffff; border: none; padding-bottom: 24px;">
           <button class="btn btn-outline btn-block" onclick="window.closeModal('modal-confirm-logout')">
             Ở lại phiên làm việc
           </button>
@@ -1609,7 +1717,8 @@
 
             <div class="receipt-details-list">
               <div>
-                <strong>Người nộp:</strong> <span id="receipt-payer-info">Trần Quốc Bảo · THE-5001109 · Lớp 50.01.SPTIN.A</span>
+                <strong>Người nộp:</strong> <span id="receipt-payer-info">Trần Quốc Bảo · THE-5001109 · Lớp
+                  50.01.SPTIN.A</span>
               </div>
               <div>
                 <strong>Lý do:</strong> <span id="receipt-reason-info">Quá hạn 8 ngày cuốn AI-002</span>
@@ -1617,39 +1726,52 @@
               <div>
                 <strong>Người thu:</strong> <span>Nguyễn Trường Thịnh · Thủ thư ca 1</span>
               </div>
-              <div id="receipt-multi-debts-notice" style="display: none; background: #eff6ff; padding: 6px 10px; border-radius: 4px; border-left: 3px solid #3b82f6; font-size: 12px; color: #1e40af;">
-                <i class="fa-solid fa-circle-info"></i> <span id="receipt-multi-debts-text">Độc giả này đang có 2 khoản nợ chưa tất toán (tổng nợ: 277,000 đ).</span>
+              <div id="receipt-multi-debts-notice"
+                style="display: none; background: #eff6ff; padding: 6px 10px; border-radius: 4px; border-left: 3px solid #3b82f6; font-size: 12px; color: #1e40af;">
+                <i class="fa-solid fa-circle-info"></i> <span id="receipt-multi-debts-text">Độc giả này đang có 2 khoản
+                  nợ chưa tất toán (tổng nợ: 277,000 đ).</span>
               </div>
             </div>
 
             <!-- Tùy chọn thu nợ linh hoạt (Chỉ hiện khi nợ >= 100k hoặc có nhiều khoản nợ) -->
-            <div id="receipt-payment-options-box" style="text-align: left; margin: 14px 0; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px 14px; display: none;">
-              <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">
+            <div id="receipt-payment-options-box"
+              style="text-align: left; margin: 14px 0; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px 14px; display: none;">
+              <div
+                style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">
                 Phương thức thanh toán
               </div>
               <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                  <input type="radio" name="receipt-pay-mode" id="receipt-opt-full-item" value="FULL_ITEM" checked onchange="window.handleReceiptPaymentModeChange()">
-                  <span>Thu toàn bộ khoản này: <strong id="receipt-opt-full-item-amount" style="color: var(--hcmue-navy);">16,000 đ</strong></span>
+                  <input type="radio" name="receipt-pay-mode" id="receipt-opt-full-item" value="FULL_ITEM" checked
+                    onchange="window.handleReceiptPaymentModeChange()">
+                  <span>Thu toàn bộ khoản này: <strong id="receipt-opt-full-item-amount"
+                      style="color: var(--hcmue-navy);">16,000 đ</strong></span>
                 </label>
 
                 <div id="receipt-opt-partial-container" style="display: none;">
                   <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input type="radio" name="receipt-pay-mode" id="receipt-opt-partial" value="PARTIAL_ITEM" onchange="window.handleReceiptPaymentModeChange()">
+                    <input type="radio" name="receipt-pay-mode" id="receipt-opt-partial" value="PARTIAL_ITEM"
+                      onchange="window.handleReceiptPaymentModeChange()">
                     <span>Thu nợ từng phần: (Sinh viên trả trước một phần)</span>
                   </label>
                   <div id="receipt-partial-input-group" style="display: none; margin-top: 6px; padding-left: 22px;">
                     <div style="display: flex; align-items: center; gap: 8px;">
-                      <input type="number" id="receipt-partial-amount-input" class="form-input" style="width: 140px; height: 32px; padding: 4px 8px; font-size: 13px; font-weight: 700;" placeholder="Nhập số tiền..." oninput="window.handleReceiptPartialInputChange()">
-                      <span style="font-size: 12px; color: var(--text-muted);">đ (Còn nợ: <strong id="receipt-partial-remaining-label" style="color: #dc2626;">0 đ</strong>)</span>
+                      <input type="number" id="receipt-partial-amount-input" class="form-input"
+                        style="width: 140px; height: 32px; padding: 4px 8px; font-size: 13px; font-weight: 700;"
+                        placeholder="Nhập số tiền..." oninput="window.handleReceiptPartialInputChange()">
+                      <span style="font-size: 12px; color: var(--text-muted);">đ (Còn nợ: <strong
+                          id="receipt-partial-remaining-label" style="color: #dc2626;">0 đ</strong>)</span>
                     </div>
                   </div>
                 </div>
 
                 <div id="receipt-opt-all-reader-container" style="display: none;">
                   <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input type="radio" name="receipt-pay-mode" id="receipt-opt-all-reader" value="SETTLE_ALL" onchange="window.handleReceiptPaymentModeChange()">
-                    <span>Tất toán gộp tất cả các khoản nợ: <strong id="receipt-opt-all-amount" style="color: #16a34a; font-weight: 800;">277,000 đ</strong> (<span id="receipt-opt-all-count">2</span> khoản nợ)</span>
+                    <input type="radio" name="receipt-pay-mode" id="receipt-opt-all-reader" value="SETTLE_ALL"
+                      onchange="window.handleReceiptPaymentModeChange()">
+                    <span>Tất toán gộp tất cả các khoản nợ: <strong id="receipt-opt-all-amount"
+                        style="color: #16a34a; font-weight: 800;">277,000 đ</strong> (<span
+                        id="receipt-opt-all-count">2</span> khoản nợ)</span>
                   </label>
                 </div>
               </div>
@@ -1660,9 +1782,11 @@
               <span class="receipt-amount-val" id="receipt-amount-display">16,000 đ</span>
             </div>
 
-            <div id="receipt-alert-box" class="alert-banner alert-banner-success" style="font-size: 12px; text-align: left; margin-bottom: 0;">
+            <div id="receipt-alert-box" class="alert-banner alert-banner-success"
+              style="font-size: 12px; text-align: left; margin-bottom: 0;">
               <i class="fa-solid fa-circle-check" id="receipt-alert-icon"></i>
-              <span id="receipt-alert-text">Thanh toán toàn bộ công nợ. Thẻ độc giả được mở khóa sau khi xác nhận.</span>
+              <span id="receipt-alert-text">Thanh toán toàn bộ công nợ. Thẻ độc giả được mở khóa sau khi xác
+                nhận.</span>
             </div>
           </div>
         </div>
@@ -1728,9 +1852,11 @@
             <div class="form-group">
               <div class="floating-input-wrap" style="height: 90px; align-items: flex-start;">
                 <span class="floating-label">Tóm tắt nội dung</span>
-                <textarea id="add-title-summary" class="floating-input" placeholder="Nhập tóm tắt nội dung tài liệu..." style="height: 100%; resize: none;"></textarea>
+                <textarea id="add-title-summary" class="floating-input" placeholder="Nhập tóm tắt nội dung tài liệu..."
+                  style="height: 100%; resize: none;"></textarea>
               </div>
-              <div class="cell-sub" style="margin-top: 4px;">Mô tả ngắn giúp độc giả tra cứu tài liệu chính xác hơn.</div>
+              <div class="cell-sub" style="margin-top: 4px;">Mô tả ngắn giúp độc giả tra cứu tài liệu chính xác hơn.
+              </div>
             </div>
 
             <div class="file-upload-dropzone">
@@ -1762,7 +1888,8 @@
             <div class="form-group">
               <div class="floating-input-wrap">
                 <span class="floating-label">Mã bản sao (*)</span>
-                <input type="text" id="add-copy-code" class="floating-input" placeholder="Nhập mã bản sao duy nhất" required>
+                <input type="text" id="add-copy-code" class="floating-input" placeholder="Nhập mã bản sao duy nhất"
+                  required>
               </div>
             </div>
 
@@ -1818,12 +1945,16 @@
     <!-- Modal 06b: Gia Hạn Mượn Sách Tại Quầy UC14 (Untitled 3 Ảnh 06b)        -->
     <!-- ===================================================================== -->
     <div id="modal-renew-counter" class="modal-overlay">
-      <div class="modal-container" style="max-width: 540px; border-radius: 10px; overflow: hidden; padding: 0; background: #ffffff;">
-        <div class="modal-header" style="background: #102a43; color: #ffffff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;">
-          <div class="modal-title" style="color: #ffffff; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; letter-spacing: 0.3px;">
+      <div class="modal-container"
+        style="max-width: 540px; border-radius: 10px; overflow: hidden; padding: 0; background: #ffffff;">
+        <div class="modal-header"
+          style="background: #102a43; color: #ffffff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;">
+          <div class="modal-title"
+            style="color: #ffffff; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; letter-spacing: 0.3px;">
             <i class="fa-regular fa-clock" style="font-size: 15px;"></i> GIA HẠN MƯỢN SÁCH TẠI QUẦY
           </div>
-          <button type="button" class="modal-close-btn" onclick="window.closeModal('modal-renew-counter')" style="background: #1e3a5a; color: #ffffff; width: 28px; height: 28px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px;">
+          <button type="button" class="modal-close-btn" onclick="window.closeModal('modal-renew-counter')"
+            style="background: #1e3a5a; color: #ffffff; width: 28px; height: 28px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px;">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -1831,32 +1962,40 @@
         <div class="modal-body" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px;">
           <!-- THÔNG TIN LƯỢT MƯỢN -->
           <div>
-            <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 10px;">
+            <div
+              style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 10px;">
               THÔNG TIN LƯỢT MƯỢN
             </div>
-            <div style="display: grid; grid-template-columns: 130px 1fr; gap: 10px 16px; font-size: 13px; align-items: baseline;">
+            <div
+              style="display: grid; grid-template-columns: 130px 1fr; gap: 10px 16px; font-size: 13px; align-items: baseline;">
               <div style="color: #64748b;">Độc giả:</div>
               <div>
-                <div style="font-weight: 700; color: #0f172a; font-size: 14px;" id="renew-modal-reader-name">Nguyễn Ngọc Hồng An</div>
-                <div style="color: #64748b; font-size: 12px; margin-top: 2px;" id="renew-modal-reader-sub">Mã thẻ: THE-5001102 · Khoa CNTT</div>
+                <div style="font-weight: 700; color: #0f172a; font-size: 14px;" id="renew-modal-reader-name">Nguyễn Ngọc
+                  Hồng An</div>
+                <div style="color: #64748b; font-size: 12px; margin-top: 2px;" id="renew-modal-reader-sub">Mã thẻ:
+                  THE-5001102 · Khoa CNTT</div>
               </div>
 
               <div style="color: #64748b;">Cuốn sách:</div>
               <div>
-                <div style="font-weight: 700; color: #0f172a; font-size: 14px;" id="renew-modal-book-title">Lập trình Web nâng cao</div>
-                <div style="color: #64748b; font-size: 12px; margin-top: 2px;" id="renew-modal-book-sub">Mã bản sao: WEB-001 · Kệ K01</div>
+                <div style="font-weight: 700; color: #0f172a; font-size: 14px;" id="renew-modal-book-title">Lập trình
+                  Web nâng cao</div>
+                <div style="color: #64748b; font-size: 12px; margin-top: 2px;" id="renew-modal-book-sub">Mã bản sao:
+                  WEB-001 · Kệ K01</div>
               </div>
 
               <div style="color: #64748b;">Hạn trả hiện tại:</div>
               <div>
-                <div style="font-weight: 700; color: #0f172a; font-size: 14px;" id="renew-modal-current-due">08/11/2026</div>
+                <div style="font-weight: 700; color: #0f172a; font-size: 14px;" id="renew-modal-current-due">08/11/2026
+                </div>
               </div>
             </div>
           </div>
 
           <!-- ĐỦ ĐIỀU KIỆN GIA HẠN -->
           <div style="background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 8px; padding: 14px 18px;">
-            <div style="font-size: 13px; font-weight: 700; color: #15803d; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+            <div
+              style="font-size: 13px; font-weight: 700; color: #15803d; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
               <span>✓ ĐỦ ĐIỀU KIỆN GIA HẠN</span>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #166534;">
@@ -1864,10 +2003,12 @@
                 <span style="font-weight: 700;">✓</span> <span>Sách đang mượn trong hạn, không bị quá hạn.</span>
               </div>
               <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-weight: 700;">✓</span> <span id="renew-modal-check-times">Số lần đã gia hạn: 0/1 (Thỏa mãn quy định tối đa 1 lần).</span>
+                <span style="font-weight: 700;">✓</span> <span id="renew-modal-check-times">Số lần đã gia hạn: 0/1 (Thỏa
+                  mãn quy định tối đa 1 lần).</span>
               </div>
               <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-weight: 700;">✓</span> <span id="renew-modal-check-debt">Thẻ không có nợ phạt tồn đọng (Công nợ: 0 đ).</span>
+                <span style="font-weight: 700;">✓</span> <span id="renew-modal-check-debt">Thẻ không có nợ phạt tồn đọng
+                  (Công nợ: 0 đ).</span>
               </div>
             </div>
           </div>
@@ -1877,19 +2018,22 @@
             <div style="font-size: 13px; font-weight: 700; color: #0284c7; margin-bottom: 8px;">
               THÔNG TIN GIA HẠN
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 6px;">
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 6px;">
               <span style="color: #0f172a;">Ngày gia hạn:</span>
               <span style="font-weight: 700; color: #0f172a;" id="renew-modal-renew-date">Hôm nay (28/10/2026)</span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
               <span style="color: #0f172a;">Hạn trả mới (cộng +7 ngày):</span>
-              <span style="font-weight: 800; color: #16a34a; font-size: 15px;" id="renew-modal-new-due">15/11/2026</span>
+              <span style="font-weight: 800; color: #16a34a; font-size: 15px;"
+                id="renew-modal-new-due">15/11/2026</span>
             </div>
           </div>
 
           <!-- GHI CHÚ NGHIỆP VỤ -->
           <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px;">
-            <div style="font-size: 12px; font-weight: 700; color: #b45309; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+            <div
+              style="font-size: 12px; font-weight: 700; color: #b45309; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
               <span>📝 GHI CHÚ NGHIỆP VỤ</span>
             </div>
             <div style="font-size: 12px; color: #92400e; line-height: 1.5;">
@@ -1898,11 +2042,15 @@
           </div>
         </div>
 
-        <div class="modal-footer" style="padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; background: #ffffff;">
-          <button type="button" class="btn btn-outline" onclick="window.closeModal('modal-renew-counter')" style="padding: 10px 24px; border-radius: 6px; border: 1.5px solid #cbd5e1; color: #475569; font-weight: 600; cursor: pointer; background: #ffffff;">
+        <div class="modal-footer"
+          style="padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; background: #ffffff;">
+          <button type="button" class="btn btn-outline" onclick="window.closeModal('modal-renew-counter')"
+            style="padding: 10px 24px; border-radius: 6px; border: 1.5px solid #cbd5e1; color: #475569; font-weight: 600; cursor: pointer; background: #ffffff;">
             Hủy bỏ
           </button>
-          <button type="button" id="btn-submit-renew-counter" class="btn btn-primary" onclick="window.handleExecuteRenewCounterModal()" style="background: #102a43; color: #ffffff; padding: 10px 24px; border-radius: 6px; font-weight: 700; border: none; cursor: pointer; letter-spacing: 0.3px;">
+          <button type="button" id="btn-submit-renew-counter" class="btn btn-primary"
+            onclick="window.handleExecuteRenewCounterModal()"
+            style="background: #102a43; color: #ffffff; padding: 10px 24px; border-radius: 6px; font-weight: 700; border: none; cursor: pointer; letter-spacing: 0.3px;">
             XÁC NHẬN GIA HẠN TẠI QUẦY
           </button>
         </div>
@@ -1919,7 +2067,7 @@
           </div>
           <button class="modal-close-btn" onclick="window.closeModal('modal-pdf-preview')">&times;</button>
         </div>
-        
+
         <div class="pdf-toolbar">
           <span id="pdf-modal-book-title">Kỹ nghệ phần mềm (Tập 1)</span>
           <div style="display: flex; align-items: center; gap: 16px;">
@@ -1951,13 +2099,16 @@
     <!-- Modal 7: Cảnh Báo Phục Hồi CSDL UC06 (Ảnh 17b) -->
     <div id="modal-restore-alert" class="modal-overlay">
       <div class="modal-container" style="max-width: 540px;">
-        <div class="modal-header" style="background: #ffffff; color: var(--text-main); border-bottom: 1px solid var(--border-color);">
+        <div class="modal-header"
+          style="background: #ffffff; color: var(--text-main); border-bottom: 1px solid var(--border-color);">
           <div class="modal-title">CẢNH BÁO PHỤC HỒI CSDL</div>
-          <button class="modal-close-btn" style="color: var(--text-muted);" onclick="window.closeModal('modal-restore-alert')">&times;</button>
+          <button class="modal-close-btn" style="color: var(--text-muted);"
+            onclick="window.closeModal('modal-restore-alert')">&times;</button>
         </div>
         <div class="modal-body">
           <div style="display: flex; gap: 16px; margin-bottom: 16px;">
-            <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; color: var(--hcmue-crimson); flex-shrink: 0;"></i>
+            <i class="fa-solid fa-triangle-exclamation"
+              style="font-size: 32px; color: var(--hcmue-crimson); flex-shrink: 0;"></i>
             <div>
               <div class="cell-bold" style="color: var(--hcmue-crimson); font-size: 15px; margin-bottom: 6px;">
                 Phục hồi sẽ ghi đè toàn bộ dữ liệu CSDL hiện tại.
@@ -1968,14 +2119,16 @@
             </div>
           </div>
 
-          <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+          <div
+            style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
             <div class="cell-bold" id="restore-alert-filename">backup_20261028_120000.sql.gz</div>
             <div class="cell-sub" id="restore-alert-meta">14.8 MB · 28/10/2026 12:00:15 · admin01</div>
           </div>
 
           <div class="alert-banner alert-banner-danger" style="font-size: 12px; margin-bottom: 0;">
             <i class="fa-solid fa-triangle-exclamation"></i>
-            <span>Thao tác dành cho Quản trị viên. Chỉ tiếp tục khi đã kiểm tra tệp và xác nhận phạm vi khôi phục.</span>
+            <span>Thao tác dành cho Quản trị viên. Chỉ tiếp tục khi đã kiểm tra tệp và xác nhận phạm vi khôi
+              phục.</span>
           </div>
         </div>
 
@@ -1983,6 +2136,162 @@
           <button class="btn btn-outline" onclick="window.closeModal('modal-restore-alert')">Hủy bỏ</button>
           <button class="btn btn-danger" id="btn-confirm-restore-db">Xác nhận phục hồi CSDL</button>
         </div>
+      </div>
+    </div>
+
+
+    <!-- ===================================================================== -->
+    <!-- Modal 8: CẤP THẺ ĐỘC GIẢ MỚI & TỰ ĐỘNG KHỞI TẠO TÀI KHOẢN UC11 UC04   -->
+    <!-- ===================================================================== -->
+    <div id="modal-create-reader-card" class="modal-overlay">
+      <div class="modal-container"
+        style="max-width: 600px; width: 100%; border-radius: 14px; overflow: hidden; padding: 0; background: #ffffff; border: 1px solid #E2E8F0; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.1);">
+
+        <!-- Header Nền xanh Navy #16375C, chữ trắng -->
+        <div class="modal-header"
+          style="background: #16375C; color: #ffffff; padding: 16px 24px; display: flex; flex-direction: column; gap: 4px; border-bottom: none;">
+          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <div class="modal-title"
+              style="color: #ffffff; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; letter-spacing: 0.3px;">
+              CẤP THẺ ĐỘC GIẢ MỚI & TỰ ĐỘNG KHỞI TẠO TÀI KHOẢN
+            </div>
+            <button type="button" class="modal-close-btn" onclick="window.closeModal('modal-create-reader-card')"
+              style="background: rgba(255, 255, 255, 0.15); color: #ffffff; width: 28px; height: 28px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <div style="font-size: 12px; color: #cbd5e1; line-height: 1.4;">
+            Nhập thông tin sinh viên tại quầy. Hệ thống sẽ tự động cấp Mã thẻ thư viện và đồng bộ Tài khoản Cổng sinh
+            viên.
+          </div>
+        </div>
+
+        <!-- Form Body -->
+        <div class="modal-body" style="padding: 20px 24px; max-height: calc(85vh - 130px); overflow-y: auto;">
+          <div id="nc-error-alert" class="alert-banner alert-banner-danger"
+            style="display: none; margin-bottom: 14px; padding: 10px 14px; font-size: 13px;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span id="nc-error-text">Vui lòng nhập đầy đủ thông tin bắt buộc!</span>
+          </div>
+
+          <form id="create-reader-card-form" onsubmit="event.preventDefault(); window.handleCreateReaderCardSubmit();">
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+
+              <!-- Hàng 1: MSSV & Họ tên -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <div class="floating-input-wrap">
+                  <span class="floating-label">MSSV / Mã số CB <span
+                      style="color: var(--hcmue-crimson); font-weight: 700;">*</span></span>
+                  <input type="text" id="nc-mssv" class="floating-input" placeholder="Ví dụ: 50.01.103.088" required
+                    oninput="window.handleReaderCardMssvInput(this.value)">
+                </div>
+                <div class="floating-input-wrap">
+                  <span class="floating-label">Họ và tên độc giả <span
+                      style="color: var(--hcmue-crimson); font-weight: 700;">*</span></span>
+                  <input type="text" id="nc-name" class="floating-input" placeholder="Ví dụ: Trần Thị Mai Lan" required>
+                </div>
+              </div>
+
+              <!-- Hàng 2: Khoa / Đơn vị & Lớp sinh hoạt -->
+              <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 14px;">
+                <div class="floating-input-wrap">
+                  <span class="floating-label">Khoa / Đơn vị</span>
+                  <select id="nc-department" class="form-select">
+                    <option value="Khoa Công nghệ Thông tin" selected>Khoa Công nghệ Thông tin</option>
+                    <option value="Khoa Toán - Tin học">Khoa Toán - Tin học</option>
+                    <option value="Khoa Ngoại ngữ">Khoa Ngoại ngữ</option>
+                    <option value="Khoa Vật lý">Khoa Vật lý</option>
+                    <option value="Khoa Hóa học">Khoa Hóa học</option>
+                    <option value="Khoa Sinh học">Khoa Sinh học</option>
+                    <option value="Khoa Ngữ văn">Khoa Ngữ văn</option>
+                    <option value="Khoa Lịch sử">Khoa Lịch sử</option>
+                    <option value="Khoa Địa lý">Khoa Địa lý</option>
+                    <option value="Khoa Giáo dục Tiểu học">Khoa Giáo dục Tiểu học</option>
+                    <option value="Khoa Giáo dục Mầm non">Khoa Giáo dục Mầm non</option>
+                    <option value="Khoa Tâm lý học">Khoa Tâm lý học</option>
+                  </select>
+                </div>
+                <div class="floating-input-wrap">
+                  <span class="floating-label">Lớp sinh hoạt</span>
+                  <input type="text" id="nc-class" class="floating-input" placeholder="Ví dụ: 50.01.SPTIN.A"
+                    value="50.01.SPTIN.A">
+                </div>
+              </div>
+
+              <!-- Hàng 3: Email sinh viên & Số điện thoại -->
+              <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 14px;">
+                <div class="floating-input-wrap">
+                  <span class="floating-label">Email sinh viên</span>
+                  <input type="email" id="nc-email" class="floating-input"
+                    placeholder="50.01.103.088@student.hcmue.edu.vn">
+                </div>
+                <div class="floating-input-wrap">
+                  <span class="floating-label">Số điện thoại</span>
+                  <input type="tel" id="nc-phone" class="floating-input" placeholder="Ví dụ: 0912345678"
+                    value="0912345678">
+                </div>
+              </div>
+
+              <!-- Hàng 4: Ngày cấp thẻ & Hạn thẻ -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <div class="floating-input-wrap">
+                  <span class="floating-label">Ngày cấp thẻ (Hôm nay)</span>
+                  <input type="text" id="nc-issue-date" class="floating-input" value="28/10/2026" readonly
+                    style="background: #f8fafc; color: #64748b; cursor: not-allowed;">
+                </div>
+                <div class="floating-input-wrap">
+                  <span class="floating-label">Hạn thẻ (+4 năm niên khóa)</span>
+                  <input type="text" id="nc-expiry-date" class="floating-input" value="30/06/2030">
+                </div>
+              </div>
+
+              <!-- Khung Tự Động Khởi Tạo Tài Khoản (Box viền xanh nhạt) -->
+              <div
+                style="background: #f0f7ff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 14px 18px; margin-top: 4px;">
+                <div
+                  style="font-size: 11px; font-weight: 700; color: #1d4ed8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">
+                  THÔNG TIN TỰ ĐỘNG KHỞI TẠO TÀI KHOẢN (SSO & RBAC)
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; font-size: 13px;">
+                  <div>
+                    <span style="color: #64748b;">Tên đăng nhập:</span>
+                    <strong id="nc-preview-username" style="color: #16375C; margin-left: 4px;">50.01.103.088</strong>
+                  </div>
+                  <div>
+                    <span style="color: #64748b;">Mật khẩu khởi tạo:</span>
+                    <strong style="color: #0f172a; margin-left: 4px;">123456</strong>
+                    <span style="color: #64748b; font-size: 11px;">(Mặc định)</span>
+                  </div>
+                  <div>
+                    <span style="color: #64748b;">Mã thẻ dự kiến:</span>
+                    <strong id="nc-preview-cardid"
+                      style="color: var(--hcmue-crimson); margin-left: 4px;">THE-50011088</strong>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <span style="color: #64748b;">Quyền hệ thống:</span>
+                    <span class="badge badge-green" style="font-size: 11px;">DOC_GIA</span>
+                    <span style="color: #64748b; font-size: 11px;">(Đồng bộ Admin)</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </form>
+        </div>
+
+        <!-- Footer Modal -->
+        <div class="modal-footer"
+          style="padding: 14px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 12px;">
+          <button type="button" class="btn btn-outline" onclick="window.closeModal('modal-create-reader-card')">Hủy
+            bỏ</button>
+          <button type="button" class="btn btn-primary" id="btn-submit-create-reader"
+            onclick="window.handleCreateReaderCardSubmit()"
+            style="background: #16375C; font-weight: 700; letter-spacing: 0.3px;">
+            XÁC NHẬN CẤP THẺ & TẠO TÀI KHOẢN
+          </button>
+        </div>
+
       </div>
     </div>
 
@@ -2018,7 +2327,8 @@
         </div>
 
         <div class="ai-msg ai-msg-bot">
-          Theo quy định hiện hành: Mỗi độc giả được mượn tối đa 3 cuốn sách trong thời hạn 14 ngày. Bạn được gia hạn trực tuyến 1 lần (+7 ngày) nếu sách chưa quá hạn nhé!
+          Theo quy định hiện hành: Mỗi độc giả được mượn tối đa 3 cuốn sách trong thời hạn 14 ngày. Bạn được gia hạn
+          trực tuyến 1 lần (+7 ngày) nếu sách chưa quá hạn nhé!
         </div>
 
         <div class="ai-quick-prompts">
@@ -2030,7 +2340,8 @@
       </div>
 
       <div class="ai-chat-footer">
-        <input type="text" id="ai-chat-input-field" class="ai-chat-input" placeholder="Nhập câu hỏi của bạn..." onkeydown="if(event.key === 'Enter') window.sendAiMessage()">
+        <input type="text" id="ai-chat-input-field" class="ai-chat-input" placeholder="Nhập câu hỏi của bạn..."
+          onkeydown="if(event.key === 'Enter') window.sendAiMessage()">
         <button class="ai-chat-send-btn" onclick="window.sendAiMessage()">
           <i class="fa-regular fa-paper-plane"></i>
         </button>
@@ -2046,4 +2357,5 @@
   <!-- Script chạy trực tiếp mượt mà cả trên file:// (nhấp đúp mở ngay) và http:// (Live Server / Dev server) -->
   <script src="js/app.bundle.js"></script>
 </body>
+
 </html>

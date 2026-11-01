@@ -16,7 +16,8 @@ import {
   renderMasterTitlesScreen, addMasterTitle, renderCopiesScreen, addPhysicalCopy, 
   renderCategoriesScreen, renderInventoryScreen, renderReadersScreen, restoreCopyReady,
   confirmInventoryLost, markInventorySuspect, fixInventoryShelf, updateInventoryShelf,
-  handleInventoryScan, exportInventoryExcel, commitInventorySync
+  handleInventoryScan, exportInventoryExcel, commitInventorySync,
+  openCreateReaderCardModal, handleReaderCardMssvInput, handleCreateReaderCardSubmit
 } from './modules/catalog.js';
 import { 
   renderAccountsScreen, renderParamsScreen, saveSystemParams, renderBackupsScreen, 
@@ -418,6 +419,9 @@ function registerGlobalEvents() {
   window.renderStudentSearchScreen = renderStudentSearchScreen;
   window.executeStudentRenew = executeStudentRenew;
   window.executeReturnBook = executeReturnBook;
+  window.openCreateReaderCardModal = openCreateReaderCardModal;
+  window.handleReaderCardMssvInput = handleReaderCardMssvInput;
+  window.handleCreateReaderCardSubmit = handleCreateReaderCardSubmit;
 
   // Xử lý Quick Login Chip 1-click
   window.quickLogin = function(username, pass) {

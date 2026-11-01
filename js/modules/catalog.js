@@ -594,3 +594,227 @@ export function renderReadersScreen() {
   `).join('');
 }
 
+/**
+ * Mở hộp thoại Modal cấp thẻ độc giả mới (UC11)
+ */
+export function openCreateReaderCardModal() {
+  const form = document.getElementById('create-reader-card-form');
+  if (form) form.reset();
+  
+  const errAlert = document.getElementById('nc-error-alert');
+  if (errAlert) errAlert.style.display = 'none';
+
+  const mssvInput = document.getElementById('nc-mssv');
+  const issueDateInput = document.getElementById('nc-issue-date');
+  const expiryDateInput = document.getElementById('nc-expiry-date');
+  const emailInput = document.getElementById('nc-email');
+
+  if (issueDateInput) issueDateInput.value = '28/10/2026';
+  if (expiryDateInput) expiryDateInput.value = '30/06/2030';
+  if (emailInput) delete emailInput.dataset.manualEdited;
+  if (mssvInput) {
+    mssvInput.value = '';
+    handleReaderCardMssvInput('');
+  }
+
+  if (window.openModal) {
+    window.openModal('modal-create-reader-card');
+  } else {
+    const modal = document.getElementById('modal-create-reader-card');
+    if (modal) modal.classList.add('active');
+  }
+
+  setTimeout(() => {
+    if (mssvInput) mssvInput.focus();
+  }, 100);
+}
+
+/**
+ * Tự sinh mã thẻ độc giả theo chuẩn HCMUE (Ví dụ: 50.01.103.088 -> THE-50011088)
+ */
+export function generateCardIdFromMssv(mssv) {
+  if (!mssv) return 'THE-50011088';
+  const clean = String(mssv).replace(/[^0-9a-zA-Z]/g, '');
+  if (clean.length === 10 && clean.startsWith('5001103')) {
+    const lastDigits = clean.slice(7).replace(/^0+/, '');
+    return `THE-500110${lastDigits || '0'}`;
+  }
+  if (clean.length >= 8) {
+    const prefix = clean.slice(0, 6);
+    const suffix = clean.slice(7);
+    return `THE-${prefix}${suffix}`;
+  }
+  return `THE-${clean}`;
+}
+
+/**
+ * Xử lý khi người dùng nhập MSSV: tự động cập nhật Email và Khung xem trước tài khoản
+ */
+export function handleReaderCardMssvInput(val) {
+  const raw = String(val || '').trim();
+  const emailInput = document.getElementById('nc-email');
+  const previewUser = document.getElementById('nc-preview-username');
+  const previewCard = document.getElementById('nc-preview-cardid');
+
+  const cardCode = raw ? generateCardIdFromMssv(raw) : 'THE-50011088';
+  const username = raw || '50.01.103.088';
+
+  if (emailInput && !emailInput.dataset.manualEdited) {
+    emailInput.value = raw ? `${raw}@student.hcmue.edu.vn` : '';
+  }
+  if (previewUser) previewUser.textContent = username;
+  if (previewCard) previewCard.textContent = cardCode;
+}
+
+/**
+ * Xử lý Xác nhận cấp thẻ & Tự động tạo tài khoản Web (UC11 & UC04)
+ */
+export function handleCreateReaderCardSubmit() {
+  const mssvEl = document.getElementById('nc-mssv');
+  const nameEl = document.getElementById('nc-name');
+  const deptEl = document.getElementById('nc-department');
+  const classEl = document.getElementById('nc-class');
+  const emailEl = document.getElementById('nc-email');
+  const phoneEl = document.getElementById('nc-phone');
+  const issueEl = document.getElementById('nc-issue-date');
+  const expiryEl = document.getElementById('nc-expiry-date');
+  const errAlert = document.getElementById('nc-error-alert');
+  const errText = document.getElementById('nc-error-text');
+
+  const mssv = (mssvEl ? mssvEl.value : '').trim();
+  const name = (nameEl ? nameEl.value : '').trim();
+  const department = (deptEl ? deptEl.value : '').trim() || 'Khoa Công nghệ Thông tin';
+  const className = (classEl ? classEl.value : '').trim() || '50.01.SPTIN.A';
+  const email = (emailEl ? emailEl.value : '').trim() || (mssv ? `${mssv}@student.hcmue.edu.vn` : '');
+  const phone = (phoneEl ? phoneEl.value : '').trim() || '0912345678';
+  const issueDate = (issueEl ? issueEl.value : '').trim() || '28/10/2026';
+  const cardExpiry = (expiryEl ? expiryEl.value : '').trim() || '30/06/2030';
+
+  const showError = (msg) => {
+    if (errAlert && errText) {
+      errText.textContent = msg;
+      errAlert.style.display = 'flex';
+      errAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+      if (window.showToast) window.showToast(msg, 'error');
+      else alert(msg);
+    }
+  };
+
+  // Bước 1: Kiểm tra hợp lệ các trường bắt buộc
+  if (!mssv) {
+    showError('Vui lòng nhập Mã số sinh viên / Cán bộ (MSSV)!');
+    if (mssvEl) mssvEl.focus();
+    return;
+  }
+  if (!name) {
+    showError('Vui lòng nhập Họ và tên độc giả!');
+    if (nameEl) nameEl.focus();
+    return;
+  }
+
+  const generatedCardId = generateCardIdFromMssv(mssv);
+
+  // Kiểm tra trùng lặp trong CSDL
+  const db = getDB();
+  const duplicate = (db.accounts || []).find(a => 
+    (a.username && a.username.toUpperCase() === mssv.toUpperCase()) ||
+    (a.staffId && a.staffId.toUpperCase() === mssv.toUpperCase()) ||
+    (a.cardId && a.cardId.toUpperCase() === generatedCardId.toUpperCase())
+  );
+
+  if (duplicate) {
+    showError('Mã sinh viên này đã được cấp thẻ trước đó!');
+    if (mssvEl) mssvEl.focus();
+    return;
+  }
+
+  if (errAlert) errAlert.style.display = 'none';
+
+  // Tính chữ viết tắt avatar
+  const parts = name.split(/\s+/).filter(Boolean);
+  let avatarText = 'SV';
+  if (parts.length >= 2) {
+    avatarText = (parts[parts.length - 2][0] + parts[parts.length - 1][0]).toUpperCase();
+  } else if (parts.length === 1) {
+    avatarText = parts[0].substring(0, 2).toUpperCase();
+  }
+
+  let deptKey = 'CNTT';
+  if (department.includes('Toán')) deptKey = 'TOAN_TIN';
+  else if (department.includes('Ngoại ngữ') || department.includes('Anh')) deptKey = 'NGOAI_NGU';
+  else if (department.includes('Vật lý')) deptKey = 'VAT_LY';
+
+  const newAccount = {
+    id: mssv,
+    username: mssv,
+    password: "123456",
+    name: name,
+    staffId: mssv,
+    cardId: generatedCardId,
+    role: "DOC_GIA",
+    email: email,
+    phone: phone,
+    className: className,
+    department: department,
+    departmentKey: deptKey,
+    status: "KICH_HOAT",
+    cardStatus: "HOAT_DONG",
+    cardExpiry: cardExpiry,
+    issueDate: issueDate,
+    debt: 0,
+    borrowedCount: 0,
+    avatarText: avatarText
+  };
+
+  const newReader = {
+    id: generatedCardId,
+    cardId: generatedCardId,
+    mssv: mssv,
+    name: name,
+    department: department,
+    className: className,
+    email: email,
+    phone: phone,
+    status: "HOAT_DONG",
+    cardStatus: "HOAT_DONG",
+    issueDate: issueDate,
+    cardExpiry: cardExpiry,
+    debt: 0,
+    borrowedCount: 0
+  };
+
+  // Bước 2, 3, 4: Ghi vào CSDL, lưu LocalStorage và phát sự kiện đồng bộ toàn cục
+  mutateDB(draft => {
+    // 1. Thêm tài khoản mới cho Web & Admin UC04 (Đưa lên đầu để hiển thị ngay)
+    draft.accounts.unshift(newAccount);
+
+    // 2. Thêm thẻ độc giả cho Thủ thư UC11
+    if (!Array.isArray(draft.readers)) {
+      draft.readers = [];
+    }
+    draft.readers.unshift(newReader);
+  }, 'CREATE_READER_CARD');
+
+  // Đóng modal
+  if (window.closeModal) {
+    window.closeModal('modal-create-reader-card');
+  } else {
+    const modal = document.getElementById('modal-create-reader-card');
+    if (modal) modal.classList.remove('active');
+  }
+
+  // Reset form
+  const form = document.getElementById('create-reader-card-form');
+  if (form) form.reset();
+
+  // Hiệu ứng pháo hoa & thông báo thành công
+  if (window.triggerConfetti) window.triggerConfetti();
+  if (window.showToast) {
+    window.showToast('Đã cấp thẻ và kích hoạt tài khoản Cổng sinh viên thành công!', 'success');
+  }
+
+  // Cập nhật giao diện màn hình 14 lập tức
+  renderReadersScreen();
+}
+
