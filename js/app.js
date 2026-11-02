@@ -43,7 +43,8 @@ import {
 } from './modules/catalog.js';
 import { 
   renderAccountsScreen, renderParamsScreen, saveSystemParams, resetSystemParamsToDefault, renderBackupsScreen, 
-  createNewBackup, deleteBackup, getBackupForRestore, renderReportsScreen 
+  createNewBackup, deleteBackup, getBackupForRestore, renderReportsScreen,
+  handleSelectAccountRole, handleCreateAccountUsernameInput, handleToggleCreateCardOption, handleCreateAccountSubmit
 } from './modules/admin.js';
 import { 
   renderStudentSearchScreen, openPdfPreviewModal, setPdfPage, changePdfPage, renderStudentLoansScreen, 
@@ -289,6 +290,19 @@ export function reRenderScreen(targetScreenId = activeScreenId) {
  */
 export function openModal(modalId) {
   refreshGlobalDropdowns();
+  if (modalId === 'modal-create-account') {
+    const form = document.getElementById('create-account-form');
+    if (form) form.reset();
+    const emailInput = document.getElementById('ca-email');
+    if (emailInput) delete emailInput.dataset.manualEdited;
+    const errAlert = document.getElementById('ca-error-alert');
+    if (errAlert) errAlert.style.display = 'none';
+    if (typeof handleSelectAccountRole === 'function') {
+      handleSelectAccountRole('DOC_GIA');
+    }
+    const uInp = document.getElementById('ca-username');
+    if (uInp) setTimeout(() => uInp.focus(), 100);
+  }
   const todayVN = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
   if (modalId === 'modal-add-copy') {
     const dateInput = document.getElementById('add-copy-date');
@@ -1199,9 +1213,13 @@ function registerGlobalEvents() {
     showToast(deleted ? `Đã xóa bản sao lưu ${deleted.filename} thành công!` : "Đã xóa bản sao lưu thành công!", "success");
   };
 
-  // Expose admin renderers
+  // Expose admin renderers & account creation handlers
   window.renderAccountsScreen = renderAccountsScreen;
   window.renderBackupsScreen = renderBackupsScreen;
+  window.handleSelectAccountRole = handleSelectAccountRole;
+  window.handleCreateAccountUsernameInput = handleCreateAccountUsernameInput;
+  window.handleToggleCreateCardOption = handleToggleCreateCardOption;
+  window.handleCreateAccountSubmit = handleCreateAccountSubmit;
 
   // Các handler bổ trợ quản lý tài khoản & độc giả
   window.handleResetPasswordAccount = function(username) {

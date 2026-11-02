@@ -3919,18 +3919,21 @@ function openCreateReaderCardModal() {
  * Tự sinh mã thẻ độc giả theo chuẩn HCMUE (Ví dụ: 50.01.103.088 -> THE-50011088)
  */
 function generateCardIdFromMssv(mssv) {
-  if (!mssv) return 'THE-50011088';
+  if (!mssv) return 'THE-4901104';
   const clean = String(mssv).replace(/[^0-9a-zA-Z]/g, '');
-  if (clean.length === 10 && clean.startsWith('5001103')) {
+  if (clean.length === 10 && (clean.startsWith('5001103') || clean.startsWith('4901104') || clean.startsWith('5001104'))) {
     const lastDigits = clean.slice(7).replace(/^0+/, '');
-    return `THE-500110${lastDigits || '0'}`;
+    return `THE-${clean.slice(0, 6)}${lastDigits || '0'}`;
   }
   if (clean.length >= 8) {
     const prefix = clean.slice(0, 6);
-    const suffix = clean.slice(7);
-    return `THE-${prefix}${suffix}`;
+    const suffix = clean.slice(7).replace(/^0+/, '');
+    return `THE-${prefix}${suffix || '0'}`;
   }
-  return `THE-${clean}`;
+  if (clean) {
+    return `THE-${clean}`;
+  }
+  return 'THE-4901104';
 }
 
 /**
@@ -4112,6 +4115,7 @@ function handleCreateReaderCardSubmit() {
 // =============================================================================
 // ADMIN.JS: QUẢN TRỊ HỆ THỐNG, THAM SỐ, SAO LƯU & BÁO CÁO (UC04, UC05, UC06, UC18, UC19)
 // =============================================================================
+
 
 
 
@@ -4450,6 +4454,276 @@ function renderReportsScreen() {
   }
 }
 
+
+// =============================================================================
+// QUẢN LÝ TẠO TÀI KHOẢN NGƯỜI DÙNG & PHÂN QUYỀN (UC04)
+// =============================================================================
+let currentCreateAccountRole = 'DOC_GIA';
+
+function handleSelectAccountRole(role) {
+  currentCreateAccountRole = role;
+
+  // Cập nhật giao diện 3 thẻ vai trò
+  ['ADMIN', 'THU_THU', 'DOC_GIA'].forEach(r => {
+    const card = document.getElementById(`ca-role-label-${r}`);
+    if (card) {
+      if (r === role) {
+        card.classList.add('active');
+        if (r === 'ADMIN') {
+          card.style.borderColor = '#9333ea';
+          card.style.background = '#faf5ff';
+        } else if (r === 'THU_THU') {
+          card.style.borderColor = '#0284c7';
+          card.style.background = '#f0f9ff';
+        } else {
+          card.style.borderColor = '#16a34a';
+          card.style.background = '#f0fdf4';
+        }
+      } else {
+        card.classList.remove('active');
+        card.style.borderColor = '#e2e8f0';
+        card.style.background = '#ffffff';
+      }
+    }
+  });
+
+  const usernameInput = document.getElementById('ca-username');
+  const usernameLabel = document.getElementById('ca-label-username');
+  const emailInput = document.getElementById('ca-email');
+  const readerCardBox = document.getElementById('ca-reader-card-box');
+  const classWrap = document.getElementById('ca-wrap-class');
+
+  if (role === 'DOC_GIA') {
+    if (usernameLabel) usernameLabel.innerHTML = 'Tên đăng nhập / MSSV <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (usernameInput) usernameInput.placeholder = 'Ví dụ: 49.01.104.088';
+    if (emailInput && (!emailInput.dataset.manualEdited)) {
+      const u = (usernameInput?.value || '').trim();
+      emailInput.placeholder = u ? `${u}@student.hcmue.edu.vn` : 'Ví dụ: 49.01.104.088@student.hcmue.edu.vn';
+      if (u) emailInput.value = `${u}@student.hcmue.edu.vn`;
+    }
+    if (readerCardBox) readerCardBox.style.display = 'block';
+    if (classWrap) classWrap.style.display = 'block';
+  } else {
+    if (usernameLabel) usernameLabel.innerHTML = 'Tên đăng nhập / Mã cán bộ <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (usernameInput) usernameInput.placeholder = role === 'ADMIN' ? 'Ví dụ: admin02 hoặc CB202601' : 'Ví dụ: thuthu02 hoặc CB202602';
+    if (emailInput && (!emailInput.dataset.manualEdited)) {
+      const u = (usernameInput?.value || '').trim();
+      emailInput.placeholder = 'Ví dụ: canbo@hcmue.edu.vn';
+      if (u) emailInput.value = `${u}@hcmue.edu.vn`;
+    }
+    if (readerCardBox) readerCardBox.style.display = 'none';
+    if (classWrap) classWrap.style.display = 'none';
+  }
+}
+
+function handleCreateAccountUsernameInput(val) {
+  const clean = (val || '').trim();
+  const cardCodePreview = document.getElementById('ca-card-code-preview');
+  const emailInput = document.getElementById('ca-email');
+
+  if (cardCodePreview) {
+    if (clean) {
+      if (typeof generateCardIdFromMssv === 'function') {
+        cardCodePreview.textContent = generateCardIdFromMssv(clean);
+      } else {
+        const digits = clean.replace(/[^a-zA-Z0-9]/g, '');
+        cardCodePreview.textContent = `THE-${digits}`;
+      }
+    } else {
+      cardCodePreview.textContent = 'THE-4901104';
+    }
+  }
+
+  // Tự động gợi ý email nếu email chưa được sửa thủ công
+  if (emailInput && !emailInput.dataset.manualEdited) {
+    if (currentCreateAccountRole === 'DOC_GIA') {
+      emailInput.value = clean ? `${clean}@student.hcmue.edu.vn` : '';
+    } else {
+      emailInput.value = clean ? `${clean}@hcmue.edu.vn` : '';
+    }
+  }
+}
+
+function handleToggleCreateCardOption(checked) {
+  const summary = document.getElementById('ca-card-summary');
+  if (summary) {
+    summary.style.display = checked ? 'grid' : 'none';
+  }
+}
+
+function handleCreateAccountSubmit() {
+  const usernameEl = document.getElementById('ca-username');
+  const nameEl = document.getElementById('ca-name');
+  const emailEl = document.getElementById('ca-email');
+  const phoneEl = document.getElementById('ca-phone');
+  const deptEl = document.getElementById('ca-department');
+  const classEl = document.getElementById('ca-class');
+  const createCardCheckbox = document.getElementById('ca-create-card-checkbox');
+  const mustChangePassCheckbox = document.getElementById('ca-must-change-password');
+  const errAlert = document.getElementById('ca-error-alert');
+  const errText = document.getElementById('ca-error-text');
+
+  const username = (usernameEl ? usernameEl.value : '').trim();
+  const name = (nameEl ? nameEl.value : '').trim();
+  const email = (emailEl ? emailEl.value : '').trim();
+  const phone = (phoneEl ? phoneEl.value : '').trim() || '0912345678';
+  const department = (deptEl ? deptEl.value : '').trim() || 'Khoa Công nghệ Thông tin';
+  const className = (classEl ? classEl.value : '').trim() || (currentCreateAccountRole === 'DOC_GIA' ? '49.01.CNTT.A' : '—');
+  const createCard = createCardCheckbox ? createCardCheckbox.checked : false;
+  const mustChangePassword = mustChangePassCheckbox ? mustChangePassCheckbox.checked : true;
+
+  const showError = (msg) => {
+    if (errAlert && errText) {
+      errText.textContent = msg;
+      errAlert.style.display = 'flex';
+      errAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+      if (window.showToast) window.showToast(msg, 'error');
+    }
+  };
+
+  // 1. Validation kiểm tra bắt buộc
+  if (!username) {
+    showError('Vui lòng nhập Tên đăng nhập / Mã định danh!');
+    if (usernameEl) usernameEl.focus();
+    return;
+  }
+  if (!name) {
+    showError('Vui lòng nhập Họ và tên đầy đủ!');
+    if (nameEl) nameEl.focus();
+    return;
+  }
+  if (!email) {
+    showError('Vui lòng nhập Email liên hệ!');
+    if (emailEl) emailEl.focus();
+    return;
+  }
+
+  const db = getDB();
+
+  // 2. Validation kiểm tra trùng lặp
+  const usernameExists = (db.accounts || []).some(a => 
+    a.username && a.username.toUpperCase() === username.toUpperCase()
+  );
+  if (usernameExists) {
+    showError(`Tên đăng nhập "${username}" đã tồn tại trong hệ thống!`);
+    if (usernameEl) usernameEl.focus();
+    return;
+  }
+
+  const emailExists = (db.accounts || []).some(a => 
+    a.email && a.email.toLowerCase() === email.toLowerCase()
+  );
+  if (emailExists) {
+    showError(`Email "${email}" đã được đăng ký bởi tài khoản khác!`);
+    if (emailEl) emailEl.focus();
+    return;
+  }
+
+  if (errAlert) errAlert.style.display = 'none';
+
+  // 3. Tính chữ viết tắt avatar
+  const parts = name.split(/\s+/).filter(Boolean);
+  let avatarText = 'ND';
+  if (parts.length >= 2) {
+    avatarText = (parts[parts.length - 2][0] + parts[parts.length - 1][0]).toUpperCase();
+  } else if (parts.length === 1) {
+    avatarText = parts[0].substring(0, 2).toUpperCase();
+  }
+
+  // 4. Mã thẻ dự kiến
+  let generatedCardId = '';
+  if (typeof generateCardIdFromMssv === 'function' && username) {
+    generatedCardId = generateCardIdFromMssv(username);
+  } else {
+    const digits = username.replace(/[^a-zA-Z0-9]/g, '');
+    generatedCardId = `THE-${digits || '4901104'}`;
+  }
+
+  let deptKey = 'CNTT';
+  if (department.includes('Toán')) deptKey = 'TOAN_TIN';
+  else if (department.includes('Ngoại ngữ') || department.includes('Anh')) deptKey = 'NGOAI_NGU';
+  else if (department.includes('Vật lý')) deptKey = 'VAT_LY';
+
+  const newAccount = {
+    id: username,
+    username: username,
+    password: "123456",
+    name: name,
+    staffId: username,
+    cardId: (currentCreateAccountRole === 'DOC_GIA' && createCard) ? generatedCardId : '',
+    role: currentCreateAccountRole,
+    email: email,
+    phone: phone,
+    className: className,
+    department: department,
+    departmentKey: deptKey,
+    status: "KICH_HOAT",
+    cardStatus: (currentCreateAccountRole === 'DOC_GIA' && createCard) ? "HOAT_DONG" : "—",
+    cardExpiry: (currentCreateAccountRole === 'DOC_GIA' && createCard) ? "30/06/2030" : "—",
+    issueDate: new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+    debt: 0,
+    borrowedCount: 0,
+    avatarText: avatarText,
+    mustChangePassword: mustChangePassword,
+    lastLogin: "Chưa từng"
+  };
+
+  mutateDB(draft => {
+    // Đẩy tài khoản mới lên đầu danh sách
+    draft.accounts.unshift(newAccount);
+
+    // Nếu vai trò là DOC_GIA và có chọn cấp thẻ: thêm vào readers
+    if (currentCreateAccountRole === 'DOC_GIA' && createCard) {
+      if (!Array.isArray(draft.readers)) draft.readers = [];
+      draft.readers.unshift({
+        id: generatedCardId,
+        cardId: generatedCardId,
+        mssv: username,
+        name: name,
+        department: department,
+        className: className,
+        email: email,
+        phone: phone,
+        status: "HOAT_DONG",
+        cardStatus: "HOAT_DONG",
+        issueDate: newAccount.issueDate,
+        cardExpiry: "30/06/2030",
+        debt: 0,
+        borrowedCount: 0
+      });
+    }
+  }, 'CREATE_ACCOUNT');
+
+  // Đóng modal
+  if (window.closeModal) {
+    window.closeModal('modal-create-account');
+  } else {
+    const modal = document.getElementById('modal-create-account');
+    if (modal) modal.classList.remove('active');
+  }
+
+  // Reset form
+  const form = document.getElementById('create-account-form');
+  if (form) form.reset();
+  const emailInp = document.getElementById('ca-email');
+  if (emailInp) delete emailInp.dataset.manualEdited;
+  handleSelectAccountRole('DOC_GIA');
+
+  // Cập nhật giao diện màn hình 15
+  if (window.renderAccountsScreen) {
+    window.renderAccountsScreen();
+  }
+  // Đồng bộ màn hình 14 nếu có cấp thẻ độc giả
+  if (currentCreateAccountRole === 'DOC_GIA' && createCard && window.renderReadersScreen) {
+    window.renderReadersScreen();
+  }
+
+  if (window.triggerConfetti) window.triggerConfetti();
+  if (window.showToast) {
+    window.showToast('Đã tạo tài khoản thành công!', 'success');
+  }
+}
 
 
 // ==========================================
@@ -5203,6 +5477,19 @@ function reRenderScreen(targetScreenId = activeScreenId) {
  */
 function openModal(modalId) {
   refreshGlobalDropdowns();
+  if (modalId === 'modal-create-account') {
+    const form = document.getElementById('create-account-form');
+    if (form) form.reset();
+    const emailInput = document.getElementById('ca-email');
+    if (emailInput) delete emailInput.dataset.manualEdited;
+    const errAlert = document.getElementById('ca-error-alert');
+    if (errAlert) errAlert.style.display = 'none';
+    if (typeof handleSelectAccountRole === 'function') {
+      handleSelectAccountRole('DOC_GIA');
+    }
+    const uInp = document.getElementById('ca-username');
+    if (uInp) setTimeout(() => uInp.focus(), 100);
+  }
   const todayVN = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
   if (modalId === 'modal-add-copy') {
     const dateInput = document.getElementById('add-copy-date');
@@ -6113,9 +6400,13 @@ function registerGlobalEvents() {
     showToast(deleted ? `Đã xóa bản sao lưu ${deleted.filename} thành công!` : "Đã xóa bản sao lưu thành công!", "success");
   };
 
-  // Expose admin renderers
+  // Expose admin renderers & account creation handlers
   window.renderAccountsScreen = renderAccountsScreen;
   window.renderBackupsScreen = renderBackupsScreen;
+  window.handleSelectAccountRole = handleSelectAccountRole;
+  window.handleCreateAccountUsernameInput = handleCreateAccountUsernameInput;
+  window.handleToggleCreateCardOption = handleToggleCreateCardOption;
+  window.handleCreateAccountSubmit = handleCreateAccountSubmit;
 
   // Các handler bổ trợ quản lý tài khoản & độc giả
   window.handleResetPasswordAccount = function(username) {

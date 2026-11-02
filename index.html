@@ -423,7 +423,8 @@
           <div id="screen-dashboard" class="app-screen">
             <div class="content-breadcrumb">Thư viện HCMUE / Bảng điều khiển</div>
             <div class="page-title-ribbon">BẢNG ĐIỀU KHIỂN LƯU THÔNG THƯ VIỆN</div>
-            <div class="page-subtitle" id="dashboard-greeting-subtitle">Chào Nguyễn Trường Thịnh: Tổng quan hoạt động thư viện ngày hôm nay.</div>
+            <div class="page-subtitle" id="dashboard-greeting-subtitle">Chào Nguyễn Trường Thịnh: Tổng quan hoạt động
+              thư viện ngày hôm nay.</div>
 
             <!-- 4 KPI Cards -->
             <div class="kpi-grid-4">
@@ -572,11 +573,15 @@
                   <div class="loan-dates-row">
                     <div class="loan-date-item">
                       <div class="loan-date-val" id="borrow-summary-borrow-date">--/--/----</div>
-                      <div class="loan-date-lbl"><i class="fa-solid fa-calendar-check" style="color: #10b981; margin-right: 4px;" title="Ghi nhận tự động theo hệ thống"></i>Ngày mượn hôm nay (Hệ thống tự động)</div>
+                      <div class="loan-date-lbl"><i class="fa-solid fa-calendar-check"
+                          style="color: #10b981; margin-right: 4px;" title="Ghi nhận tự động theo hệ thống"></i>Ngày
+                        mượn hôm nay (Hệ thống tự động)</div>
                     </div>
                     <div class="loan-date-item" style="text-align: right;">
-                      <div class="loan-date-val" id="borrow-summary-due-date" style="color: var(--hcmue-navy);">--/--/----</div>
-                      <div class="loan-date-lbl"><i class="fa-solid fa-clock-rotate-left" style="color: var(--text-muted); margin-right: 4px;"></i>Hạn trả tự động · +14 ngày</div>
+                      <div class="loan-date-val" id="borrow-summary-due-date" style="color: var(--hcmue-navy);">
+                        --/--/----</div>
+                      <div class="loan-date-lbl"><i class="fa-solid fa-clock-rotate-left"
+                          style="color: var(--text-muted); margin-right: 4px;"></i>Hạn trả tự động · +14 ngày</div>
                     </div>
                   </div>
 
@@ -1162,7 +1167,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
               <div class="page-subtitle" style="margin-bottom: 0;">Quản lý định danh và quyền truy cập theo vai trò.
               </div>
-              <button class="btn btn-primary" onclick="window.showToast('Mở form tạo tài khoản mới', 'info')">
+              <button class="btn btn-primary" onclick="window.openModal('modal-create-account')">
                 <i class="fa-solid fa-plus"></i> Tạo tài khoản mới
               </button>
             </div>
@@ -1274,8 +1279,10 @@
                   </div>
                   <div class="floating-input-wrap">
                     <span class="floating-label">Số ngày mượn</span>
-                    <input type="number" id="param-loan-days" class="floating-input" value="14" min="1" max="60" style="flex: 1;">
-                    <span class="input-suffix" style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">ngày</span>
+                    <input type="number" id="param-loan-days" class="floating-input" value="14" min="1" max="60"
+                      style="flex: 1;">
+                    <span class="input-suffix"
+                      style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">ngày</span>
                   </div>
                   <div class="param-range-note">Miền kiểm tra: 1 - 60 ngày</div>
                 </div>
@@ -1288,8 +1295,10 @@
                   </div>
                   <div class="floating-input-wrap">
                     <span class="floating-label">Số cuốn tối đa</span>
-                    <input type="number" id="param-max-books" class="floating-input" value="3" min="1" max="5" style="flex: 1;">
-                    <span class="input-suffix" style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">cuốn</span>
+                    <input type="number" id="param-max-books" class="floating-input" value="3" min="1" max="5"
+                      style="flex: 1;">
+                    <span class="input-suffix"
+                      style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">cuốn</span>
                   </div>
                   <div class="param-range-note">Miền kiểm tra: 1 - 5 cuốn</div>
                 </div>
@@ -1302,8 +1311,11 @@
                   </div>
                   <div class="floating-input-wrap">
                     <span class="floating-label">Đơn giá phạt</span>
-                    <input type="number" id="param-fine-per-day" class="floating-input" value="2000" min="1000" max="50000" step="500" style="flex: 1;">
-                    <span class="input-suffix" style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">đ / ngày</span>
+                    <input type="number" id="param-fine-per-day" class="floating-input" value="2000" min="1000"
+                      max="50000" step="500" style="flex: 1;">
+                    <span class="input-suffix"
+                      style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">đ
+                      / ngày</span>
                   </div>
                   <div class="param-range-note">Miền kiểm tra: 1.000 - 50.000 đ</div>
                 </div>
@@ -1317,13 +1329,17 @@
                   <div style="display: flex; gap: 10px;">
                     <div class="floating-input-wrap" style="flex: 1;">
                       <span class="floating-label">Số lần tối đa</span>
-                      <input type="number" id="param-max-renewals" class="floating-input" value="1" min="0" max="5" style="flex: 1;">
-                      <span class="input-suffix" style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">lần</span>
+                      <input type="number" id="param-max-renewals" class="floating-input" value="1" min="0" max="5"
+                        style="flex: 1;">
+                      <span class="input-suffix"
+                        style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">lần</span>
                     </div>
                     <div class="floating-input-wrap" style="flex: 1;">
                       <span class="floating-label">Cộng thêm mỗi lần</span>
-                      <input type="number" id="param-renewal-days" class="floating-input" value="7" min="1" max="30" style="flex: 1;">
-                      <span class="input-suffix" style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">ngày</span>
+                      <input type="number" id="param-renewal-days" class="floating-input" value="7" min="1" max="30"
+                        style="flex: 1;">
+                      <span class="input-suffix"
+                        style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">ngày</span>
                     </div>
                   </div>
                   <div class="param-range-note">Chỉ gia hạn nếu sách còn hạn và không có công nợ.</div>
@@ -1337,8 +1353,10 @@
                   </div>
                   <div class="floating-input-wrap">
                     <span class="floating-label">Thời gian giữ chỗ</span>
-                    <input type="number" id="param-hold-hours" class="floating-input" value="24" min="1" max="168" style="flex: 1;">
-                    <span class="input-suffix" style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">giờ</span>
+                    <input type="number" id="param-hold-hours" class="floating-input" value="24" min="1" max="168"
+                      style="flex: 1;">
+                    <span class="input-suffix"
+                      style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">giờ</span>
                   </div>
                   <div class="param-range-note">Miền kiểm tra: 1 - 72 giờ (mặc định: 24 giờ)</div>
                 </div>
@@ -1351,8 +1369,10 @@
                   </div>
                   <div class="floating-input-wrap">
                     <span class="floating-label">Số tiền nợ tối đa</span>
-                    <input type="number" id="param-max-debt" class="floating-input" value="50000" min="0" max="500000" step="5000" style="flex: 1;">
-                    <span class="input-suffix" style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">đ</span>
+                    <input type="number" id="param-max-debt" class="floating-input" value="50000" min="0" max="500000"
+                      step="5000" style="flex: 1;">
+                    <span class="input-suffix"
+                      style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">đ</span>
                   </div>
                   <div class="param-range-note">Miền kiểm tra: 0 - 500.000 đ (mặc định: 50.000 đ)</div>
                 </div>
@@ -1366,10 +1386,12 @@
               </div>
 
               <div style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 20px;">
-                <button type="button" class="btn btn-outline btn-lg" id="btn-reset-params" onclick="window.handleResetParamsDefault()" title="Khôi phục lại tham số mặc định chuẩn ban đầu">
+                <button type="button" class="btn btn-outline btn-lg" id="btn-reset-params"
+                  onclick="window.handleResetParamsDefault()" title="Khôi phục lại tham số mặc định chuẩn ban đầu">
                   <i class="fa-solid fa-arrow-rotate-left"></i> Khôi phục mặc định
                 </button>
-                <button type="button" class="btn btn-primary btn-lg" id="btn-save-params" onclick="window.handleSaveParamsForm()">
+                <button type="button" class="btn btn-primary btn-lg" id="btn-save-params"
+                  onclick="window.handleSaveParamsForm()">
                   <i class="fa-solid fa-floppy-disk"></i> LƯU CẤU HÌNH THAM SỐ HỆ THỐNG
                 </button>
               </div>
@@ -1386,15 +1408,20 @@
             <div class="page-title-ribbon">QUẢN LÝ SAO LƯU & PHỤC HỒI CSDL POSTGRESQL</div>
             <div class="page-subtitle">Quản lý bản sao lưu dữ liệu và kiểm tra tính toàn vẹn của tệp lưu trữ.</div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
               <span class="badge badge-gray" style="padding: 6px 12px; font-size: 13px;">PostgreSQL · Sao lưu dữ
                 liệu</span>
               <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <input type="file" id="backup-file-upload-input" accept=".sql,.gz,.json,.sql.gz" style="display: none;" onchange="window.handleUploadBackupFile(event)">
-                <button type="button" class="btn btn-outline" id="btn-upload-backup" onclick="document.getElementById('backup-file-upload-input').click()" style="display: inline-flex; align-items: center; gap: 6px;">
+                <input type="file" id="backup-file-upload-input" accept=".sql,.gz,.json,.sql.gz" style="display: none;"
+                  onchange="window.handleUploadBackupFile(event)">
+                <button type="button" class="btn btn-outline" id="btn-upload-backup"
+                  onclick="document.getElementById('backup-file-upload-input').click()"
+                  style="display: inline-flex; align-items: center; gap: 6px;">
                   <i class="fa-solid fa-cloud-arrow-up"></i> Tải lên bản sao lưu (.sql / .gz / .json)
                 </button>
-                <button class="btn btn-outline" style="color: var(--hcmue-crimson); border-color: var(--hcmue-crimson);" onclick="window.handleResetSeedData()" title="Khôi phục trạng thái CSDL chuẩn ban đầu">
+                <button class="btn btn-outline" style="color: var(--hcmue-crimson); border-color: var(--hcmue-crimson);"
+                  onclick="window.handleResetSeedData()" title="Khôi phục trạng thái CSDL chuẩn ban đầu">
                   <i class="fa-solid fa-arrows-rotate"></i> Reset CSDL
                 </button>
                 <button class="btn btn-primary" id="btn-create-backup" onclick="window.handleCreateNewBackup()">
@@ -2363,6 +2390,218 @@
             onclick="window.handleCreateReaderCardSubmit()"
             style="background: #16375C; font-weight: 700; letter-spacing: 0.3px;">
             XÁC NHẬN CẤP THẺ & TẠO TÀI KHOẢN
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ===================================================================== -->
+    <!-- Modal 9: TẠO TÀI KHOẢN NGƯỜI DÙNG & PHÂN QUYỀN (UC04)                 -->
+    <!-- ===================================================================== -->
+    <div id="modal-create-account" class="modal-overlay">
+      <div class="modal-container"
+        style="max-width: 680px; width: 95%; max-height: 85vh; border-radius: 14px; overflow: hidden; padding: 0; background: #ffffff; border: 1px solid #E2E8F0; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column;">
+
+        <!-- Header Nền xanh Navy #16375C, chữ trắng -->
+        <div class="modal-header"
+          style="background: #16375C; color: #ffffff; padding: 16px 24px; display: flex; flex-direction: column; gap: 4px; border-bottom: none;">
+          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <div class="modal-title"
+              style="color: #ffffff; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; letter-spacing: 0.3px;">
+              <i class="fa-solid fa-user-plus"></i> TẠO TÀI KHOẢN NGƯỜI DÙNG & PHÂN QUYỀN (UC04)
+            </div>
+            <button type="button" class="modal-close-btn" onclick="window.closeModal('modal-create-account')"
+              style="background: rgba(255, 255, 255, 0.15); color: #ffffff; width: 28px; height: 28px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <div style="font-size: 12px; color: #cbd5e1; line-height: 1.4;">
+            Khởi tạo định danh, phân quyền hệ thống và thiết lập quyền truy cập cho người dùng.
+          </div>
+        </div>
+
+        <!-- Form Body -->
+        <div class="modal-body" style="padding: 20px 24px; overflow-y: auto; flex: 1;">
+          <div id="ca-error-alert" class="alert-banner alert-banner-danger"
+            style="display: none; margin-bottom: 14px; padding: 10px 14px; font-size: 13px;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span id="ca-error-text">Vui lòng nhập đầy đủ thông tin bắt buộc!</span>
+          </div>
+
+          <form id="create-account-form" onsubmit="event.preventDefault(); window.handleCreateAccountSubmit();">
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+
+              <!-- Cụm 1: Chọn vai trò (Role Cards - Dàn ngang 3 nút bấm hiện đại) -->
+              <div>
+                <div
+                  style="font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
+                  1. Chọn vai trò & quyền hạn hệ thống <span
+                    style="color: var(--hcmue-crimson); font-weight: 700;">*</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                  <!-- Card ADMIN -->
+                  <div class="ca-role-card" id="ca-role-label-ADMIN"
+                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 14px 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: #ffffff; cursor: pointer; transition: all 0.2s;"
+                    onclick="window.handleSelectAccountRole('ADMIN')">
+                    <span style="font-weight: 700; font-size: 13px; color: #1e293b;">Quản trị viên</span>
+                    <span class="badge badge-purple" style="font-size: 10px;">ADMIN</span>
+                  </div>
+
+                  <!-- Card THU_THU -->
+                  <div class="ca-role-card" id="ca-role-label-THU_THU"
+                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 14px 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: #ffffff; cursor: pointer; transition: all 0.2s;"
+                    onclick="window.handleSelectAccountRole('THU_THU')">
+                    <span style="font-weight: 700; font-size: 13px; color: #1e293b;">Thủ thư</span>
+                    <span class="badge badge-blue" style="font-size: 10px;">THU_THU</span>
+                  </div>
+
+                  <!-- Card DOC_GIA (Mặc định chọn) -->
+                  <div class="ca-role-card active" id="ca-role-label-DOC_GIA"
+                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 14px 10px; border-radius: 10px; border: 2px solid #16a34a; background: #f0fdf4; cursor: pointer; transition: all 0.2s;"
+                    onclick="window.handleSelectAccountRole('DOC_GIA')">
+                    <span style="font-weight: 700; font-size: 13px; color: #166534;">Độc giả / SV</span>
+                    <span class="badge badge-green" style="font-size: 10px;">DOC_GIA</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cụm 2: Thông tin định danh & liên hệ -->
+              <div>
+                <div
+                  style="font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
+                  2. Thông tin định danh & liên hệ
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <!-- Hàng 1: MSSV / Tên đăng nhập & Họ tên -->
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div class="floating-input-wrap">
+                      <span class="floating-label" id="ca-label-username">Tên đăng nhập / MSSV <span
+                          style="color: var(--hcmue-crimson); font-weight: 700;">*</span></span>
+                      <input type="text" id="ca-username" class="floating-input" placeholder="Ví dụ: 49.01.104.088"
+                        required oninput="window.handleCreateAccountUsernameInput(this.value)">
+                    </div>
+                    <div class="floating-input-wrap">
+                      <span class="floating-label">Họ và tên đầy đủ <span
+                          style="color: var(--hcmue-crimson); font-weight: 700;">*</span></span>
+                      <input type="text" id="ca-name" class="floating-input" placeholder="Ví dụ: Nguyễn Văn An"
+                        required>
+                    </div>
+                  </div>
+
+                  <!-- Hàng 2: Email & Số điện thoại -->
+                  <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 14px;">
+                    <div class="floating-input-wrap">
+                      <span class="floating-label">Email liên hệ <span
+                          style="color: var(--hcmue-crimson); font-weight: 700;">*</span></span>
+                      <input type="email" id="ca-email" class="floating-input"
+                        placeholder="Ví dụ: 49.01.104.088@student.hcmue.edu.vn" required
+                        oninput="this.dataset.manualEdited = 'true'">
+                    </div>
+                    <div class="floating-input-wrap">
+                      <span class="floating-label">Số điện thoại</span>
+                      <input type="tel" id="ca-phone" class="floating-input" placeholder="Ví dụ: 0912345678"
+                        value="0912345678">
+                    </div>
+                  </div>
+
+                  <!-- Hàng 3: Đơn vị công tác / Khoa & Lớp chuyên ngành -->
+                  <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 14px;">
+                    <div class="floating-input-wrap">
+                      <span class="floating-label">Đơn vị công tác / Khoa</span>
+                      <select id="ca-department" class="form-select">
+                        <option value="Khoa Công nghệ Thông tin" selected>Khoa Công nghệ Thông tin</option>
+                        <option value="Khoa Toán - Tin học">Khoa Toán - Tin học</option>
+                        <option value="Khoa Ngoại ngữ">Khoa Ngoại ngữ</option>
+                        <option value="Khoa Vật lý">Khoa Vật lý</option>
+                        <option value="Khoa Hóa học">Khoa Hóa học</option>
+                        <option value="Khoa Sinh học">Khoa Sinh học</option>
+                        <option value="Khoa Ngữ văn">Khoa Ngữ văn</option>
+                        <option value="Khoa Lịch sử">Khoa Lịch sử</option>
+                        <option value="Khoa Địa lý">Khoa Địa lý</option>
+                        <option value="Khoa Giáo dục Tiểu học">Khoa Giáo dục Tiểu học</option>
+                        <option value="Khoa Giáo dục Mầm non">Khoa Giáo dục Mầm non</option>
+                        <option value="Khoa Tâm lý học">Khoa Tâm lý học</option>
+                        <option value="Phòng Công tác Quản lý Thư viện">Phòng Công tác Quản lý Thư viện</option>
+                      </select>
+                    </div>
+                    <div class="floating-input-wrap" id="ca-wrap-class">
+                      <span class="floating-label">Lớp chuyên ngành</span>
+                      <input type="text" id="ca-class" class="floating-input" placeholder="Ví dụ: 49.01.CNTT.A"
+                        value="49.01.CNTT.A">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cụm 3: Tùy chọn thẻ Độc giả (Dynamic Context Box - Chỉ hiện khi vai trò là DOC_GIA) -->
+              <div id="ca-reader-card-box"
+                style="background: #f0f7ff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 14px 18px; margin-top: 2px; transition: all 0.25s ease;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <label
+                    style="display: flex; align-items: center; gap: 10px; font-weight: 700; color: #1e40af; cursor: pointer; font-size: 13px;">
+                    <input type="checkbox" id="ca-create-card-checkbox" checked
+                      onchange="window.handleToggleCreateCardOption(this.checked)"
+                      style="width: 17px; height: 17px; accent-color: #1d4ed8; cursor: pointer;">
+                    <span>Cấp thẻ thư viện liên kết song song</span>
+                  </label>
+                  <span class="badge badge-blue" style="font-size: 11px;">ĐỒNG BỘ THỦ THƯ</span>
+                </div>
+                <div id="ca-card-summary"
+                  style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #bfdbfe;">
+                  <div>
+                    <span style="color: #64748b;">Mã thẻ dự kiến:</span>
+                    <strong id="ca-card-code-preview"
+                      style="color: var(--hcmue-crimson); margin-left: 6px; font-family: monospace;">THE-4901104</strong>
+                  </div>
+                  <div>
+                    <span style="color: #64748b;">Thời hạn thẻ:</span>
+                    <strong style="color: #0f172a; margin-left: 6px;">4 năm</strong>
+                    <span style="color: #64748b; font-size: 11px;">(30/06/2030)</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cụm 4: Mật khẩu & Kích hoạt -->
+              <div id="ca-security-box"
+                style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 18px; margin-top: 2px;">
+                <div
+                  style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 13px;">
+                  <div>
+                    <span style="color: #64748b;">Mật khẩu ban đầu:</span>
+                    <strong
+                      style="color: #0f172a; font-family: monospace; font-size: 13px; background: #e2e8f0; padding: 2px 8px; border-radius: 4px; margin-left: 6px;">123456</strong>
+                    <span style="color: #64748b; font-size: 11px; margin-left: 4px;">(Mặc định)</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <span style="color: #64748b;">Trạng thái:</span>
+                    <span class="badge badge-green" style="font-size: 11px;">KÍCH HOẠT NGAY</span>
+                  </div>
+                </div>
+                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
+                  <label
+                    style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #334155; font-size: 13px;">
+                    <input type="checkbox" id="ca-must-change-password" checked
+                      style="width: 15px; height: 15px; accent-color: var(--hcmue-navy); cursor: pointer;">
+                    <span>Yêu cầu đổi mật khẩu ở lần đăng nhập đầu tiên</span>
+                  </label>
+                </div>
+              </div>
+
+            </div>
+          </form>
+        </div>
+
+        <!-- Footer Modal -->
+        <div class="modal-footer"
+          style="padding: 14px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 12px;">
+          <button type="button" class="btn btn-outline" onclick="window.closeModal('modal-create-account')">Hủy
+            bỏ</button>
+          <button type="button" class="btn btn-primary" id="btn-submit-create-account"
+            onclick="window.handleCreateAccountSubmit()"
+            style="background: var(--hcmue-navy); font-weight: 700; letter-spacing: 0.3px;">
+            <i class="fa-solid fa-user-plus"></i> XÁC NHẬN TẠO TÀI KHOẢN
           </button>
         </div>
 

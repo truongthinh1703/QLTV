@@ -648,18 +648,21 @@ export function openCreateReaderCardModal() {
  * Tự sinh mã thẻ độc giả theo chuẩn HCMUE (Ví dụ: 50.01.103.088 -> THE-50011088)
  */
 export function generateCardIdFromMssv(mssv) {
-  if (!mssv) return 'THE-50011088';
+  if (!mssv) return 'THE-4901104';
   const clean = String(mssv).replace(/[^0-9a-zA-Z]/g, '');
-  if (clean.length === 10 && clean.startsWith('5001103')) {
+  if (clean.length === 10 && (clean.startsWith('5001103') || clean.startsWith('4901104') || clean.startsWith('5001104'))) {
     const lastDigits = clean.slice(7).replace(/^0+/, '');
-    return `THE-500110${lastDigits || '0'}`;
+    return `THE-${clean.slice(0, 6)}${lastDigits || '0'}`;
   }
   if (clean.length >= 8) {
     const prefix = clean.slice(0, 6);
-    const suffix = clean.slice(7);
-    return `THE-${prefix}${suffix}`;
+    const suffix = clean.slice(7).replace(/^0+/, '');
+    return `THE-${prefix}${suffix || '0'}`;
   }
-  return `THE-${clean}`;
+  if (clean) {
+    return `THE-${clean}`;
+  }
+  return 'THE-4901104';
 }
 
 /**
