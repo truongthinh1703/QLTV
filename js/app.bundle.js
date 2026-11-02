@@ -1,4 +1,4 @@
-(function() {
+﻿(function() {
   "use strict";
 
 // ==========================================
@@ -3084,6 +3084,13 @@ function renderMasterTitlesScreen() {
     filtered = filtered.filter(t => t.category === cat || t.categoryId === cat);
   }
 
+  const paginInfo = document.getElementById('titles-pagination-info');
+  if (paginInfo) {
+    paginInfo.textContent = filtered.length > 0
+      ? `Hiển thị 1–${filtered.length} trong ${filtered.length} đầu sách`
+      : `Hiển thị 0 trong 0 đầu sách`;
+  }
+
   const tbody = document.getElementById('master-titles-tbody');
   if (!tbody) return;
 
@@ -3610,6 +3617,13 @@ function renderReadersScreen() {
     }
   }
 
+  const paginInfo = document.getElementById('readers-pagination-info');
+  if (paginInfo) {
+    paginInfo.textContent = readers.length > 0
+      ? `Hiển thị 1–${readers.length} trong ${readers.length} độc giả`
+      : `Hiển thị 0 trong 0 độc giả`;
+  }
+
   const tbody = document.getElementById('readers-list-tbody');
   if (!tbody) return;
 
@@ -3891,6 +3905,13 @@ let selectedBackupToRestore = null;
  */
 function renderAccountsScreen() {
   const db = getDB();
+  const paginInfo = document.getElementById('accounts-pagination-info');
+  if (paginInfo) {
+    paginInfo.textContent = db.accounts.length > 0
+      ? `Hiển thị 1–${db.accounts.length} trong ${db.accounts.length} tài khoản`
+      : `Hiển thị 0 trong 0 tài khoản`;
+  }
+
   const tbody = document.getElementById('accounts-list-tbody');
   if (!tbody) return;
 
@@ -5100,7 +5121,9 @@ function registerGlobalEvents() {
 
   // Nút Reset Seed Data trên Topbar
   window.handleResetSeedData = function() {
-    if (confirm("Bạn có chắc chắn muốn khôi phục dữ liệu gốc ban đầu để đối soát chấm bài?")) {
+    const confirmed = window.confirm("Cảnh báo: Bạn có chắc chắn muốn thực hiện thao tác này không? Toàn bộ dữ liệu CSDL hiện tại sẽ được thiết lập lại về trạng thái gốc ban đầu.");
+    if (!confirmed) return;
+    {
       resetDB();
       resetCirculationState();
       showToast("Đã khôi phục toàn bộ CSDL gốc 100% chuẩn đối soát!", "success");
@@ -5635,6 +5658,17 @@ function registerGlobalEvents() {
   };
 
   window.handleToggleLockAccount = function(username) {
+    const db = getDB();
+    const acc = db.accounts.find(a => a.username === username);
+    if (!acc) return;
+
+    const isCurrentlyLocked = acc.status === 'KHOA';
+    const actionText = isCurrentlyLocked ? 'mở khóa' : 'khóa';
+
+    const confirmed = window.confirm(`Cảnh báo: Bạn có chắc chắn muốn thực hiện thao tác ${actionText} tài khoản "${username}" không?${!isCurrentlyLocked ? ' Người dùng này sẽ không thể đăng nhập vào hệ thống.' : ''}`);
+    if (!confirmed) {
+      return;
+    }
     mutateDB(draft => {
       const acc = draft.accounts.find(a => a.username === username);
       if (acc) {
@@ -5646,6 +5680,17 @@ function registerGlobalEvents() {
   };
 
   window.handleToggleLockReader = function(username) {
+    const db = getDB();
+    const acc = db.accounts.find(a => a.username === username);
+    if (!acc) return;
+
+    const isCurrentlyLocked = acc.cardStatus === 'TAM_KHOA_NO' || acc.status === 'KHOA';
+    const actionText = isCurrentlyLocked ? 'mở khóa' : 'khóa';
+
+    const confirmed = window.confirm(`Cảnh báo: Bạn có chắc chắn muốn thực hiện thao tác ${actionText} thẻ độc giả "${acc.name || username}" không?`);
+    if (!confirmed) {
+      return;
+    }
     mutateDB(draft => {
       const acc = draft.accounts.find(a => a.username === username);
       if (acc) {

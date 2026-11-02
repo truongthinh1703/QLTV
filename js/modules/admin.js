@@ -12,6 +12,13 @@ let selectedBackupToRestore = null;
  */
 export function renderAccountsScreen() {
   const db = getDB();
+  const paginInfo = document.getElementById('accounts-pagination-info');
+  if (paginInfo) {
+    paginInfo.textContent = db.accounts.length > 0
+      ? `Hiển thị 1–${db.accounts.length} trong ${db.accounts.length} tài khoản`
+      : `Hiển thị 0 trong 0 tài khoản`;
+  }
+
   const tbody = document.getElementById('accounts-list-tbody');
   if (!tbody) return;
 

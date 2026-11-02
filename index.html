@@ -736,7 +736,7 @@
               </div>
 
               <button class="btn btn-primary" onclick="window.openModal('modal-add-title')">
-                <i class="fa-solid fa-plus"></i> THÊM ĐẦU SÁCH MỚI
+                <i class="fa-solid fa-plus"></i> Thêm đầu sách mới
               </button>
             </div>
 
@@ -764,7 +764,7 @@
               </div>
 
               <div class="table-pagination-bar">
-                <span>Hiển thị 1–2 trong 2 đầu sách</span>
+                <span id="titles-pagination-info">Hiển thị 1–2 trong 2 đầu sách</span>
                 <div class="pagination-controls">
                   <button class="page-btn"><i class="fa-solid fa-chevron-left"></i></button>
                   <button class="page-btn active">1</button>
@@ -1107,7 +1107,7 @@
               </div>
 
               <button class="btn btn-primary" id="btn-open-create-reader" onclick="window.openCreateReaderCardModal()">
-                <i class="fa-solid fa-plus"></i> CẤP THẺ ĐỘC GIẢ MỚI
+                <i class="fa-solid fa-plus"></i> Cấp thẻ độc giả mới
               </button>
             </div>
 
@@ -1135,7 +1135,7 @@
               </div>
 
               <div class="table-pagination-bar">
-                <span>Hiển thị 1–3 trong 3 độc giả</span>
+                <span id="readers-pagination-info">Hiển thị 1–3 trong 3 độc giả</span>
                 <div class="pagination-controls">
                   <button class="page-btn"><i class="fa-solid fa-chevron-left"></i></button>
                   <button class="page-btn active">1</button>
@@ -1163,7 +1163,7 @@
               <div class="page-subtitle" style="margin-bottom: 0;">Quản lý định danh và quyền truy cập theo vai trò.
               </div>
               <button class="btn btn-primary" onclick="window.showToast('Mở form tạo tài khoản mới', 'info')">
-                <i class="fa-solid fa-plus"></i> TẠO TÀI KHOẢN MỚI
+                <i class="fa-solid fa-plus"></i> Tạo tài khoản mới
               </button>
             </div>
 
@@ -1189,7 +1189,7 @@
               </div>
 
               <div class="table-pagination-bar">
-                <span>Hiển thị 1–3 trong 3 tài khoản</span>
+                <span id="accounts-pagination-info">Hiển thị 1–3 trong 3 tài khoản</span>
                 <div class="pagination-controls">
                   <button class="page-btn"><i class="fa-solid fa-chevron-left"></i></button>
                   <button class="page-btn active">1</button>
@@ -1324,8 +1324,8 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
               <span class="badge badge-gray" style="padding: 6px 12px; font-size: 13px;">PostgreSQL · Sao lưu dữ
                 liệu</span>
-              <button class="btn btn-primary" id="btn-create-backup" onclick="window.handleCreateNewBackup()">
-                <i class="fa-solid fa-database"></i> + TẠO BẢN SAO LƯU MỚI (PG_DUMP)
+              <button class="btn btn-outline" style="color: var(--hcmue-crimson); border-color: var(--hcmue-crimson); margin-right: 10px;" onclick="window.handleResetSeedData()" title="Khôi phục trạng thái CSDL chuẩn ban đầu"><i class="fa-solid fa-arrows-rotate"></i> Reset CSDL</button><button class="btn btn-primary" id="btn-create-backup" onclick="window.handleCreateNewBackup()">
+                <i class="fa-solid fa-database"></i> + Tạo bản sao lưu mới (pg_dump)
               </button>
             </div>
 

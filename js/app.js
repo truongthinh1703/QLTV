@@ -543,7 +543,9 @@ function registerGlobalEvents() {
 
   // Nút Reset Seed Data trên Topbar
   window.handleResetSeedData = function() {
-    if (confirm("Bạn có chắc chắn muốn khôi phục dữ liệu gốc ban đầu để đối soát chấm bài?")) {
+    const confirmed = window.confirm("Cảnh báo: Bạn có chắc chắn muốn thực hiện thao tác này không? Toàn bộ dữ liệu CSDL hiện tại sẽ được thiết lập lại về trạng thái gốc ban đầu.");
+    if (!confirmed) return;
+    {
       resetDB();
       resetCirculationState();
       showToast("Đã khôi phục toàn bộ CSDL gốc 100% chuẩn đối soát!", "success");
@@ -1078,6 +1080,17 @@ function registerGlobalEvents() {
   };
 
   window.handleToggleLockAccount = function(username) {
+    const db = getDB();
+    const acc = db.accounts.find(a => a.username === username);
+    if (!acc) return;
+
+    const isCurrentlyLocked = acc.status === 'KHOA';
+    const actionText = isCurrentlyLocked ? 'mở khóa' : 'khóa';
+
+    const confirmed = window.confirm(`Cảnh báo: Bạn có chắc chắn muốn thực hiện thao tác ${actionText} tài khoản "${username}" không?${!isCurrentlyLocked ? ' Người dùng này sẽ không thể đăng nhập vào hệ thống.' : ''}`);
+    if (!confirmed) {
+      return;
+    }
     mutateDB(draft => {
       const acc = draft.accounts.find(a => a.username === username);
       if (acc) {
@@ -1089,6 +1102,17 @@ function registerGlobalEvents() {
   };
 
   window.handleToggleLockReader = function(username) {
+    const db = getDB();
+    const acc = db.accounts.find(a => a.username === username);
+    if (!acc) return;
+
+    const isCurrentlyLocked = acc.cardStatus === 'TAM_KHOA_NO' || acc.status === 'KHOA';
+    const actionText = isCurrentlyLocked ? 'mở khóa' : 'khóa';
+
+    const confirmed = window.confirm(`Cảnh báo: Bạn có chắc chắn muốn thực hiện thao tác ${actionText} thẻ độc giả "${acc.name || username}" không?`);
+    if (!confirmed) {
+      return;
+    }
     mutateDB(draft => {
       const acc = draft.accounts.find(a => a.username === username);
       if (acc) {

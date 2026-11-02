@@ -30,6 +30,13 @@ export function renderMasterTitlesScreen() {
     filtered = filtered.filter(t => t.category === cat || t.categoryId === cat);
   }
 
+  const paginInfo = document.getElementById('titles-pagination-info');
+  if (paginInfo) {
+    paginInfo.textContent = filtered.length > 0
+      ? `Hiển thị 1–${filtered.length} trong ${filtered.length} đầu sách`
+      : `Hiển thị 0 trong 0 đầu sách`;
+  }
+
   const tbody = document.getElementById('master-titles-tbody');
   if (!tbody) return;
 
@@ -554,6 +561,13 @@ export function renderReadersScreen() {
     } else if (statusFilter === 'KHOA') {
       readers = readers.filter(r => r.cardStatus === 'TAM_KHOA_NO' || r.status === 'KHOA');
     }
+  }
+
+  const paginInfo = document.getElementById('readers-pagination-info');
+  if (paginInfo) {
+    paginInfo.textContent = readers.length > 0
+      ? `Hiển thị 1–${readers.length} trong ${readers.length} độc giả`
+      : `Hiển thị 0 trong 0 độc giả`;
   }
 
   const tbody = document.getElementById('readers-list-tbody');
