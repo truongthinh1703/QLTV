@@ -1167,6 +1167,35 @@
               </button>
             </div>
 
+            <!-- Thanh tìm kiếm & Bộ lọc tài khoản -->
+            <div class="catalog-filter-bar">
+              <div class="floating-input-wrap" style="flex: 1;">
+                <span class="floating-label">Tìm kiếm tài khoản</span>
+                <input type="text" id="accounts-search-input" class="floating-input"
+                  placeholder="Tìm kiếm theo Tên, MSSV/Mã CB, Email..." oninput="window.renderAccountsScreen()">
+                <i class="fa-solid fa-magnifying-glass input-icon-right"></i>
+              </div>
+
+              <div class="floating-input-wrap" style="width: 220px;">
+                <span class="floating-label">Vai trò</span>
+                <select id="accounts-filter-role" class="form-select" onchange="window.renderAccountsScreen()">
+                  <option value="ALL">Tất cả vai trò</option>
+                  <option value="ADMIN">Quản trị viên (ADMIN)</option>
+                  <option value="THU_THU">Thủ thư (THU_THU)</option>
+                  <option value="DOC_GIA">Độc giả (DOC_GIA)</option>
+                </select>
+              </div>
+
+              <div class="floating-input-wrap" style="width: 180px;">
+                <span class="floating-label">Trạng thái</span>
+                <select id="accounts-filter-status" class="form-select" onchange="window.renderAccountsScreen()">
+                  <option value="ALL">Tất cả trạng thái</option>
+                  <option value="ACTIVE">Kích hoạt</option>
+                  <option value="KHOA">Bị khóa</option>
+                </select>
+              </div>
+            </div>
+
             <div class="hcmue-card">
               <div class="hcmue-card-header">
                 <div class="hcmue-card-title">Danh sách tài khoản hệ thống</div>
@@ -1357,12 +1386,21 @@
             <div class="page-title-ribbon">QUẢN LÝ SAO LƯU & PHỤC HỒI CSDL POSTGRESQL</div>
             <div class="page-subtitle">Quản lý bản sao lưu dữ liệu và kiểm tra tính toàn vẹn của tệp lưu trữ.</div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
               <span class="badge badge-gray" style="padding: 6px 12px; font-size: 13px;">PostgreSQL · Sao lưu dữ
                 liệu</span>
-              <button class="btn btn-outline" style="color: var(--hcmue-crimson); border-color: var(--hcmue-crimson); margin-right: 10px;" onclick="window.handleResetSeedData()" title="Khôi phục trạng thái CSDL chuẩn ban đầu"><i class="fa-solid fa-arrows-rotate"></i> Reset CSDL</button><button class="btn btn-primary" id="btn-create-backup" onclick="window.handleCreateNewBackup()">
-                <i class="fa-solid fa-database"></i> + Tạo bản sao lưu mới (pg_dump)
-              </button>
+              <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <input type="file" id="backup-file-upload-input" accept=".sql,.gz,.json,.sql.gz" style="display: none;" onchange="window.handleUploadBackupFile(event)">
+                <button type="button" class="btn btn-outline" id="btn-upload-backup" onclick="document.getElementById('backup-file-upload-input').click()" style="display: inline-flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-cloud-arrow-up"></i> Tải lên bản sao lưu (.sql / .gz / .json)
+                </button>
+                <button class="btn btn-outline" style="color: var(--hcmue-crimson); border-color: var(--hcmue-crimson);" onclick="window.handleResetSeedData()" title="Khôi phục trạng thái CSDL chuẩn ban đầu">
+                  <i class="fa-solid fa-arrows-rotate"></i> Reset CSDL
+                </button>
+                <button class="btn btn-primary" id="btn-create-backup" onclick="window.handleCreateNewBackup()">
+                  <i class="fa-solid fa-database"></i> + Tạo bản sao lưu mới (pg_dump)
+                </button>
+              </div>
             </div>
 
             <div class="hcmue-card">

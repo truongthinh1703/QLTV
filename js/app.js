@@ -43,7 +43,7 @@ import {
 } from './modules/catalog.js';
 import { 
   renderAccountsScreen, renderParamsScreen, saveSystemParams, resetSystemParamsToDefault, renderBackupsScreen, 
-  createNewBackup, getBackupForRestore, renderReportsScreen 
+  createNewBackup, deleteBackup, getBackupForRestore, renderReportsScreen 
 } from './modules/admin.js';
 import { 
   renderStudentSearchScreen, openPdfPreviewModal, setPdfPage, changePdfPage, renderStudentLoansScreen, 
@@ -1112,6 +1112,60 @@ function registerGlobalEvents() {
 
     openModal('modal-restore-alert');
   };
+
+  window.handleUploadBackupFile = function(event) {
+    const file = event.target?.files?.[0];
+    if (!file) return;
+
+    const confirmed = window.confirm("Bạn có muốn khôi phục dữ liệu từ tệp này không?");
+    if (!confirmed) {
+      event.target.value = '';
+      return;
+    }
+
+    showToast("Đang tải lên và phân tích tệp sao lưu...", "info");
+
+    setTimeout(() => {
+      const cur = getCurrentUser();
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+      const sizeStr = file.size >= 1024 * 1024 ? `${sizeMB} MB` : `${Math.max(1, Math.round(file.size / 1024))} KB`;
+      const now = new Date();
+      const pad = n => n.toString().padStart(2, '0');
+      const timeStr = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+      const uploadedBackup = {
+        id: `BK-${Date.now()}`,
+        filename: file.name,
+        checksum: "sha256:" + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10),
+        size: sizeStr,
+        author: `${cur?.username || 'admin01'} (Tải lên)`,
+        createdAt: timeStr
+      };
+
+      mutateDB(draft => {
+        draft.backups = draft.backups || [];
+        draft.backups.unshift(uploadedBackup);
+      }, 'RESTORE_FROM_UPLOADED_BACKUP');
+
+      renderBackupsScreen();
+      if (window.triggerConfetti) triggerConfetti();
+      showToast("Đã khôi phục dữ liệu mô phỏng thành công!", "success");
+      event.target.value = '';
+    }, 600);
+  };
+
+  window.handleDeleteBackup = function(backupId) {
+    const confirmed = window.confirm("Bạn có chắc muốn xóa bản sao lưu này để giải phóng dung lượng không?");
+    if (!confirmed) return;
+
+    const deleted = deleteBackup(backupId);
+    renderBackupsScreen();
+    showToast(deleted ? `Đã xóa bản sao lưu ${deleted.filename} thành công!` : "Đã xóa bản sao lưu thành công!", "success");
+  };
+
+  // Expose admin renderers
+  window.renderAccountsScreen = renderAccountsScreen;
+  window.renderBackupsScreen = renderBackupsScreen;
 
   // Các handler bổ trợ quản lý tài khoản & độc giả
   window.handleResetPasswordAccount = function(username) {

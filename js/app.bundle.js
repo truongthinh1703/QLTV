@@ -4077,17 +4077,76 @@ let selectedBackupToRestore = null;
  */
 function renderAccountsScreen() {
   const db = getDB();
+  const searchInput = document.getElementById('accounts-search-input');
+  const roleSelect = document.getElementById('accounts-filter-role');
+  const statusSelect = document.getElementById('accounts-filter-status');
+
+  const searchTerm = (searchInput?.value || '').trim();
+  const normalizedSearch = typeof removeVietnameseTones === 'function' 
+    ? removeVietnameseTones(searchTerm) 
+    : searchTerm.toLowerCase();
+  const selectedRole = roleSelect?.value || 'ALL';
+  const selectedStatus = statusSelect?.value || 'ALL';
+
+  const filteredAccounts = db.accounts.filter(acc => {
+    // 1. Lọc theo vai trò
+    if (selectedRole !== 'ALL' && acc.role !== selectedRole) {
+      return false;
+    }
+    // 2. Lọc theo trạng thái
+    if (selectedStatus === 'ACTIVE' && acc.status === 'KHOA') {
+      return false;
+    }
+    if (selectedStatus === 'KHOA' && acc.status !== 'KHOA') {
+      return false;
+    }
+    // 3. Lọc theo từ khóa tìm kiếm (hỗ trợ tiếng Việt không dấu & không phân biệt hoa thường)
+    if (normalizedSearch) {
+      const nameNorm = typeof removeVietnameseTones === 'function' ? removeVietnameseTones(acc.name || '') : (acc.name || '').toLowerCase();
+      const usernameNorm = (acc.username || '').toLowerCase();
+      const staffIdNorm = (acc.staffId || '').toLowerCase();
+      const emailNorm = (acc.email || '').toLowerCase();
+      const cardIdNorm = (acc.cardId || '').toLowerCase();
+
+      const matched = nameNorm.includes(normalizedSearch) ||
+                      usernameNorm.includes(normalizedSearch) ||
+                      staffIdNorm.includes(normalizedSearch) ||
+                      emailNorm.includes(normalizedSearch) ||
+                      cardIdNorm.includes(normalizedSearch);
+      if (!matched) return false;
+    }
+    return true;
+  });
+
   const paginInfo = document.getElementById('accounts-pagination-info');
   if (paginInfo) {
-    paginInfo.textContent = db.accounts.length > 0
-      ? `Hiển thị 1–${db.accounts.length} trong ${db.accounts.length} tài khoản`
-      : `Hiển thị 0 trong 0 tài khoản`;
+    const total = db.accounts.length;
+    const count = filteredAccounts.length;
+    if (count === 0) {
+      paginInfo.textContent = `Hiển thị 0 trong 0 tài khoản (Tổng CSDL: ${total})`;
+    } else if (count < total) {
+      paginInfo.textContent = `Hiển thị 1–${count} trong ${count} tài khoản (Lọc từ ${total} tài khoản)`;
+    } else {
+      paginInfo.textContent = `Hiển thị 1–${count} trong ${count} tài khoản`;
+    }
   }
 
   const tbody = document.getElementById('accounts-list-tbody');
   if (!tbody) return;
 
-  tbody.innerHTML = db.accounts.map(acc => {
+  if (filteredAccounts.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px 16px;">
+          <i class="fa-solid fa-user-slash" style="font-size: 24px; margin-bottom: 8px; display: block; opacity: 0.5;"></i>
+          Không tìm thấy tài khoản nào khớp với bộ lọc hiện tại.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filteredAccounts.map(acc => {
     let roleBadge = 'badge-green';
     let roleLabel = 'ĐỘC GIẢ / SINH VIÊN';
     if (acc.role === 'ADMIN') {
@@ -4198,6 +4257,18 @@ function renderBackupsScreen() {
   const tbody = document.getElementById('backups-list-tbody');
   if (!tbody) return;
 
+  if (!db.backups || db.backups.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 32px 16px;">
+          <i class="fa-solid fa-database" style="font-size: 24px; margin-bottom: 8px; display: block; opacity: 0.5;"></i>
+          Chưa có tệp sao lưu nào. Hãy bấm <strong>+ Tạo bản sao lưu mới</strong> hoặc <strong>Tải lên bản sao lưu</strong>.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
   tbody.innerHTML = db.backups.map(bk => `
     <tr>
       <td>
@@ -4211,11 +4282,28 @@ function renderBackupsScreen() {
         <div class="cell-actions">
           <button class="btn-link" onclick="window.handleDownloadBackup('${bk.filename}')">Tải về (.sql.gz)</button>
           <span>·</span>
-          <button class="btn-link danger" onclick="window.handleOpenRestoreAlertModal('${bk.id}')">Phục hồi CSDL</button>
+          <button class="btn-link" onclick="window.handleOpenRestoreAlertModal('${bk.id}')" style="color: var(--hcmue-navy);">Phục hồi CSDL</button>
+          <span>·</span>
+          <button class="btn-link danger" onclick="window.handleDeleteBackup('${bk.id}')" title="Xóa bản sao lưu để giải phóng dung lượng"><i class="fa-solid fa-trash-can"></i> Xóa</button>
         </div>
       </td>
     </tr>
   `).join('');
+}
+
+/**
+ * Xóa một bản sao lưu khỏi danh sách CSDL mô phỏng (UC06)
+ */
+function deleteBackup(backupId) {
+  let deletedBk = null;
+  mutateDB(draft => {
+    const idx = (draft.backups || []).findIndex(b => b.id === backupId);
+    if (idx !== -1) {
+      deletedBk = draft.backups[idx];
+      draft.backups.splice(idx, 1);
+    }
+  }, 'DELETE_BACKUP');
+  return deletedBk;
 }
 
 function createNewBackup(authorName = 'admin01') {
@@ -5892,6 +5980,60 @@ function registerGlobalEvents() {
 
     openModal('modal-restore-alert');
   };
+
+  window.handleUploadBackupFile = function(event) {
+    const file = event.target?.files?.[0];
+    if (!file) return;
+
+    const confirmed = window.confirm("Bạn có muốn khôi phục dữ liệu từ tệp này không?");
+    if (!confirmed) {
+      event.target.value = '';
+      return;
+    }
+
+    showToast("Đang tải lên và phân tích tệp sao lưu...", "info");
+
+    setTimeout(() => {
+      const cur = getCurrentUser();
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+      const sizeStr = file.size >= 1024 * 1024 ? `${sizeMB} MB` : `${Math.max(1, Math.round(file.size / 1024))} KB`;
+      const now = new Date();
+      const pad = n => n.toString().padStart(2, '0');
+      const timeStr = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+      const uploadedBackup = {
+        id: `BK-${Date.now()}`,
+        filename: file.name,
+        checksum: "sha256:" + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10),
+        size: sizeStr,
+        author: `${cur?.username || 'admin01'} (Tải lên)`,
+        createdAt: timeStr
+      };
+
+      mutateDB(draft => {
+        draft.backups = draft.backups || [];
+        draft.backups.unshift(uploadedBackup);
+      }, 'RESTORE_FROM_UPLOADED_BACKUP');
+
+      renderBackupsScreen();
+      if (window.triggerConfetti) triggerConfetti();
+      showToast("Đã khôi phục dữ liệu mô phỏng thành công!", "success");
+      event.target.value = '';
+    }, 600);
+  };
+
+  window.handleDeleteBackup = function(backupId) {
+    const confirmed = window.confirm("Bạn có chắc muốn xóa bản sao lưu này để giải phóng dung lượng không?");
+    if (!confirmed) return;
+
+    const deleted = deleteBackup(backupId);
+    renderBackupsScreen();
+    showToast(deleted ? `Đã xóa bản sao lưu ${deleted.filename} thành công!` : "Đã xóa bản sao lưu thành công!", "success");
+  };
+
+  // Expose admin renderers
+  window.renderAccountsScreen = renderAccountsScreen;
+  window.renderBackupsScreen = renderBackupsScreen;
 
   // Các handler bổ trợ quản lý tài khoản & độc giả
   window.handleResetPasswordAccount = function(username) {
