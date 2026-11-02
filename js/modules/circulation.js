@@ -63,15 +63,6 @@ export function renderDashboard() {
     greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
   }
 
-  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
-  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
-  const userName = user?.name || 'Nguyễn Trường Thịnh';
-  const todayStr = getTodayVN();
-  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
-  if (greetingEl) {
-    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
-  }
-
   // Tính toán KPI
   const totalTitles = db.titles.length + 1244; // Hiển thị 1,248 theo mockup
   const availableCopies = 3892;

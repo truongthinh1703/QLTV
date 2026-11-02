@@ -1064,8 +1064,24 @@ function handleLogin(username, password, callbacks) {
 
   const db = getDB();
 
-  // 2. Kiểm tra tài khoản trong CSDL (Strict Match, không có logic else dễ dãi)
-  const user = db.accounts.find(acc => acc.username === cleanUsername);
+  // 2. Kiểm tra tài khoản trong CSDL: tìm theo username, cardId, staffId, email (hỗ trợ không phân biệt hoa thường và MSSV không chấm)
+  const user = db.accounts.find(acc => {
+    if (!acc) return false;
+    const u = (acc.username || '').toLowerCase();
+    const c = (acc.cardId || '').toLowerCase();
+    const s = (acc.staffId || '').toLowerCase();
+    const e = (acc.email || '').toLowerCase();
+    const input = cleanUsername.toLowerCase();
+    
+    if (u === input || c === input || s === input || e === input) return true;
+
+    // Hỗ trợ nhập MSSV bỏ dấu chấm (ví dụ 5001103002 tương đương 50.01.103.002)
+    const rawNoDot = input.replace(/\./g, '');
+    const accNoDot = u.replace(/\./g, '');
+    if (rawNoDot && accNoDot && rawNoDot === accNoDot) return true;
+
+    return false;
+  });
 
   if (!user || user.password !== cleanPassword) {
     failedLoginAttempts++;
@@ -1235,15 +1251,6 @@ function renderDashboard() {
   // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
   const currentUser = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
   const userName = currentUser?.name || 'Nguyễn Trường Thịnh';
-  const todayStr = getTodayVN();
-  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
-  if (greetingEl) {
-    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
-  }
-
-  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
-  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
-  const userName = user?.name || 'Nguyễn Trường Thịnh';
   const todayStr = getTodayVN();
   const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
   if (greetingEl) {
