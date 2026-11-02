@@ -43,7 +43,7 @@
           <div class="auth-banner-overlay"></div>
           <div class="auth-banner-content">
             <div class="auth-banner-tag">THƯ VIỆN HCMUE</div>
-            <h1 class="auth-banner-title">Tri thức mở đường.<br>Kết nối tương lai.</h1>
+            <h1 class="auth-banner-title">Chất lượng - Sáng tạo - Nhân văn</h1>
             <p class="auth-banner-desc">Không gian học tập và nghiên cứu của cộng đồng Trường Đại học Sư phạm Thành phố
               Hồ Chí Minh.</p>
             <div class="auth-banner-address">280 An Dương Vương, Phường 4, Quận 5, TP. Hồ Chí Minh</div>
@@ -227,8 +227,8 @@
             <i class="fa-solid fa-arrows-rotate"></i> Reset CSDL Chuẩn
           </button>
 
-          <div class="topbar-datetime" id="topbar-current-time">
-            28/10/2026 · 14:30
+          <div class="topbar-datetime" id="header-realtime-clock">
+            --/--/---- --:--:--
           </div>
 
           <!-- User Badge -->
@@ -423,7 +423,7 @@
           <div id="screen-dashboard" class="app-screen">
             <div class="content-breadcrumb">Thư viện HCMUE / Bảng điều khiển</div>
             <div class="page-title-ribbon">BẢNG ĐIỀU KHIỂN LƯU THÔNG THƯ VIỆN</div>
-            <div class="page-subtitle">Chào Nguyễn Trường Thịnh, tổng quan hoạt động thư viện hôm nay, 28/10/2026.</div>
+            <div class="page-subtitle" id="dashboard-greeting-subtitle">Chào Nguyễn Trường Thịnh: Tổng quan hoạt động thư viện ngày hôm nay.</div>
 
             <!-- 4 KPI Cards -->
             <div class="kpi-grid-4">
@@ -571,12 +571,12 @@
                 <div class="loan-summary-box">
                   <div class="loan-dates-row">
                     <div class="loan-date-item">
-                      <div class="loan-date-val">28/10/2026</div>
-                      <div class="loan-date-lbl">Ngày mượn hôm nay</div>
+                      <div class="loan-date-val" id="borrow-summary-borrow-date">--/--/----</div>
+                      <div class="loan-date-lbl"><i class="fa-solid fa-calendar-check" style="color: #10b981; margin-right: 4px;" title="Ghi nhận tự động theo hệ thống"></i>Ngày mượn hôm nay (Hệ thống tự động)</div>
                     </div>
                     <div class="loan-date-item" style="text-align: right;">
-                      <div class="loan-date-val" style="color: var(--hcmue-navy);">11/11/2026</div>
-                      <div class="loan-date-lbl">Hạn trả tự động · +14 ngày</div>
+                      <div class="loan-date-val" id="borrow-summary-due-date" style="color: var(--hcmue-navy);">--/--/----</div>
+                      <div class="loan-date-lbl"><i class="fa-solid fa-clock-rotate-left" style="color: var(--text-muted); margin-right: 4px;"></i>Hạn trả tự động · +14 ngày</div>
                     </div>
                   </div>
 
@@ -1711,7 +1711,7 @@
           <div class="receipt-paper">
             <div class="receipt-school-header">THƯ VIỆN TRƯỜNG ĐẠI HỌC SƯ PHẠM TP.HCM</div>
             <div class="receipt-code-big" id="receipt-code-display">BL-2026-089</div>
-            <div class="receipt-date" id="receipt-date-display">Ngày thu: 28/10/2026</div>
+            <div class="receipt-date" id="receipt-date-display">Ngày thu: --/--/----</div>
 
             <div class="receipt-divider"></div>
 
@@ -1912,7 +1912,7 @@
               </div>
               <div class="floating-input-wrap">
                 <span class="floating-label">Ngày nhập kho (*)</span>
-                <input type="text" id="add-copy-date" class="floating-input" value="28/10/2026" required>
+                <input type="text" id="add-copy-date" class="floating-input" value="" required>
                 <i class="fa-regular fa-calendar-days input-icon-right"></i>
               </div>
             </div>
@@ -2021,7 +2021,7 @@
             <div
               style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 6px;">
               <span style="color: #0f172a;">Ngày gia hạn:</span>
-              <span style="font-weight: 700; color: #0f172a;" id="renew-modal-renew-date">Hôm nay (28/10/2026)</span>
+              <span style="font-weight: 700; color: #0f172a;" id="renew-modal-renew-date">Hôm nay</span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
               <span style="color: #0f172a;">Hạn trả mới (cộng +7 ngày):</span>
@@ -2236,7 +2236,7 @@
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
                 <div class="floating-input-wrap">
                   <span class="floating-label">Ngày cấp thẻ (Hôm nay)</span>
-                  <input type="text" id="nc-issue-date" class="floating-input" value="28/10/2026" readonly
+                  <input type="text" id="nc-issue-date" class="floating-input" value="" readonly
                     style="background: #f8fafc; color: #64748b; cursor: not-allowed;">
                 </div>
                 <div class="floating-input-wrap">

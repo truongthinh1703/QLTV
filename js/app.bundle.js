@@ -1,4 +1,4 @@
-﻿(function() {
+(function() {
   "use strict";
 
 // ==========================================
@@ -1182,6 +1182,24 @@ function handleLogout() {
 
 
 
+
+function getTodayVN(dateObj) {
+  const d = dateObj || new Date();
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+
+function getTodayVN(dateObj) {
+  const d = dateObj || new Date();
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
 let pendingBorrowCopies = [];
 let verifiedBorrowReader = null;
 let currentReturnLoan = null;
@@ -1213,6 +1231,24 @@ function escapeHTML(str) {
  */
 function renderDashboard() {
   const db = getDB();
+
+  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
+  const currentUser = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const userName = currentUser?.name || 'Nguyễn Trường Thịnh';
+  const todayStr = getTodayVN();
+  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
+  if (greetingEl) {
+    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
+  }
+
+  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const userName = user?.name || 'Nguyễn Trường Thịnh';
+  const todayStr = getTodayVN();
+  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
+  if (greetingEl) {
+    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
+  }
 
   // Tính toán KPI
   const totalTitles = db.titles.length + 1244; // Hiển thị 1,248 theo mockup
@@ -1283,6 +1319,15 @@ let activeRenewTarget = null;
  */
 function openRenewCounterModal(copyCode) {
   const db = getDB();
+
+  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const userName = user?.name || 'Nguyễn Trường Thịnh';
+  const todayStr = getTodayVN();
+  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
+  if (greetingEl) {
+    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
+  }
   
   // Tìm kiếm lượt mượn tương ứng
   let targetLoan = db.activeLoans ? db.activeLoans.find(l => l.copyCode && l.copyCode.toUpperCase() === copyCode.toUpperCase()) : null;
@@ -1363,7 +1408,7 @@ function openRenewCounterModal(copyCode) {
 
   if (checkTimesEl) checkTimesEl.textContent = `Số lần đã gia hạn: ${activeRenewTarget.renewCount}/1 (Thỏa mãn quy định tối đa 1 lần).`;
   if (checkDebtEl) checkDebtEl.textContent = `Thẻ không có nợ phạt tồn đọng (Công nợ: ${debt.toLocaleString()} đ).`;
-  if (renewDateEl) renewDateEl.textContent = 'Hôm nay (28/10/2026)';
+  if (renewDateEl) renewDateEl.textContent = `Hôm nay (${getTodayVN()})`;
   if (newDueEl) newDueEl.textContent = activeRenewTarget.newDueDate;
 
   if (window.openModal) {
@@ -1455,6 +1500,16 @@ function renewLoanAtDashboard(copyCode) {
  * Màn hình 07: Lập phiếu mượn UC12
  */
 function renderBorrowScreen() {
+  const todayStr = getTodayVN();
+  const dueObj = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+  const dueStr = getTodayVN(dueObj);
+
+  const borrowDateEl = document.getElementById('borrow-summary-borrow-date') || document.querySelector('#screen-borrow .loan-dates-row .loan-date-item:first-child .loan-date-val');
+  if (borrowDateEl) borrowDateEl.textContent = todayStr;
+
+  const dueDateEl = document.getElementById('borrow-summary-due-date') || document.querySelector('#screen-borrow .loan-dates-row .loan-date-item:last-child .loan-date-val');
+  if (dueDateEl) dueDateEl.textContent = dueStr;
+
   const readerInput = document.getElementById('borrow-reader-input');
   if (readerInput && !readerInput.value) {
     readerInput.value = 'THE-5001102'; // Giá trị mẫu
@@ -1465,6 +1520,15 @@ function renderBorrowScreen() {
   // Chỉ nạp demo 2 cuốn lần đầu tiên nếu chưa từng thao tác và sách còn sẵn sàng
   if (!hasInitializedBorrowDemo && pendingBorrowCopies.length === 0) {
     const db = getDB();
+
+  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const userName = user?.name || 'Nguyễn Trường Thịnh';
+  const todayStr = getTodayVN();
+  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
+  if (greetingEl) {
+    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
+  }
     const c1 = db.copies.find(c => c.code === 'CNPM-002');
     const c2 = db.copies.find(c => c.code === 'CSDL-004');
     const isL1Free = c1 && c1.status === 'SAN_SANG' && !db.activeLoans.some(l => l.copyCode.toUpperCase() === 'CNPM-002');
@@ -1481,6 +1545,15 @@ function renderBorrowScreen() {
 
 function verifyBorrowReader() {
   const db = getDB();
+
+  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const userName = user?.name || 'Nguyễn Trường Thịnh';
+  const todayStr = getTodayVN();
+  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
+  if (greetingEl) {
+    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
+  }
   const cardInput = document.getElementById('borrow-reader-input');
   const cardCode = (cardInput && cardInput.value && cardInput.value.trim() ? cardInput.value.trim() : 'THE-5001102');
 
@@ -1516,7 +1589,8 @@ function verifyBorrowReader() {
   }
 
   // 1. Kiểm tra trạng thái thẻ & Thời hạn hiệu lực của thẻ (Hạng mục 3.1)
-  const systemCurrentDate = new Date(2026, 9, 28); // 28/10/2026 mốc giao dịch hệ thống
+  const systemCurrentDate = new Date(); // Thời gian thực tế hệ thống
+  systemCurrentDate.setHours(0, 0, 0, 0);
   const cardExpiryParts = String(reader.cardExpiry || '').trim().split('/');
   const cardExpiryDate = cardExpiryParts.length === 3 ? new Date(Number(cardExpiryParts[2]), Number(cardExpiryParts[1]) - 1, Number(cardExpiryParts[0])) : null;
   const isCardNotExpired = cardExpiryDate ? (cardExpiryDate >= systemCurrentDate) : true;
@@ -1631,6 +1705,15 @@ function addCopyCodeToBorrow(copyCodeInput) {
   }
 
   const db = getDB();
+
+  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const userName = user?.name || 'Nguyễn Trường Thịnh';
+  const todayStr = getTodayVN();
+  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
+  if (greetingEl) {
+    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
+  }
   const copy = db.copies.find(c => c.code.toUpperCase() === code);
 
   // 1. Kiểm tra tồn tại trong danh mục bản sao
@@ -1783,6 +1866,15 @@ function executeConfirmBorrow(onDone) {
 
   const db = getDB();
 
+  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const userName = user?.name || 'Nguyễn Trường Thịnh';
+  const todayStr = getTodayVN();
+  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
+  if (greetingEl) {
+    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
+  }
+
   // Kiểm tra tính đủ điều kiện của độc giả
   if (!verifiedBorrowReader.isEligible) {
     alert(`Độc giả không đủ điều kiện mượn sách: ${verifiedBorrowReader.ineligibleReason}!`);
@@ -1830,8 +1922,8 @@ function executeConfirmBorrow(onDone) {
           readerName: verifiedBorrowReader.name,
           readerCard: verifiedBorrowReader.cardId,
           readerClass: verifiedBorrowReader.className || '50.01.SPTIN.B',
-          borrowDate: '28/10/2026',
-          dueDate: '11/11/2026',
+          borrowDate: getTodayVN(),
+          dueDate: getTodayVN(new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)),
           overdueDays: 0,
           statusBadge: 'badge-green',
           statusText: 'Trong hạn · Còn 14 ngày',
@@ -1983,6 +2075,15 @@ function handleReturnSearchInput(searchQuery) {
   if (!dd) return;
 
   const db = getDB();
+
+  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const userName = user?.name || 'Nguyễn Trường Thịnh';
+  const todayStr = getTodayVN();
+  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
+  if (greetingEl) {
+    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
+  }
   const allLoansList = getAllActiveReturnLoans(db);
 
   // 1. Khi click vào ô tìm kiếm rỗng: hiển thị danh sách các lượt mượn đang diễn ra
@@ -2174,6 +2275,15 @@ function handleSelectReturnLoanFromDropdown(copyCode, preferredCard) {
 
 function lookupReturnLoan(searchQuery, preferredCard) {
   const db = getDB();
+
+  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const userName = user?.name || 'Nguyễn Trường Thịnh';
+  const todayStr = getTodayVN();
+  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
+  if (greetingEl) {
+    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
+  }
   const q = (searchQuery || '').trim();
   hideReturnDropdown();
 
@@ -2318,7 +2428,7 @@ function renderEmptyReturnState() {
           <div class="loan-date-lbl">Hạn trả</div>
         </div>
         <div class="loan-date-item">
-          <div class="loan-date-val" style="color: #94a3b8;">Chưa xác định</div>
+          <div class="loan-date-val" style="color: #102a43; font-weight: 700;">${getTodayVN()}</div>
           <div class="loan-date-lbl">Ngày trả thực tế</div>
         </div>
       </div>
@@ -2431,6 +2541,15 @@ function renderActiveReturnState() {
 
   const { loan, copy } = currentReturnLoan;
   const db = getDB();
+
+  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const userName = user?.name || 'Nguyễn Trường Thịnh';
+  const todayStr = getTodayVN();
+  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
+  if (greetingEl) {
+    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
+  }
   const overdueFee = loan.overdueDays * (db.parameters.overdueFinePerDay || 2000);
   const bookPrice = copy ? copy.price : 85000;
   const isOverdue = loan.overdueDays > 0;
@@ -2545,7 +2664,7 @@ function renderActiveReturnState() {
           <div class="loan-date-lbl">Hạn trả</div>
         </div>
         <div class="loan-date-item">
-          <div class="loan-date-val" style="font-weight: 700; color: #102a43;">28/10/2026</div>
+          <div class="loan-date-val" style="font-weight: 700; color: #102a43;">${getTodayVN()}</div>
           <div class="loan-date-lbl">Ngày trả thực tế</div>
         </div>
       </div>
@@ -2570,6 +2689,15 @@ function renderActiveRightColumn() {
 
   const { loan, copy } = currentReturnLoan;
   const db = getDB();
+
+  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const userName = user?.name || 'Nguyễn Trường Thịnh';
+  const todayStr = getTodayVN();
+  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
+  if (greetingEl) {
+    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
+  }
   const overdueFee = loan.overdueDays * (db.parameters.overdueFinePerDay || 2000);
   const bookPrice = copy ? copy.price : 85000;
 
@@ -2679,6 +2807,15 @@ function executeReturnBook(asDebt = false, onDone) {
 
   const { loan, copy } = currentReturnLoan;
   const db = getDB();
+
+  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const userName = user?.name || 'Nguyễn Trường Thịnh';
+  const todayStr = getTodayVN();
+  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
+  if (greetingEl) {
+    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
+  }
   const overdueFee = loan.overdueDays * (db.parameters.overdueFinePerDay || 2000);
   const bookPrice = copy ? copy.price : 85000;
 
@@ -2806,7 +2943,7 @@ function executeReturnBook(asDebt = false, onDone) {
       code: `${loan.id || 'PM-2026-' + Math.floor(100 + Math.random() * 900)} · ${loan.copyCode}`,
       title: loan.titleName,
       borrowDate: loan.borrowDate || "13/10/2026",
-      returnDate: "28/10/2026",
+      returnDate: getTodayVN(),
       status: selectedConditionIndex === 0 ? (loan.overdueDays > 0 ? `Quá hạn ${loan.overdueDays} ngày` : "Trả đúng hạn") : (selectedConditionIndex === 1 ? "Hư hỏng" : "Đã mất"),
       statusBadge: selectedConditionIndex === 0 ? (loan.overdueDays > 0 ? "badge-red" : "badge-green") : "badge-purple",
       fee: `${totalFee.toLocaleString()} đ`,
@@ -2822,6 +2959,15 @@ function executeReturnBook(asDebt = false, onDone) {
  */
 function renderDebtsScreen() {
   const db = getDB();
+
+  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const userName = user?.name || 'Nguyễn Trường Thịnh';
+  const todayStr = getTodayVN();
+  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
+  if (greetingEl) {
+    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
+  }
   const totalDebt = db.debts.reduce((sum, d) => sum + Number(d.amount), 0);
   
   // Đếm chính xác số lượng độc giả duy nhất bị nợ
@@ -2891,6 +3037,15 @@ function renderDebtsScreen() {
  */
 function getDebtReceiptDetails(debtId) {
   const db = getDB();
+
+  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const userName = user?.name || 'Nguyễn Trường Thịnh';
+  const todayStr = getTodayVN();
+  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
+  if (greetingEl) {
+    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
+  }
   const currentDebt = db.debts.find(d => d.id === debtId) || db.debts[0];
   if (!currentDebt) return null;
 
@@ -3677,7 +3832,8 @@ function openCreateReaderCardModal() {
   const expiryDateInput = document.getElementById('nc-expiry-date');
   const emailInput = document.getElementById('nc-email');
 
-  if (issueDateInput) issueDateInput.value = '28/10/2026';
+  const todayVN = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  if (issueDateInput) issueDateInput.value = todayVN;
   if (expiryDateInput) expiryDateInput.value = '30/06/2030';
   if (emailInput) delete emailInput.dataset.manualEdited;
   if (mssvInput) {
@@ -3755,7 +3911,7 @@ function handleCreateReaderCardSubmit() {
   const className = (classEl ? classEl.value : '').trim() || '50.01.SPTIN.A';
   const email = (emailEl ? emailEl.value : '').trim() || (mssv ? `${mssv}@student.hcmue.edu.vn` : '');
   const phone = (phoneEl ? phoneEl.value : '').trim() || '0912345678';
-  const issueDate = (issueEl ? issueEl.value : '').trim() || '28/10/2026';
+  const issueDate = (issueEl ? issueEl.value : '').trim() || new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const cardExpiry = (expiryEl ? expiryEl.value : '').trim() || '30/06/2030';
 
   const showError = (msg) => {
@@ -4595,6 +4751,28 @@ function handleAiQuery(queryText) {
 // ==========================================
 // SECTION: js/app.js
 // ==========================================
+/**
+ * Cập nhật đồng hồ thời gian thực Topbar Header (#header-realtime-clock)
+ * Định dạng DD/MM/YYYY HH:mm:ss cập nhật từng giây
+ */
+function initRealtimeClock() {
+  function updateClock() {
+    const clockEl = document.getElementById('header-realtime-clock') || document.getElementById('topbar-current-time');
+    if (!clockEl) return;
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    clockEl.textContent = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+}
+
 // =============================================================================
 // APP.JS: MASTER SPA ROUTER, EVENT DISPATCHER & RBAC ROUTE GUARD
 // =============================================================================
@@ -4845,6 +5023,15 @@ function reRenderScreen(targetScreenId = activeScreenId) {
  */
 function openModal(modalId) {
   refreshGlobalDropdowns();
+  const todayVN = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  if (modalId === 'modal-add-copy') {
+    const dateInput = document.getElementById('add-copy-date');
+    if (dateInput && !dateInput.value) dateInput.value = todayVN;
+  }
+  if (modalId === 'modal-receipt') {
+    const receiptDate = document.getElementById('receipt-date-display');
+    if (receiptDate) receiptDate.textContent = `Ngày thu: ${todayVN}`;
+  }
   const modal = document.getElementById(modalId);
   if (modal) modal.classList.add('active');
 }
@@ -4882,6 +5069,16 @@ function syncUserInterface(user) {
   const topbarAvatar = document.getElementById('topbar-avatar');
 
   if (topbarUserName) topbarUserName.textContent = user.name;
+
+  // Cập nhật câu chào Dashboard chuẩn hóa
+  const greetingEl = document.getElementById('dashboard-greeting-subtitle');
+  if (greetingEl) {
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    greetingEl.textContent = `Chào ${user.name}: Tổng quan hoạt động thư viện ngày hôm nay, ${day}/${month}/${year}.`;
+  }
 
   if (user.role === 'ADMIN') {
     // 1. Quản trị viên
@@ -5400,6 +5597,14 @@ function registerGlobalEvents() {
     if (codeEl) codeEl.textContent = d.receiptCode || 'BL-2026-089';
     if (payerEl) payerEl.textContent = `${d.readerName} · ${d.readerCard} · Lớp ${d.readerClass || '50.01.SPTIN.B'}`;
     if (reasonEl) reasonEl.textContent = d.reason;
+    const receiptDateEl = document.getElementById('receipt-date-display');
+    if (receiptDateEl) {
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = now.getFullYear();
+      receiptDateEl.textContent = `Ngày thu: ${day}/${month}/${year}`;
+    }
 
     if (d.readerDebtsCount > 1) {
       if (multiNotice) multiNotice.style.display = 'block';
@@ -5902,6 +6107,7 @@ function registerGlobalEvents() {
 
 // Khởi chạy ứng dụng an toàn khi DOM sẵn sàng hoặc đã nạp xong
 function initApp() {
+  initRealtimeClock();
   registerGlobalEvents();
   refreshGlobalDropdowns();
 

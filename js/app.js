@@ -1,3 +1,25 @@
+/**
+ * Cập nhật đồng hồ thời gian thực Topbar Header (#header-realtime-clock)
+ * Định dạng DD/MM/YYYY HH:mm:ss cập nhật từng giây
+ */
+export function initRealtimeClock() {
+  function updateClock() {
+    const clockEl = document.getElementById('header-realtime-clock') || document.getElementById('topbar-current-time');
+    if (!clockEl) return;
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    clockEl.textContent = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+}
+
 // =============================================================================
 // APP.JS: MASTER SPA ROUTER, EVENT DISPATCHER & RBAC ROUTE GUARD
 // =============================================================================
@@ -267,6 +289,15 @@ export function reRenderScreen(targetScreenId = activeScreenId) {
  */
 export function openModal(modalId) {
   refreshGlobalDropdowns();
+  const todayVN = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  if (modalId === 'modal-add-copy') {
+    const dateInput = document.getElementById('add-copy-date');
+    if (dateInput && !dateInput.value) dateInput.value = todayVN;
+  }
+  if (modalId === 'modal-receipt') {
+    const receiptDate = document.getElementById('receipt-date-display');
+    if (receiptDate) receiptDate.textContent = `Ngày thu: ${todayVN}`;
+  }
   const modal = document.getElementById(modalId);
   if (modal) modal.classList.add('active');
 }
@@ -304,6 +335,16 @@ export function syncUserInterface(user) {
   const topbarAvatar = document.getElementById('topbar-avatar');
 
   if (topbarUserName) topbarUserName.textContent = user.name;
+
+  // Cập nhật câu chào Dashboard chuẩn hóa
+  const greetingEl = document.getElementById('dashboard-greeting-subtitle');
+  if (greetingEl) {
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    greetingEl.textContent = `Chào ${user.name}: Tổng quan hoạt động thư viện ngày hôm nay, ${day}/${month}/${year}.`;
+  }
 
   if (user.role === 'ADMIN') {
     // 1. Quản trị viên
@@ -822,6 +863,14 @@ function registerGlobalEvents() {
     if (codeEl) codeEl.textContent = d.receiptCode || 'BL-2026-089';
     if (payerEl) payerEl.textContent = `${d.readerName} · ${d.readerCard} · Lớp ${d.readerClass || '50.01.SPTIN.B'}`;
     if (reasonEl) reasonEl.textContent = d.reason;
+    const receiptDateEl = document.getElementById('receipt-date-display');
+    if (receiptDateEl) {
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = now.getFullYear();
+      receiptDateEl.textContent = `Ngày thu: ${day}/${month}/${year}`;
+    }
 
     if (d.readerDebtsCount > 1) {
       if (multiNotice) multiNotice.style.display = 'block';
@@ -1324,6 +1373,7 @@ function registerGlobalEvents() {
 
 // Khởi chạy ứng dụng an toàn khi DOM sẵn sàng hoặc đã nạp xong
 function initApp() {
+  initRealtimeClock();
   registerGlobalEvents();
   refreshGlobalDropdowns();
 

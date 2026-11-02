@@ -623,7 +623,8 @@ export function openCreateReaderCardModal() {
   const expiryDateInput = document.getElementById('nc-expiry-date');
   const emailInput = document.getElementById('nc-email');
 
-  if (issueDateInput) issueDateInput.value = '28/10/2026';
+  const todayVN = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  if (issueDateInput) issueDateInput.value = todayVN;
   if (expiryDateInput) expiryDateInput.value = '30/06/2030';
   if (emailInput) delete emailInput.dataset.manualEdited;
   if (mssvInput) {
@@ -701,7 +702,7 @@ export function handleCreateReaderCardSubmit() {
   const className = (classEl ? classEl.value : '').trim() || '50.01.SPTIN.A';
   const email = (emailEl ? emailEl.value : '').trim() || (mssv ? `${mssv}@student.hcmue.edu.vn` : '');
   const phone = (phoneEl ? phoneEl.value : '').trim() || '0912345678';
-  const issueDate = (issueEl ? issueEl.value : '').trim() || '28/10/2026';
+  const issueDate = (issueEl ? issueEl.value : '').trim() || new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const cardExpiry = (expiryEl ? expiryEl.value : '').trim() || '30/06/2030';
 
   const showError = (msg) => {
