@@ -29,7 +29,7 @@ import { getCurrentUser, setCurrentUser, handleLogin, handleChangePassword, hand
 import { 
   renderDashboard, renderBorrowScreen, verifyBorrowReader, addCopyCodeToBorrow, 
   removeCopyFromBorrow, executeConfirmBorrow, renderReturnScreen, lookupReturnLoan, 
-  selectConditionOption, executeReturnBook, renderDebtsScreen, getDebtReceiptDetails, 
+  selectConditionOption, executeReturnBook, getCurrentReturnLoan, renderDebtsScreen, getDebtReceiptDetails, 
   settleDebt, resetCirculationState, renewLoanAtDashboard, renewCurrentReturnLoan, escapeHTML,
   openRenewCounterModal, handleExecuteRenewCounterModal, handleReturnSearchInput,
   handleSelectReturnLoanFromDropdown, hideReturnDropdown, getAllActiveReturnLoans
@@ -460,6 +460,7 @@ function registerGlobalEvents() {
   window.renderStudentSearchScreen = renderStudentSearchScreen;
   window.executeStudentRenew = executeStudentRenew;
   window.executeReturnBook = executeReturnBook;
+  window.getCurrentReturnLoan = getCurrentReturnLoan;
   window.openCreateReaderCardModal = openCreateReaderCardModal;
   window.handleReaderCardMssvInput = handleReaderCardMssvInput;
   window.handleCreateReaderCardSubmit = handleCreateReaderCardSubmit;
@@ -734,17 +735,52 @@ function registerGlobalEvents() {
   };
 
   window.handleCompleteReturn = function(asDebt) {
-    executeReturnBook(asDebt, (fee, isDebt) => {
-      if (isDebt) {
-        showToast(`Đã trả sách và ghi nhận nợ ${fee.toLocaleString('vi-VN')} đ vào thẻ độc giả!`, "warning");
-      } else {
-        triggerConfetti();
-        showToast(`Đã tiếp nhận sách và thu ${fee.toLocaleString('vi-VN')} đ tiền mặt thành công!`, "success");
-      }
-      
+    const curReturn = (typeof getCurrentReturnLoan === 'function') ? getCurrentReturnLoan() : null;
+    const fallbackReaderCard = curReturn?.loan?.readerCard || '';
+    const fallbackReaderName = curReturn?.loan?.readerName || '';
+    const fallbackCopyCode = curReturn?.loan?.copyCode || '';
+
+    executeReturnBook(asDebt, (fee, isDebt, returnedLoan, returnedCopy) => {
+      const loan = returnedLoan || curReturn?.loan;
+      const currentReaderCard = loan?.readerCard || fallbackReaderCard;
+      const currentReaderName = loan?.readerName || fallbackReaderName;
+      const copyCode = loan?.copyCode || fallbackCopyCode;
+
+      const db = getDB();
+      const remainingLoans = (db.activeLoans || []).filter(l => 
+        (currentReaderCard && l.readerCard && l.readerCard.toUpperCase() === currentReaderCard.toUpperCase()) ||
+        (currentReaderName && l.readerName === currentReaderName)
+      );
+
       const returnInp = document.getElementById('return-copy-input');
-      if (returnInp) returnInp.value = '';
-      lookupReturnLoan('');
+
+      if (remainingLoans.length > 0) {
+        // NẾU ĐỘC GIẢ VẪN CÒN SÁCH ĐANG MƯỢN (remainingLoans.length > 0):
+        // TUYỆT ĐỐI KHÔNG xóa trắng ô input tìm kiếm!
+        // Giữ nguyên giá trị ô tìm kiếm là mã thẻ hoặc tên độc giả đó.
+        const searchTarget = currentReaderCard || currentReaderName;
+        if (returnInp) returnInp.value = searchTarget;
+
+        // Tự động gọi lại hàm tìm kiếm/hiển thị: lookupReturnLoan(currentReaderCard) để tiếp tục hiển thị các cuốn sách CÒN LẠI của độc giả
+        lookupReturnLoan(currentReaderCard || searchTarget);
+
+        if (window.triggerConfetti && !isDebt) triggerConfetti();
+        showToast(
+          `Đã trả xong cuốn ${copyCode}! Độc giả vẫn còn ${remainingLoans.length} cuốn sách chưa trả.`,
+          isDebt ? "warning" : "success"
+        );
+      } else {
+        // NẾU ĐỘC GIẢ ĐÃ TRẢ HẾT TOÀN BỘ SÁCH (remainingLoans.length === 0):
+        // Lúc này mới xóa trắng ô tìm kiếm và đưa màn hình về trạng thái rỗng.
+        if (returnInp) returnInp.value = '';
+        lookupReturnLoan('');
+
+        if (window.triggerConfetti && !isDebt) triggerConfetti();
+        showToast(
+          `Độc giả ${currentReaderName || currentReaderCard} đã hoàn tất trả toàn bộ sách!`,
+          "success"
+        );
+      }
     });
   };
 

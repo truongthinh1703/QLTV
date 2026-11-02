@@ -305,8 +305,11 @@ export function renewLoanAtDashboard(copyCode) {
  * Màn hình 07: Lập phiếu mượn UC12
  */
 export function renderBorrowScreen() {
-  const todayStr = getTodayVN();
-  const dueObj = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+  const db = getDB();
+  const loanDays = Number(db.parameters?.loanDurationDays) || 14;
+  const now = new Date();
+  const todayStr = getTodayVN(now);
+  const dueObj = new Date(now.getTime() + loanDays * 24 * 60 * 60 * 1000);
   const dueStr = getTodayVN(dueObj);
 
   const borrowDateEl = document.getElementById('borrow-summary-borrow-date') || document.querySelector('#screen-borrow .loan-dates-row .loan-date-item:first-child .loan-date-val');
@@ -708,6 +711,12 @@ export function executeConfirmBorrow(onDone) {
 
   setTimeout(() => {
     mutateDB(draft => {
+      const loanDays = Number(db.parameters?.loanDurationDays) || 14;
+      const now = new Date();
+      const borrowDateStr = getTodayVN(now);
+      const dueDateObj = new Date(now.getTime() + loanDays * 24 * 60 * 60 * 1000);
+      const dueDateStr = getTodayVN(dueDateObj);
+
       pendingBorrowCopies.forEach(pCopy => {
         // 1. Cập nhật bản sao vật lý thành DANG_MUON
         const copyInDB = draft.copies.find(c => c.code.toUpperCase() === pCopy.code.toUpperCase());
@@ -727,11 +736,11 @@ export function executeConfirmBorrow(onDone) {
           readerName: verifiedBorrowReader.name,
           readerCard: verifiedBorrowReader.cardId,
           readerClass: verifiedBorrowReader.className || '50.01.SPTIN.B',
-          borrowDate: getTodayVN(),
-          dueDate: getTodayVN(new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)),
+          borrowDate: borrowDateStr,
+          dueDate: dueDateStr,
           overdueDays: 0,
           statusBadge: 'badge-green',
-          statusText: 'Trong hạn · Còn 14 ngày',
+          statusText: `Trong hạn · Còn ${loanDays} ngày`,
           actionText: 'Xem lượt mượn',
           renewed: false,
           renewCount: 0
@@ -1433,6 +1442,36 @@ function renderActiveReturnState() {
         </div>
       </div>
 
+      ${(() => {
+        const allActiveLoans = getAllActiveReturnLoans(db);
+        const readerActiveLoans = allActiveLoans.filter(l => 
+          (loan.readerCard && l.readerCard && l.readerCard.toUpperCase() === loan.readerCard.toUpperCase()) ||
+          (l.readerName === loan.readerName)
+        );
+        if (readerActiveLoans.length <= 1) return '';
+        return `
+          <div style="background: #f0f7ff; border: 1.5px solid #bfdbfe; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px;">
+            <div style="font-size: 12px; font-weight: 700; color: #1d4ed8; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+              <span><i class="fa-solid fa-layer-group" style="margin-right: 6px;"></i>Độc giả đang mượn ${readerActiveLoans.length} cuốn sách:</span>
+              <span style="font-size: 11px; font-weight: 400; color: #64748b;">(Chọn cuốn để xử lý trả)</span>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              ${readerActiveLoans.map(otherLoan => {
+                const isCurrent = otherLoan.copyCode.toUpperCase() === loan.copyCode.toUpperCase();
+                return `
+                  <button type="button" class="btn ${isCurrent ? 'btn-primary' : 'btn-outline'}" 
+                    style="font-size: 12px; padding: 4px 10px; border-radius: 6px; cursor: pointer;"
+                    onclick="window.lookupReturnLoan('${otherLoan.copyCode}', '${loan.readerCard}')"
+                    ${isCurrent ? 'disabled' : ''}>
+                    ${escapeHTML(otherLoan.copyCode)} ${isCurrent ? '(Đang chọn)' : ''}
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      })()}
+
       <div class="return-overdue-banner ${isOverdue ? 'danger' : 'success'}">
         <i class="fa-solid ${isOverdue ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i>
         <span>${isOverdue ? `QUÁ HẠN ${loan.overdueDays} NGÀY` : 'ĐANG TRONG HẠN MƯỢN'}</span>
@@ -1756,7 +1795,14 @@ export function executeReturnBook(asDebt = false, onDone) {
     });
   }, 'RETURN_BOOK');
 
-  if (onDone) onDone(totalFee, asDebt);
+  if (onDone) onDone(totalFee, asDebt, loan, copy);
+}
+
+/**
+ * Trả về thông tin lượt mượn đang được chọn xử lý tại màn hình Trả sách
+ */
+export function getCurrentReturnLoan() {
+  return currentReturnLoan;
 }
 
 /**
