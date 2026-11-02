@@ -638,7 +638,9 @@ export const INITIAL_DB = {
     maxBooksPerReader: 3,
     overdueFinePerDay: 2000,
     maxOnlineRenewals: 1,
-    renewalDays: 7
+    renewalDays: 7,
+    reservationHoldHours: 24,
+    maxAllowedDebt: 50000
   },
 
   // 10. Tệp sao lưu CSDL PostgreSQL

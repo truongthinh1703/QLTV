@@ -644,7 +644,9 @@ const INITIAL_DB = {
     maxBooksPerReader: 3,
     overdueFinePerDay: 2000,
     maxOnlineRenewals: 1,
-    renewalDays: 7
+    renewalDays: 7,
+    reservationHoldHours: 24,
+    maxAllowedDebt: 50000
   },
 
   // 10. Tệp sao lưu CSDL PostgreSQL
@@ -945,6 +947,21 @@ function sanitizeDB(dbData) {
     });
   }
 
+  // 5. Chuẩn hóa tham số vận hành dbData.parameters
+  if (!dbData.parameters) {
+    dbData.parameters = { ...INITIAL_DB.parameters };
+    modified = true;
+  } else {
+    if (dbData.parameters.reservationHoldHours === undefined) {
+      dbData.parameters.reservationHoldHours = 24;
+      modified = true;
+    }
+    if (dbData.parameters.maxAllowedDebt === undefined) {
+      dbData.parameters.maxAllowedDebt = 50000;
+      modified = true;
+    }
+  }
+
   if (modified && typeof localStorage !== 'undefined') {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(dbData));
@@ -1208,14 +1225,6 @@ function getTodayVN(dateObj) {
 }
 
 
-function getTodayVN(dateObj) {
-  const d = dateObj || new Date();
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const year = d.getFullYear();
-  return `${day}/${month}/${year}`;
-}
-
 let pendingBorrowCopies = [];
 let verifiedBorrowReader = null;
 let currentReturnLoan = null;
@@ -1271,7 +1280,7 @@ function renderDashboard() {
   if (kpiTotalTitles) kpiTotalTitles.textContent = totalTitles.toLocaleString();
   if (kpiAvailableCopies) kpiAvailableCopies.textContent = availableCopies.toLocaleString();
   if (kpiBorrowingCopies) kpiBorrowingCopies.textContent = borrowingCopies.toLocaleString();
-  if (kpiPendingDebt) kpiPendingDebt.textContent = `${pendingDebt.toLocaleString()} đ`;
+  if (kpiPendingDebt) kpiPendingDebt.textContent = `${pendingDebt.toLocaleString('vi-VN')} đ`;
 
   // Render bảng Lượt mượn cần xử lý hôm nay (Untitled 2)
   const tbody = document.getElementById('dashboard-loans-tbody');
@@ -1414,7 +1423,7 @@ function openRenewCounterModal(copyCode) {
   if (currentDueEl) currentDueEl.textContent = activeRenewTarget.currentDueDate;
 
   if (checkTimesEl) checkTimesEl.textContent = `Số lần đã gia hạn: ${activeRenewTarget.renewCount}/1 (Thỏa mãn quy định tối đa 1 lần).`;
-  if (checkDebtEl) checkDebtEl.textContent = `Thẻ không có nợ phạt tồn đọng (Công nợ: ${debt.toLocaleString()} đ).`;
+  if (checkDebtEl) checkDebtEl.textContent = `Thẻ không có nợ phạt tồn đọng (Công nợ: ${debt.toLocaleString('vi-VN')} đ).`;
   if (renewDateEl) renewDateEl.textContent = `Hôm nay (${getTodayVN()})`;
   if (newDueEl) newDueEl.textContent = activeRenewTarget.newDueDate;
 
@@ -1641,7 +1650,7 @@ function verifyBorrowReader() {
     currentLoans: readerCurrentLoans,
     ineligibleReason: !isCardActive ? (!isCardNotExpired ? `Thẻ đã hết hạn sử dụng (${reader.cardExpiry})` : "Thẻ đang bị tạm khóa") :
                       !hasNoOverdue ? `Đang có ${overdueLoans.length} cuốn sách quá hạn chưa trả` :
-                      !hasNoDebt ? `Còn công nợ chưa tất toán (${totalDebt.toLocaleString()} đ)` :
+                      !hasNoDebt ? `Còn công nợ chưa tất toán (${totalDebt.toLocaleString('vi-VN')} đ)` :
                       !hasQuotaAvailable ? `Đã mượn đủ số lượng tối đa (${currentLoanCount}/${maxBooks} cuốn)` : ""
   };
 
@@ -1657,7 +1666,7 @@ function verifyBorrowReader() {
         <div style="margin-top: 8px;">
           <span class="badge ${cardBadgeClass}">${cardBadgeText}</span>
         </div>
-        <div class="cell-sub" style="margin-top: 6px;">Hạn thẻ: ${escapeHTML(reader.cardExpiry || '30/06/2027')} · Công nợ: ${totalDebt.toLocaleString()} đ</div>
+        <div class="cell-sub" style="margin-top: 6px;">Hạn thẻ: ${escapeHTML(reader.cardExpiry || '30/06/2027')} · Công nợ: ${totalDebt.toLocaleString('vi-VN')} đ</div>
       </div>
     `;
   }
@@ -1676,7 +1685,7 @@ function verifyBorrowReader() {
       </div>
       <div class="rule-check-item" style="${hasNoDebt ? '' : 'color: var(--hcmue-crimson); font-weight: 600;'}">
         <i class="fa-solid ${hasNoDebt ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
-        <span>[3] Không có nợ phạt / bồi thường chưa tất toán (${hasNoDebt ? '0 đ - Đạt' : `KHÔNG ĐẠT - Còn nợ ${totalDebt.toLocaleString()} đ`}).</span>
+        <span>[3] Không có nợ phạt / bồi thường chưa tất toán (${hasNoDebt ? '0 đ - Đạt' : `KHÔNG ĐẠT - Còn nợ ${totalDebt.toLocaleString('vi-VN')} đ`}).</span>
       </div>
       <div class="rule-check-item" style="${hasQuotaAvailable ? '' : 'color: var(--hcmue-crimson); font-weight: 600;'}">
         <i class="fa-solid ${hasQuotaAvailable ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
@@ -2655,7 +2664,7 @@ function renderActiveReturnState() {
             Mã bản sao: ${escapeHTML(loan.copyCode)} · ${escapeHTML(copy.shelf || 'Kệ K03 - Ngăn 2')}
           </div>
           <div class="cell-sub" style="color: #64748b;">
-            Giá đền bù: ${bookPrice.toLocaleString()}đ
+            Giá đền bù: ${bookPrice.toLocaleString('vi-VN')} đ
           </div>
         </div>
       </div>
@@ -2677,7 +2686,7 @@ function renderActiveReturnState() {
       </div>
 
       <div style="color: ${isOverdue ? '#dc2626' : '#16a34a'}; font-size: 13px; font-weight: 600; margin: 12px 0;">
-        ${isOverdue ? `Phạt quá hạn: ${loan.overdueDays} × 2,000 = ${overdueFee.toLocaleString()}đ` : 'Sách đang trong hạn mượn (Phạt quá hạn: 0đ)'}
+        ${isOverdue ? `Phạt quá hạn: ${loan.overdueDays} × 2,000 = ${overdueFee.toLocaleString('vi-VN')} đ` : 'Sách đang trong hạn mượn (Phạt quá hạn: 0đ)'}
       </div>
 
       <div style="margin-top: 16px;">
@@ -2713,7 +2722,7 @@ function renderActiveRightColumn() {
       title: "Sách nguyên vẹn, bình thường",
       badge: "badge-green",
       badgeText: "Sẵn sàng cho mượn",
-      statLeft: `Phạt: ${overdueFee.toLocaleString()}đ`,
+      statLeft: `Phạt: ${overdueFee.toLocaleString('vi-VN')} đ`,
       statMid: "Bồi thường: 0đ",
       total: overdueFee
     },
@@ -2721,16 +2730,16 @@ function renderActiveRightColumn() {
       title: "Sách bị hư hỏng (Rách bìa, vẽ bẩn, ướt)",
       badge: "badge-purple",
       badgeText: "Hư hỏng - Chờ phục hồi",
-      statLeft: `Phạt: ${overdueFee.toLocaleString()}đ`,
-      statMid: `Bồi thường: ${(bookPrice * 0.5).toLocaleString()}đ`,
+      statLeft: `Phạt: ${overdueFee.toLocaleString('vi-VN')} đ`,
+      statMid: `Bồi thường: ${(bookPrice * 0.5).toLocaleString('vi-VN')} đ`,
       total: overdueFee + (bookPrice * 0.5)
     },
     {
       title: "Độc giả báo làm mất sách",
       badge: "badge-red",
       badgeText: "Đã mất - Ngừng lưu hành",
-      statLeft: `Phạt: ${overdueFee.toLocaleString()}đ`,
-      statMid: `Bồi thường: ${bookPrice.toLocaleString()}đ`,
+      statLeft: `Phạt: ${overdueFee.toLocaleString('vi-VN')} đ`,
+      statMid: `Bồi thường: ${bookPrice.toLocaleString('vi-VN')} đ`,
       total: overdueFee + bookPrice
     }
   ];
@@ -2755,7 +2764,7 @@ function renderActiveRightColumn() {
           <div class="condition-stats-cols">
             <div class="condition-stat-unit"><div class="stat-unit-val">${opt.statLeft}</div></div>
             <div class="condition-stat-unit"><div class="stat-unit-val">${opt.statMid}</div></div>
-            <div class="condition-stat-unit"><div class="stat-unit-val total">TỔNG: ${opt.total.toLocaleString()}đ</div></div>
+            <div class="condition-stat-unit"><div class="stat-unit-val total">TỔNG: ${opt.total.toLocaleString('vi-VN')} đ</div></div>
           </div>
         </div>
       `).join('')}
@@ -2765,11 +2774,11 @@ function renderActiveRightColumn() {
     <div class="return-fee-summary-box">
       <div class="return-fee-row">
         <span>Tiền phạt quá hạn:</span>
-        <span style="font-weight: 700; color: #1e293b;">${overdueFee.toLocaleString()}đ</span>
+        <span style="font-weight: 700; color: #1e293b;">${overdueFee.toLocaleString('vi-VN')} đ</span>
       </div>
       <div class="return-fee-row">
         <span>Chi phí bồi thường phát sinh:</span>
-        <span style="font-weight: 700; color: #1e293b;">${damageFee.toLocaleString()}đ</span>
+        <span style="font-weight: 700; color: #1e293b;">${damageFee.toLocaleString('vi-VN')} đ</span>
       </div>
       <div class="return-fee-row total">
         <span style="font-weight: 800; font-size: 15px; color: #102a43;">TỔNG TIỀN PHẢI THU:</span>
@@ -2953,7 +2962,7 @@ function executeReturnBook(asDebt = false, onDone) {
       returnDate: getTodayVN(),
       status: selectedConditionIndex === 0 ? (loan.overdueDays > 0 ? `Quá hạn ${loan.overdueDays} ngày` : "Trả đúng hạn") : (selectedConditionIndex === 1 ? "Hư hỏng" : "Đã mất"),
       statusBadge: selectedConditionIndex === 0 ? (loan.overdueDays > 0 ? "badge-red" : "badge-green") : "badge-purple",
-      fee: `${totalFee.toLocaleString()} đ`,
+      fee: `${totalFee.toLocaleString('vi-VN')} đ`,
       paymentStatus: asDebt ? "Ghi nhận công nợ" : "Đã tất toán biên lai"
     });
   }, 'RETURN_BOOK');
@@ -2987,11 +2996,11 @@ function renderDebtsScreen() {
   const paginationInfoEl = document.getElementById('debts-pagination-info');
   const bannerSyncEl = document.getElementById('debts-banner-sync-info');
 
-  if (totalDebtEl) totalDebtEl.textContent = `${totalDebt.toLocaleString()} đ`;
+  if (totalDebtEl) totalDebtEl.textContent = `${totalDebt.toLocaleString('vi-VN')} đ`;
   if (totalDebtorsEl) totalDebtorsEl.textContent = `${totalDebtors} độc giả`;
-  if (sumFooterEl) sumFooterEl.textContent = `${totalDebt.toLocaleString()} đ`;
+  if (sumFooterEl) sumFooterEl.textContent = `${totalDebt.toLocaleString('vi-VN')} đ`;
   if (paginationInfoEl) paginationInfoEl.textContent = `Hiển thị 1–${db.debts.length} trong ${db.debts.length} khoản nợ (${totalDebtors} độc giả)`;
-  if (bannerSyncEl) bannerSyncEl.textContent = `Tổng công nợ khớp với Bảng điều khiển và Báo cáo tài chính theo khoa: ${totalDebt.toLocaleString()} đ.`;
+  if (bannerSyncEl) bannerSyncEl.textContent = `Tổng công nợ khớp với Bảng điều khiển và Báo cáo tài chính theo khoa: ${totalDebt.toLocaleString('vi-VN')} đ.`;
 
   const tbody = document.getElementById('debts-list-tbody');
   if (!tbody) return;
@@ -3027,7 +3036,7 @@ function renderDebtsScreen() {
           <div class="cell-sub">${escapeHTML(item.readerCard)} · ${escapeHTML(item.readerClass || '50.01.SPTIN.B')}</div>
         </td>
         <td>${escapeHTML(item.reason)}</td>
-        <td><span class="cell-amount">${Number(item.amount).toLocaleString()} đ</span></td>
+        <td><span class="cell-amount">${Number(item.amount).toLocaleString('vi-VN')} đ</span></td>
         <td><span class="badge ${cardBadgeClass}">${escapeHTML(cardStatusText)}</span></td>
         <td>
           <button class="btn-link" onclick="window.handleOpenReceiptModal('${item.id}')">
@@ -3142,7 +3151,7 @@ function settleDebt(debtId, options, onDone) {
       // 2. Thu từng phần khoản nợ này
       actualPaid = Math.min(Number(targetDebt.amount), Math.max(1000, Number(opts.amountPaid) || 0));
       targetDebt.amount = Number(targetDebt.amount) - actualPaid;
-      targetDebt.reason = `${targetDebt.reason} (Đã thu trước ${actualPaid.toLocaleString()} đ)`;
+      targetDebt.reason = `${targetDebt.reason} (Đã thu trước ${actualPaid.toLocaleString('vi-VN')} đ)`;
 
       if (acc) {
         acc.debt = Math.max(0, (Number(acc.debt) || 0) - actualPaid);
@@ -4122,33 +4131,63 @@ function renderAccountsScreen() {
 }
 
 /**
+ * Tham số mặc định chuẩn ban đầu của hệ thống thư viện HCMUE
+ */
+const DEFAULT_PARAMETERS = {
+  loanDurationDays: 14,
+  maxBooksPerReader: 3,
+  overdueFinePerDay: 2000,
+  maxOnlineRenewals: 1,
+  renewalDays: 7,
+  reservationHoldHours: 24,
+  maxAllowedDebt: 50000
+};
+
+/**
  * Screen 16: Cấu hình tham số vận hành UC05
  */
 function renderParamsScreen() {
   const db = getDB();
-  const p = db.parameters;
+  const p = db.parameters || {};
 
   const loanDaysInput = document.getElementById('param-loan-days');
   const maxBooksInput = document.getElementById('param-max-books');
   const finePerDayInput = document.getElementById('param-fine-per-day');
   const maxRenewalsInput = document.getElementById('param-max-renewals');
   const renewalDaysInput = document.getElementById('param-renewal-days');
+  const holdHoursInput = document.getElementById('param-hold-hours');
+  const maxDebtInput = document.getElementById('param-max-debt');
 
-  if (loanDaysInput) loanDaysInput.value = `${p.loanDurationDays} ngày`;
-  if (maxBooksInput) maxBooksInput.value = `${p.maxBooksPerReader} cuốn`;
-  if (finePerDayInput) finePerDayInput.value = `${p.overdueFinePerDay.toLocaleString()} VNĐ / ngày trễ`;
-  if (maxRenewalsInput) maxRenewalsInput.value = `${p.maxOnlineRenewals} lần`;
-  if (renewalDaysInput) renewalDaysInput.value = `${p.renewalDays} ngày`;
+  if (loanDaysInput) loanDaysInput.value = p.loanDurationDays !== undefined ? p.loanDurationDays : 14;
+  if (maxBooksInput) maxBooksInput.value = p.maxBooksPerReader !== undefined ? p.maxBooksPerReader : 3;
+  if (finePerDayInput) finePerDayInput.value = p.overdueFinePerDay !== undefined ? p.overdueFinePerDay : 2000;
+  if (maxRenewalsInput) maxRenewalsInput.value = p.maxOnlineRenewals !== undefined ? p.maxOnlineRenewals : 1;
+  if (renewalDaysInput) renewalDaysInput.value = p.renewalDays !== undefined ? p.renewalDays : 7;
+  if (holdHoursInput) holdHoursInput.value = p.reservationHoldHours !== undefined ? p.reservationHoldHours : 24;
+  if (maxDebtInput) maxDebtInput.value = p.maxAllowedDebt !== undefined ? p.maxAllowedDebt : 50000;
 }
 
 function saveSystemParams(formData) {
   mutateDB(draft => {
-    draft.parameters.loanDurationDays = parseInt(formData.loanDays) || 14;
-    draft.parameters.maxBooksPerReader = parseInt(formData.maxBooks) || 3;
-    draft.parameters.overdueFinePerDay = parseInt(formData.fine) || 2000;
-    draft.parameters.maxOnlineRenewals = parseInt(formData.renewals) || 1;
-    draft.parameters.renewalDays = parseInt(formData.renewalDays) || 7;
-  });
+    if (!draft.parameters) draft.parameters = {};
+    draft.parameters.loanDurationDays = parseInt(formData.loanDays, 10) || 14;
+    draft.parameters.maxBooksPerReader = parseInt(formData.maxBooks, 10) || 3;
+    draft.parameters.overdueFinePerDay = parseInt(formData.fine, 10) || 2000;
+    draft.parameters.maxOnlineRenewals = parseInt(formData.renewals, 10) || 1;
+    draft.parameters.renewalDays = parseInt(formData.renewalDays, 10) || 7;
+    draft.parameters.reservationHoldHours = parseInt(formData.holdHours, 10) || 24;
+    draft.parameters.maxAllowedDebt = parseInt(formData.maxDebt, 10) || 50000;
+  }, 'UPDATE_SYSTEM_PARAMS');
+}
+
+/**
+ * Khôi phục toàn bộ tham số vận hành về giá trị chuẩn mặc định ban đầu
+ */
+function resetSystemParamsToDefault() {
+  mutateDB(draft => {
+    draft.parameters = { ...DEFAULT_PARAMETERS };
+  }, 'RESET_SYSTEM_PARAMS_DEFAULT');
+  renderParamsScreen();
 }
 
 /**
@@ -4218,10 +4257,10 @@ function renderReportsScreen() {
   const finesEl = document.getElementById('rep-kpi-fines');
   const compEl = document.getElementById('rep-kpi-compensation');
 
-  if (loansEl) loansEl.textContent = r.monthlyLoans.toLocaleString();
-  if (returnsEl) returnsEl.textContent = r.monthlyReturns.toLocaleString();
-  if (finesEl) finesEl.textContent = `${r.finesCollected.toLocaleString()} đ`;
-  if (compEl) compEl.textContent = `${r.compensationCollected.toLocaleString()} đ`;
+  if (loansEl) loansEl.textContent = r.monthlyLoans.toLocaleString('vi-VN');
+  if (returnsEl) returnsEl.textContent = r.monthlyReturns.toLocaleString('vi-VN');
+  if (finesEl) finesEl.textContent = `${r.finesCollected.toLocaleString('vi-VN')} đ`;
+  if (compEl) compEl.textContent = `${r.compensationCollected.toLocaleString('vi-VN')} đ`;
 
   // Render Top 3 sách
   const topBooksContainer = document.getElementById('rep-top-books-container');
@@ -4251,29 +4290,29 @@ function renderReportsScreen() {
   tbody.innerHTML = `
     <tr>
       <td>Khoa Công nghệ Thông tin</td>
-      <td>1,850,000 đ</td>
-      <td><span class="cell-amount">${cnttDebt.toLocaleString()} đ</span></td>
+      <td>1.850.000 đ</td>
+      <td><span class="cell-amount">${cnttDebt.toLocaleString('vi-VN')} đ</span></td>
     </tr>
     <tr>
       <td>Khoa Toán - Tin học</td>
-      <td>980,000 đ</td>
-      <td><span class="cell-amount">${toanTinDebt.toLocaleString()} đ</span></td>
+      <td>980.000 đ</td>
+      <td><span class="cell-amount">${toanTinDebt.toLocaleString('vi-VN')} đ</span></td>
     </tr>
     <tr>
       <td>Khoa Tiếng Anh</td>
-      <td>590,000 đ</td>
-      <td><span class="${nnDebt > 0 ? 'cell-amount' : ''}">${nnDebt.toLocaleString()} đ</span></td>
+      <td>590.000 đ</td>
+      <td><span class="${nnDebt > 0 ? 'cell-amount' : ''}">${nnDebt.toLocaleString('vi-VN')} đ</span></td>
     </tr>
     <tr style="background-color: #f8fafc; font-weight: 700;">
       <td>Tổng cộng</td>
-      <td>3,420,000 đ</td>
-      <td><span class="cell-amount" style="font-size: 15px;">${totalDebt.toLocaleString()} đ</span></td>
+      <td>3.420.000 đ</td>
+      <td><span class="cell-amount" style="font-size: 15px;">${totalDebt.toLocaleString('vi-VN')} đ</span></td>
     </tr>
   `;
 
   const bannerDebtEl = document.getElementById('rep-banner-debt-val');
   if (bannerDebtEl) {
-    bannerDebtEl.textContent = `TỔNG CÔNG NỢ TỒN ĐỌNG: ${totalDebt.toLocaleString()} đ · Khớp chính xác với Dashboard và Quản lý nợ phạt.`;
+    bannerDebtEl.textContent = `TỔNG CÔNG NỢ TỒN ĐỌNG: ${totalDebt.toLocaleString('vi-VN')} đ · Khớp chính xác với Dashboard và Quản lý nợ phạt.`;
   }
 }
 
@@ -5204,6 +5243,7 @@ function registerGlobalEvents() {
   window.openCreateReaderCardModal = openCreateReaderCardModal;
   window.handleReaderCardMssvInput = handleReaderCardMssvInput;
   window.handleCreateReaderCardSubmit = handleCreateReaderCardSubmit;
+  window.resetSystemParamsToDefault = resetSystemParamsToDefault;
 
   // Xử lý Quick Login Chip 1-click
   window.quickLogin = function(username, pass) {
@@ -5476,10 +5516,10 @@ function registerGlobalEvents() {
   window.handleCompleteReturn = function(asDebt) {
     executeReturnBook(asDebt, (fee, isDebt) => {
       if (isDebt) {
-        showToast(`Đã trả sách và ghi nhận nợ ${fee.toLocaleString()} đ vào thẻ độc giả!`, "warning");
+        showToast(`Đã trả sách và ghi nhận nợ ${fee.toLocaleString('vi-VN')} đ vào thẻ độc giả!`, "warning");
       } else {
         triggerConfetti();
-        showToast(`Đã tiếp nhận sách và thu ${fee.toLocaleString()} đ tiền mặt thành công!`, "success");
+        showToast(`Đã tiếp nhận sách và thu ${fee.toLocaleString('vi-VN')} đ tiền mặt thành công!`, "success");
       }
       
       const returnInp = document.getElementById('return-copy-input');
@@ -5519,7 +5559,7 @@ function registerGlobalEvents() {
 
     if (mode === 'SETTLE_ALL') {
       const settleAmount = Number(d.totalReaderDebt || d.amount);
-      if (amtDisplay) amtDisplay.textContent = `${settleAmount.toLocaleString()} đ`;
+      if (amtDisplay) amtDisplay.textContent = `${settleAmount.toLocaleString('vi-VN')} đ`;
       
       if (alertBox) alertBox.className = 'alert-banner alert-banner-success';
       if (alertIcon) alertIcon.className = 'fa-solid fa-circle-check';
@@ -5532,8 +5572,8 @@ function registerGlobalEvents() {
     } else if (mode === 'PARTIAL_ITEM') {
       const partialVal = Number(partialInput ? partialInput.value : 0) || 0;
       const remain = Math.max(0, Number(d.amount) - partialVal);
-      if (partialRemainingLabel) partialRemainingLabel.textContent = `${remain.toLocaleString()} đ`;
-      if (amtDisplay) amtDisplay.textContent = `${partialVal.toLocaleString()} đ`;
+      if (partialRemainingLabel) partialRemainingLabel.textContent = `${remain.toLocaleString('vi-VN')} đ`;
+      if (amtDisplay) amtDisplay.textContent = `${partialVal.toLocaleString('vi-VN')} đ`;
 
       if (alertBox) alertBox.className = 'alert-banner alert-banner-warning';
       if (alertIcon) alertIcon.className = 'fa-solid fa-triangle-exclamation';
@@ -5546,14 +5586,14 @@ function registerGlobalEvents() {
     } else {
       // FULL_ITEM
       const itemAmount = Number(d.amount);
-      if (amtDisplay) amtDisplay.textContent = `${itemAmount.toLocaleString()} đ`;
+      if (amtDisplay) amtDisplay.textContent = `${itemAmount.toLocaleString('vi-VN')} đ`;
 
       if (d.readerDebtsCount > 1) {
         const otherCount = d.readerDebtsCount - 1;
         const otherDebt = d.totalReaderDebt - itemAmount;
         if (alertBox) alertBox.className = 'alert-banner alert-banner-warning';
         if (alertIcon) alertIcon.className = 'fa-solid fa-triangle-exclamation';
-        if (alertText) alertText.textContent = `Độc giả vẫn còn ${otherCount} khoản nợ khác (${otherDebt.toLocaleString()} đ). Thẻ độc giả tiếp tục TẠM KHÓA cho đến khi tất toán toàn bộ.`;
+        if (alertText) alertText.textContent = `Độc giả vẫn còn ${otherCount} khoản nợ khác (${otherDebt.toLocaleString('vi-VN')} đ). Thẻ độc giả tiếp tục TẠM KHÓA cho đến khi tất toán toàn bộ.`;
         if (confirmBtn) {
           confirmBtn.textContent = 'Xác nhận thu nợ khoản này (Giữ tạm khóa)';
           confirmBtn.style.background = '#0284c7';
@@ -5615,7 +5655,7 @@ function registerGlobalEvents() {
 
     if (d.readerDebtsCount > 1) {
       if (multiNotice) multiNotice.style.display = 'block';
-      if (multiText) multiText.textContent = `Độc giả này đang có ${d.readerDebtsCount} khoản nợ chưa tất toán (tổng nợ: ${d.totalReaderDebt.toLocaleString()} đ).`;
+      if (multiText) multiText.textContent = `Độc giả này đang có ${d.readerDebtsCount} khoản nợ chưa tất toán (tổng nợ: ${d.totalReaderDebt.toLocaleString('vi-VN')} đ).`;
     } else {
       if (multiNotice) multiNotice.style.display = 'none';
     }
@@ -5628,7 +5668,7 @@ function registerGlobalEvents() {
       optionsBox.style.display = (hasMultipleDebts || isLargeDebt) ? 'block' : 'none';
     }
 
-    if (optFullAmount) optFullAmount.textContent = `${Number(d.amount).toLocaleString()} đ`;
+    if (optFullAmount) optFullAmount.textContent = `${Number(d.amount).toLocaleString('vi-VN')} đ`;
 
     if (optPartialContainer) {
       optPartialContainer.style.display = isLargeDebt ? 'block' : 'none';
@@ -5639,7 +5679,7 @@ function registerGlobalEvents() {
 
     if (optAllContainer) {
       optAllContainer.style.display = hasMultipleDebts ? 'block' : 'none';
-      if (optAllAmount) optAllAmount.textContent = `${d.totalReaderDebt.toLocaleString()} đ`;
+      if (optAllAmount) optAllAmount.textContent = `${d.totalReaderDebt.toLocaleString('vi-VN')} đ`;
       if (optAllCount) optAllCount.textContent = `${d.readerDebtsCount}`;
     }
 
@@ -5662,9 +5702,9 @@ function registerGlobalEvents() {
           closeModal('modal-receipt');
           if (res.isCardUnlocked) {
             triggerConfetti();
-            showToast(`✅ Đã thu ${res.amountPaid.toLocaleString()} đ và mở khóa thẻ độc giả ${d.readerName} thành công!`, "success");
+            showToast(`✅ Đã thu ${res.amountPaid.toLocaleString('vi-VN')} đ và mở khóa thẻ độc giả ${d.readerName} thành công!`, "success");
           } else {
-            showToast(`✅ Đã thu ${res.amountPaid.toLocaleString()} đ từ độc giả ${d.readerName} (Còn nợ ${res.remainingDebt.toLocaleString()} đ, thẻ tiếp tục tạm khóa).`, "info");
+            showToast(`✅ Đã thu ${res.amountPaid.toLocaleString('vi-VN')} đ từ độc giả ${d.readerName} (Còn nợ ${res.remainingDebt.toLocaleString('vi-VN')} đ, thẻ tiếp tục tạm khóa).`, "info");
           }
           renderDebtsScreen();
         });
@@ -5789,12 +5829,19 @@ function registerGlobalEvents() {
   window.handleSaveParamsForm = function() {
     const loanDays = document.getElementById('param-loan-days')?.value;
     const maxBooks = document.getElementById('param-max-books')?.value;
-    const fine = document.getElementById('param-fine-per-day')?.value.replace(/\D/g, '');
+    const fine = document.getElementById('param-fine-per-day')?.value;
     const renewals = document.getElementById('param-max-renewals')?.value;
     const renewalDays = document.getElementById('param-renewal-days')?.value;
+    const holdHours = document.getElementById('param-hold-hours')?.value;
+    const maxDebt = document.getElementById('param-max-debt')?.value;
 
-    saveSystemParams({ loanDays, maxBooks, fine, renewals, renewalDays });
+    saveSystemParams({ loanDays, maxBooks, fine, renewals, renewalDays, holdHours, maxDebt });
     showToast("✅ Đã lưu cấu hình tham số vận hành thư viện thành công!", "success");
+  };
+
+  window.handleResetParamsDefault = function() {
+    resetSystemParamsToDefault();
+    showToast("Đã khôi phục các tham số về giá trị mặc định!", "info");
   };
 
   window.handleCreateNewBackup = function() {

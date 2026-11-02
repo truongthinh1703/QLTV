@@ -250,6 +250,21 @@ export function sanitizeDB(dbData) {
     });
   }
 
+  // 5. Chuẩn hóa tham số vận hành dbData.parameters
+  if (!dbData.parameters) {
+    dbData.parameters = { ...INITIAL_DB.parameters };
+    modified = true;
+  } else {
+    if (dbData.parameters.reservationHoldHours === undefined) {
+      dbData.parameters.reservationHoldHours = 24;
+      modified = true;
+    }
+    if (dbData.parameters.maxAllowedDebt === undefined) {
+      dbData.parameters.maxAllowedDebt = 50000;
+      modified = true;
+    }
+  }
+
   if (modified && typeof localStorage !== 'undefined') {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(dbData));

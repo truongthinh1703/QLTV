@@ -66,33 +66,63 @@ export function renderAccountsScreen() {
 }
 
 /**
+ * Tham số mặc định chuẩn ban đầu của hệ thống thư viện HCMUE
+ */
+export const DEFAULT_PARAMETERS = {
+  loanDurationDays: 14,
+  maxBooksPerReader: 3,
+  overdueFinePerDay: 2000,
+  maxOnlineRenewals: 1,
+  renewalDays: 7,
+  reservationHoldHours: 24,
+  maxAllowedDebt: 50000
+};
+
+/**
  * Screen 16: Cấu hình tham số vận hành UC05
  */
 export function renderParamsScreen() {
   const db = getDB();
-  const p = db.parameters;
+  const p = db.parameters || {};
 
   const loanDaysInput = document.getElementById('param-loan-days');
   const maxBooksInput = document.getElementById('param-max-books');
   const finePerDayInput = document.getElementById('param-fine-per-day');
   const maxRenewalsInput = document.getElementById('param-max-renewals');
   const renewalDaysInput = document.getElementById('param-renewal-days');
+  const holdHoursInput = document.getElementById('param-hold-hours');
+  const maxDebtInput = document.getElementById('param-max-debt');
 
-  if (loanDaysInput) loanDaysInput.value = `${p.loanDurationDays} ngày`;
-  if (maxBooksInput) maxBooksInput.value = `${p.maxBooksPerReader} cuốn`;
-  if (finePerDayInput) finePerDayInput.value = `${p.overdueFinePerDay.toLocaleString()} VNĐ / ngày trễ`;
-  if (maxRenewalsInput) maxRenewalsInput.value = `${p.maxOnlineRenewals} lần`;
-  if (renewalDaysInput) renewalDaysInput.value = `${p.renewalDays} ngày`;
+  if (loanDaysInput) loanDaysInput.value = p.loanDurationDays !== undefined ? p.loanDurationDays : 14;
+  if (maxBooksInput) maxBooksInput.value = p.maxBooksPerReader !== undefined ? p.maxBooksPerReader : 3;
+  if (finePerDayInput) finePerDayInput.value = p.overdueFinePerDay !== undefined ? p.overdueFinePerDay : 2000;
+  if (maxRenewalsInput) maxRenewalsInput.value = p.maxOnlineRenewals !== undefined ? p.maxOnlineRenewals : 1;
+  if (renewalDaysInput) renewalDaysInput.value = p.renewalDays !== undefined ? p.renewalDays : 7;
+  if (holdHoursInput) holdHoursInput.value = p.reservationHoldHours !== undefined ? p.reservationHoldHours : 24;
+  if (maxDebtInput) maxDebtInput.value = p.maxAllowedDebt !== undefined ? p.maxAllowedDebt : 50000;
 }
 
 export function saveSystemParams(formData) {
   mutateDB(draft => {
-    draft.parameters.loanDurationDays = parseInt(formData.loanDays) || 14;
-    draft.parameters.maxBooksPerReader = parseInt(formData.maxBooks) || 3;
-    draft.parameters.overdueFinePerDay = parseInt(formData.fine) || 2000;
-    draft.parameters.maxOnlineRenewals = parseInt(formData.renewals) || 1;
-    draft.parameters.renewalDays = parseInt(formData.renewalDays) || 7;
-  });
+    if (!draft.parameters) draft.parameters = {};
+    draft.parameters.loanDurationDays = parseInt(formData.loanDays, 10) || 14;
+    draft.parameters.maxBooksPerReader = parseInt(formData.maxBooks, 10) || 3;
+    draft.parameters.overdueFinePerDay = parseInt(formData.fine, 10) || 2000;
+    draft.parameters.maxOnlineRenewals = parseInt(formData.renewals, 10) || 1;
+    draft.parameters.renewalDays = parseInt(formData.renewalDays, 10) || 7;
+    draft.parameters.reservationHoldHours = parseInt(formData.holdHours, 10) || 24;
+    draft.parameters.maxAllowedDebt = parseInt(formData.maxDebt, 10) || 50000;
+  }, 'UPDATE_SYSTEM_PARAMS');
+}
+
+/**
+ * Khôi phục toàn bộ tham số vận hành về giá trị chuẩn mặc định ban đầu
+ */
+export function resetSystemParamsToDefault() {
+  mutateDB(draft => {
+    draft.parameters = { ...DEFAULT_PARAMETERS };
+  }, 'RESET_SYSTEM_PARAMS_DEFAULT');
+  renderParamsScreen();
 }
 
 /**
@@ -162,10 +192,10 @@ export function renderReportsScreen() {
   const finesEl = document.getElementById('rep-kpi-fines');
   const compEl = document.getElementById('rep-kpi-compensation');
 
-  if (loansEl) loansEl.textContent = r.monthlyLoans.toLocaleString();
-  if (returnsEl) returnsEl.textContent = r.monthlyReturns.toLocaleString();
-  if (finesEl) finesEl.textContent = `${r.finesCollected.toLocaleString()} đ`;
-  if (compEl) compEl.textContent = `${r.compensationCollected.toLocaleString()} đ`;
+  if (loansEl) loansEl.textContent = r.monthlyLoans.toLocaleString('vi-VN');
+  if (returnsEl) returnsEl.textContent = r.monthlyReturns.toLocaleString('vi-VN');
+  if (finesEl) finesEl.textContent = `${r.finesCollected.toLocaleString('vi-VN')} đ`;
+  if (compEl) compEl.textContent = `${r.compensationCollected.toLocaleString('vi-VN')} đ`;
 
   // Render Top 3 sách
   const topBooksContainer = document.getElementById('rep-top-books-container');
@@ -195,29 +225,29 @@ export function renderReportsScreen() {
   tbody.innerHTML = `
     <tr>
       <td>Khoa Công nghệ Thông tin</td>
-      <td>1,850,000 đ</td>
-      <td><span class="cell-amount">${cnttDebt.toLocaleString()} đ</span></td>
+      <td>1.850.000 đ</td>
+      <td><span class="cell-amount">${cnttDebt.toLocaleString('vi-VN')} đ</span></td>
     </tr>
     <tr>
       <td>Khoa Toán - Tin học</td>
-      <td>980,000 đ</td>
-      <td><span class="cell-amount">${toanTinDebt.toLocaleString()} đ</span></td>
+      <td>980.000 đ</td>
+      <td><span class="cell-amount">${toanTinDebt.toLocaleString('vi-VN')} đ</span></td>
     </tr>
     <tr>
       <td>Khoa Tiếng Anh</td>
-      <td>590,000 đ</td>
-      <td><span class="${nnDebt > 0 ? 'cell-amount' : ''}">${nnDebt.toLocaleString()} đ</span></td>
+      <td>590.000 đ</td>
+      <td><span class="${nnDebt > 0 ? 'cell-amount' : ''}">${nnDebt.toLocaleString('vi-VN')} đ</span></td>
     </tr>
     <tr style="background-color: #f8fafc; font-weight: 700;">
       <td>Tổng cộng</td>
-      <td>3,420,000 đ</td>
-      <td><span class="cell-amount" style="font-size: 15px;">${totalDebt.toLocaleString()} đ</span></td>
+      <td>3.420.000 đ</td>
+      <td><span class="cell-amount" style="font-size: 15px;">${totalDebt.toLocaleString('vi-VN')} đ</span></td>
     </tr>
   `;
 
   const bannerDebtEl = document.getElementById('rep-banner-debt-val');
   if (bannerDebtEl) {
-    bannerDebtEl.textContent = `TỔNG CÔNG NỢ TỒN ĐỌNG: ${totalDebt.toLocaleString()} đ · Khớp chính xác với Dashboard và Quản lý nợ phạt.`;
+    bannerDebtEl.textContent = `TỔNG CÔNG NỢ TỒN ĐỌNG: ${totalDebt.toLocaleString('vi-VN')} đ · Khớp chính xác với Dashboard và Quản lý nợ phạt.`;
   }
 }
 

@@ -650,7 +650,7 @@
                   <span class="kpi-title">Tổng nợ chờ thu</span>
                   <i class="fa-solid fa-wallet kpi-icon crimson"></i>
                 </div>
-                <div class="kpi-value crimson" id="debts-kpi-total">600,000 đ</div>
+                <div class="kpi-value crimson" id="debts-kpi-total">600.000 đ</div>
               </div>
 
               <div class="kpi-card">
@@ -687,7 +687,7 @@
               <div
                 style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-top: 2px solid var(--border-color); margin-top: 10px;">
                 <span class="cell-bold" style="font-size: 15px; text-transform: uppercase;">TỔNG CỘNG</span>
-                <span class="cell-amount" style="font-size: 20px;" id="debts-total-sum">600,000 đ</span>
+                <span class="cell-amount" style="font-size: 20px;" id="debts-total-sum">600.000 đ</span>
               </div>
 
               <div class="table-pagination-bar">
@@ -1245,7 +1245,8 @@
                   </div>
                   <div class="floating-input-wrap">
                     <span class="floating-label">Số ngày mượn</span>
-                    <input type="text" id="param-loan-days" class="floating-input" value="14 ngày">
+                    <input type="number" id="param-loan-days" class="floating-input" value="14" min="1" max="60" style="flex: 1;">
+                    <span class="input-suffix" style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">ngày</span>
                   </div>
                   <div class="param-range-note">Miền kiểm tra: 1 - 60 ngày</div>
                 </div>
@@ -1258,7 +1259,8 @@
                   </div>
                   <div class="floating-input-wrap">
                     <span class="floating-label">Số cuốn tối đa</span>
-                    <input type="text" id="param-max-books" class="floating-input" value="3 cuốn">
+                    <input type="number" id="param-max-books" class="floating-input" value="3" min="1" max="5" style="flex: 1;">
+                    <span class="input-suffix" style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">cuốn</span>
                   </div>
                   <div class="param-range-note">Miền kiểm tra: 1 - 5 cuốn</div>
                 </div>
@@ -1271,9 +1273,10 @@
                   </div>
                   <div class="floating-input-wrap">
                     <span class="floating-label">Đơn giá phạt</span>
-                    <input type="text" id="param-fine-per-day" class="floating-input" value="2,000 VNĐ / ngày trễ">
+                    <input type="number" id="param-fine-per-day" class="floating-input" value="2000" min="1000" max="50000" step="500" style="flex: 1;">
+                    <span class="input-suffix" style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">đ / ngày</span>
                   </div>
-                  <div class="param-range-note">Miền: 1,000 - 50,000 VNĐ</div>
+                  <div class="param-range-note">Miền kiểm tra: 1.000 - 50.000 đ</div>
                 </div>
 
                 <!-- Param 4 -->
@@ -1285,14 +1288,44 @@
                   <div style="display: flex; gap: 10px;">
                     <div class="floating-input-wrap" style="flex: 1;">
                       <span class="floating-label">Số lần tối đa</span>
-                      <input type="text" id="param-max-renewals" class="floating-input" value="1 lần">
+                      <input type="number" id="param-max-renewals" class="floating-input" value="1" min="0" max="5" style="flex: 1;">
+                      <span class="input-suffix" style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">lần</span>
                     </div>
                     <div class="floating-input-wrap" style="flex: 1;">
                       <span class="floating-label">Cộng thêm mỗi lần</span>
-                      <input type="text" id="param-renewal-days" class="floating-input" value="7 ngày">
+                      <input type="number" id="param-renewal-days" class="floating-input" value="7" min="1" max="30" style="flex: 1;">
+                      <span class="input-suffix" style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">ngày</span>
                     </div>
                   </div>
                   <div class="param-range-note">Chỉ gia hạn nếu sách còn hạn và không có công nợ.</div>
+                </div>
+
+                <!-- Param 5 (Mới) -->
+                <div class="param-box">
+                  <div class="param-header">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>Thời gian giữ chỗ sách đặt trước</span>
+                  </div>
+                  <div class="floating-input-wrap">
+                    <span class="floating-label">Thời gian giữ chỗ</span>
+                    <input type="number" id="param-hold-hours" class="floating-input" value="24" min="1" max="168" style="flex: 1;">
+                    <span class="input-suffix" style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">giờ</span>
+                  </div>
+                  <div class="param-range-note">Miền kiểm tra: 1 - 72 giờ (mặc định: 24 giờ)</div>
+                </div>
+
+                <!-- Param 6 (Mới) -->
+                <div class="param-box">
+                  <div class="param-header">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                    <span>Hạn mức nợ tối đa cho phép tiếp tục mượn</span>
+                  </div>
+                  <div class="floating-input-wrap">
+                    <span class="floating-label">Số tiền nợ tối đa</span>
+                    <input type="number" id="param-max-debt" class="floating-input" value="50000" min="0" max="500000" step="5000" style="flex: 1;">
+                    <span class="input-suffix" style="color: #64748b; font-size: 13px; font-weight: 600; margin-left: 8px; white-space: nowrap;">đ</span>
+                  </div>
+                  <div class="param-range-note">Miền kiểm tra: 0 - 500.000 đ (mặc định: 50.000 đ)</div>
                 </div>
 
               </div>
@@ -1303,8 +1336,11 @@
                   không thay đổi hồi tố các giao dịch đã đóng trong quá khứ</span>
               </div>
 
-              <div style="text-align: right; margin-top: 20px;">
-                <button class="btn btn-primary btn-lg" onclick="window.handleSaveParamsForm()">
+              <div style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 20px;">
+                <button type="button" class="btn btn-outline btn-lg" id="btn-reset-params" onclick="window.handleResetParamsDefault()" title="Khôi phục lại tham số mặc định chuẩn ban đầu">
+                  <i class="fa-solid fa-arrow-rotate-left"></i> Khôi phục mặc định
+                </button>
+                <button type="button" class="btn btn-primary btn-lg" id="btn-save-params" onclick="window.handleSaveParamsForm()">
                   <i class="fa-solid fa-floppy-disk"></i> LƯU CẤU HÌNH THAM SỐ HỆ THỐNG
                 </button>
               </div>
@@ -1416,7 +1452,7 @@
                   <span class="kpi-title">Tiền phạt đã thu</span>
                   <i class="fa-solid fa-wallet kpi-icon"></i>
                 </div>
-                <div class="kpi-value" id="rep-kpi-fines">3,420,000 đ</div>
+                <div class="kpi-value" id="rep-kpi-fines">3.420.000 đ</div>
               </div>
 
               <div class="kpi-card">
@@ -1424,7 +1460,7 @@
                   <span class="kpi-title">Bồi thường đã thu</span>
                   <i class="fa-solid fa-money-bill-wave kpi-icon"></i>
                 </div>
-                <div class="kpi-value" id="rep-kpi-compensation">850,000 đ</div>
+                <div class="kpi-value" id="rep-kpi-compensation">850.000 đ</div>
               </div>
             </div>
 

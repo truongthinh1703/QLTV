@@ -14,14 +14,6 @@ export function getTodayVN(dateObj) {
 }
 
 
-export function getTodayVN(dateObj) {
-  const d = dateObj || new Date();
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const year = d.getFullYear();
-  return `${day}/${month}/${year}`;
-}
-
 let pendingBorrowCopies = [];
 let verifiedBorrowReader = null;
 let currentReturnLoan = null;
@@ -77,7 +69,7 @@ export function renderDashboard() {
   if (kpiTotalTitles) kpiTotalTitles.textContent = totalTitles.toLocaleString();
   if (kpiAvailableCopies) kpiAvailableCopies.textContent = availableCopies.toLocaleString();
   if (kpiBorrowingCopies) kpiBorrowingCopies.textContent = borrowingCopies.toLocaleString();
-  if (kpiPendingDebt) kpiPendingDebt.textContent = `${pendingDebt.toLocaleString()} đ`;
+  if (kpiPendingDebt) kpiPendingDebt.textContent = `${pendingDebt.toLocaleString('vi-VN')} đ`;
 
   // Render bảng Lượt mượn cần xử lý hôm nay (Untitled 2)
   const tbody = document.getElementById('dashboard-loans-tbody');
@@ -220,7 +212,7 @@ export function openRenewCounterModal(copyCode) {
   if (currentDueEl) currentDueEl.textContent = activeRenewTarget.currentDueDate;
 
   if (checkTimesEl) checkTimesEl.textContent = `Số lần đã gia hạn: ${activeRenewTarget.renewCount}/1 (Thỏa mãn quy định tối đa 1 lần).`;
-  if (checkDebtEl) checkDebtEl.textContent = `Thẻ không có nợ phạt tồn đọng (Công nợ: ${debt.toLocaleString()} đ).`;
+  if (checkDebtEl) checkDebtEl.textContent = `Thẻ không có nợ phạt tồn đọng (Công nợ: ${debt.toLocaleString('vi-VN')} đ).`;
   if (renewDateEl) renewDateEl.textContent = `Hôm nay (${getTodayVN()})`;
   if (newDueEl) newDueEl.textContent = activeRenewTarget.newDueDate;
 
@@ -447,7 +439,7 @@ export function verifyBorrowReader() {
     currentLoans: readerCurrentLoans,
     ineligibleReason: !isCardActive ? (!isCardNotExpired ? `Thẻ đã hết hạn sử dụng (${reader.cardExpiry})` : "Thẻ đang bị tạm khóa") :
                       !hasNoOverdue ? `Đang có ${overdueLoans.length} cuốn sách quá hạn chưa trả` :
-                      !hasNoDebt ? `Còn công nợ chưa tất toán (${totalDebt.toLocaleString()} đ)` :
+                      !hasNoDebt ? `Còn công nợ chưa tất toán (${totalDebt.toLocaleString('vi-VN')} đ)` :
                       !hasQuotaAvailable ? `Đã mượn đủ số lượng tối đa (${currentLoanCount}/${maxBooks} cuốn)` : ""
   };
 
@@ -463,7 +455,7 @@ export function verifyBorrowReader() {
         <div style="margin-top: 8px;">
           <span class="badge ${cardBadgeClass}">${cardBadgeText}</span>
         </div>
-        <div class="cell-sub" style="margin-top: 6px;">Hạn thẻ: ${escapeHTML(reader.cardExpiry || '30/06/2027')} · Công nợ: ${totalDebt.toLocaleString()} đ</div>
+        <div class="cell-sub" style="margin-top: 6px;">Hạn thẻ: ${escapeHTML(reader.cardExpiry || '30/06/2027')} · Công nợ: ${totalDebt.toLocaleString('vi-VN')} đ</div>
       </div>
     `;
   }
@@ -482,7 +474,7 @@ export function verifyBorrowReader() {
       </div>
       <div class="rule-check-item" style="${hasNoDebt ? '' : 'color: var(--hcmue-crimson); font-weight: 600;'}">
         <i class="fa-solid ${hasNoDebt ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
-        <span>[3] Không có nợ phạt / bồi thường chưa tất toán (${hasNoDebt ? '0 đ - Đạt' : `KHÔNG ĐẠT - Còn nợ ${totalDebt.toLocaleString()} đ`}).</span>
+        <span>[3] Không có nợ phạt / bồi thường chưa tất toán (${hasNoDebt ? '0 đ - Đạt' : `KHÔNG ĐẠT - Còn nợ ${totalDebt.toLocaleString('vi-VN')} đ`}).</span>
       </div>
       <div class="rule-check-item" style="${hasQuotaAvailable ? '' : 'color: var(--hcmue-crimson); font-weight: 600;'}">
         <i class="fa-solid ${hasQuotaAvailable ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
@@ -1461,7 +1453,7 @@ function renderActiveReturnState() {
             Mã bản sao: ${escapeHTML(loan.copyCode)} · ${escapeHTML(copy.shelf || 'Kệ K03 - Ngăn 2')}
           </div>
           <div class="cell-sub" style="color: #64748b;">
-            Giá đền bù: ${bookPrice.toLocaleString()}đ
+            Giá đền bù: ${bookPrice.toLocaleString('vi-VN')} đ
           </div>
         </div>
       </div>
@@ -1483,7 +1475,7 @@ function renderActiveReturnState() {
       </div>
 
       <div style="color: ${isOverdue ? '#dc2626' : '#16a34a'}; font-size: 13px; font-weight: 600; margin: 12px 0;">
-        ${isOverdue ? `Phạt quá hạn: ${loan.overdueDays} × 2,000 = ${overdueFee.toLocaleString()}đ` : 'Sách đang trong hạn mượn (Phạt quá hạn: 0đ)'}
+        ${isOverdue ? `Phạt quá hạn: ${loan.overdueDays} × 2,000 = ${overdueFee.toLocaleString('vi-VN')} đ` : 'Sách đang trong hạn mượn (Phạt quá hạn: 0đ)'}
       </div>
 
       <div style="margin-top: 16px;">
@@ -1519,7 +1511,7 @@ function renderActiveRightColumn() {
       title: "Sách nguyên vẹn, bình thường",
       badge: "badge-green",
       badgeText: "Sẵn sàng cho mượn",
-      statLeft: `Phạt: ${overdueFee.toLocaleString()}đ`,
+      statLeft: `Phạt: ${overdueFee.toLocaleString('vi-VN')} đ`,
       statMid: "Bồi thường: 0đ",
       total: overdueFee
     },
@@ -1527,16 +1519,16 @@ function renderActiveRightColumn() {
       title: "Sách bị hư hỏng (Rách bìa, vẽ bẩn, ướt)",
       badge: "badge-purple",
       badgeText: "Hư hỏng - Chờ phục hồi",
-      statLeft: `Phạt: ${overdueFee.toLocaleString()}đ`,
-      statMid: `Bồi thường: ${(bookPrice * 0.5).toLocaleString()}đ`,
+      statLeft: `Phạt: ${overdueFee.toLocaleString('vi-VN')} đ`,
+      statMid: `Bồi thường: ${(bookPrice * 0.5).toLocaleString('vi-VN')} đ`,
       total: overdueFee + (bookPrice * 0.5)
     },
     {
       title: "Độc giả báo làm mất sách",
       badge: "badge-red",
       badgeText: "Đã mất - Ngừng lưu hành",
-      statLeft: `Phạt: ${overdueFee.toLocaleString()}đ`,
-      statMid: `Bồi thường: ${bookPrice.toLocaleString()}đ`,
+      statLeft: `Phạt: ${overdueFee.toLocaleString('vi-VN')} đ`,
+      statMid: `Bồi thường: ${bookPrice.toLocaleString('vi-VN')} đ`,
       total: overdueFee + bookPrice
     }
   ];
@@ -1561,7 +1553,7 @@ function renderActiveRightColumn() {
           <div class="condition-stats-cols">
             <div class="condition-stat-unit"><div class="stat-unit-val">${opt.statLeft}</div></div>
             <div class="condition-stat-unit"><div class="stat-unit-val">${opt.statMid}</div></div>
-            <div class="condition-stat-unit"><div class="stat-unit-val total">TỔNG: ${opt.total.toLocaleString()}đ</div></div>
+            <div class="condition-stat-unit"><div class="stat-unit-val total">TỔNG: ${opt.total.toLocaleString('vi-VN')} đ</div></div>
           </div>
         </div>
       `).join('')}
@@ -1571,11 +1563,11 @@ function renderActiveRightColumn() {
     <div class="return-fee-summary-box">
       <div class="return-fee-row">
         <span>Tiền phạt quá hạn:</span>
-        <span style="font-weight: 700; color: #1e293b;">${overdueFee.toLocaleString()}đ</span>
+        <span style="font-weight: 700; color: #1e293b;">${overdueFee.toLocaleString('vi-VN')} đ</span>
       </div>
       <div class="return-fee-row">
         <span>Chi phí bồi thường phát sinh:</span>
-        <span style="font-weight: 700; color: #1e293b;">${damageFee.toLocaleString()}đ</span>
+        <span style="font-weight: 700; color: #1e293b;">${damageFee.toLocaleString('vi-VN')} đ</span>
       </div>
       <div class="return-fee-row total">
         <span style="font-weight: 800; font-size: 15px; color: #102a43;">TỔNG TIỀN PHẢI THU:</span>
@@ -1759,7 +1751,7 @@ export function executeReturnBook(asDebt = false, onDone) {
       returnDate: getTodayVN(),
       status: selectedConditionIndex === 0 ? (loan.overdueDays > 0 ? `Quá hạn ${loan.overdueDays} ngày` : "Trả đúng hạn") : (selectedConditionIndex === 1 ? "Hư hỏng" : "Đã mất"),
       statusBadge: selectedConditionIndex === 0 ? (loan.overdueDays > 0 ? "badge-red" : "badge-green") : "badge-purple",
-      fee: `${totalFee.toLocaleString()} đ`,
+      fee: `${totalFee.toLocaleString('vi-VN')} đ`,
       paymentStatus: asDebt ? "Ghi nhận công nợ" : "Đã tất toán biên lai"
     });
   }, 'RETURN_BOOK');
@@ -1793,11 +1785,11 @@ export function renderDebtsScreen() {
   const paginationInfoEl = document.getElementById('debts-pagination-info');
   const bannerSyncEl = document.getElementById('debts-banner-sync-info');
 
-  if (totalDebtEl) totalDebtEl.textContent = `${totalDebt.toLocaleString()} đ`;
+  if (totalDebtEl) totalDebtEl.textContent = `${totalDebt.toLocaleString('vi-VN')} đ`;
   if (totalDebtorsEl) totalDebtorsEl.textContent = `${totalDebtors} độc giả`;
-  if (sumFooterEl) sumFooterEl.textContent = `${totalDebt.toLocaleString()} đ`;
+  if (sumFooterEl) sumFooterEl.textContent = `${totalDebt.toLocaleString('vi-VN')} đ`;
   if (paginationInfoEl) paginationInfoEl.textContent = `Hiển thị 1–${db.debts.length} trong ${db.debts.length} khoản nợ (${totalDebtors} độc giả)`;
-  if (bannerSyncEl) bannerSyncEl.textContent = `Tổng công nợ khớp với Bảng điều khiển và Báo cáo tài chính theo khoa: ${totalDebt.toLocaleString()} đ.`;
+  if (bannerSyncEl) bannerSyncEl.textContent = `Tổng công nợ khớp với Bảng điều khiển và Báo cáo tài chính theo khoa: ${totalDebt.toLocaleString('vi-VN')} đ.`;
 
   const tbody = document.getElementById('debts-list-tbody');
   if (!tbody) return;
@@ -1833,7 +1825,7 @@ export function renderDebtsScreen() {
           <div class="cell-sub">${escapeHTML(item.readerCard)} · ${escapeHTML(item.readerClass || '50.01.SPTIN.B')}</div>
         </td>
         <td>${escapeHTML(item.reason)}</td>
-        <td><span class="cell-amount">${Number(item.amount).toLocaleString()} đ</span></td>
+        <td><span class="cell-amount">${Number(item.amount).toLocaleString('vi-VN')} đ</span></td>
         <td><span class="badge ${cardBadgeClass}">${escapeHTML(cardStatusText)}</span></td>
         <td>
           <button class="btn-link" onclick="window.handleOpenReceiptModal('${item.id}')">
@@ -1948,7 +1940,7 @@ export function settleDebt(debtId, options, onDone) {
       // 2. Thu từng phần khoản nợ này
       actualPaid = Math.min(Number(targetDebt.amount), Math.max(1000, Number(opts.amountPaid) || 0));
       targetDebt.amount = Number(targetDebt.amount) - actualPaid;
-      targetDebt.reason = `${targetDebt.reason} (Đã thu trước ${actualPaid.toLocaleString()} đ)`;
+      targetDebt.reason = `${targetDebt.reason} (Đã thu trước ${actualPaid.toLocaleString('vi-VN')} đ)`;
 
       if (acc) {
         acc.debt = Math.max(0, (Number(acc.debt) || 0) - actualPaid);

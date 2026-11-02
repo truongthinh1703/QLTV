@@ -42,7 +42,7 @@ import {
   openCreateReaderCardModal, handleReaderCardMssvInput, handleCreateReaderCardSubmit
 } from './modules/catalog.js';
 import { 
-  renderAccountsScreen, renderParamsScreen, saveSystemParams, renderBackupsScreen, 
+  renderAccountsScreen, renderParamsScreen, saveSystemParams, resetSystemParamsToDefault, renderBackupsScreen, 
   createNewBackup, getBackupForRestore, renderReportsScreen 
 } from './modules/admin.js';
 import { 
@@ -463,6 +463,7 @@ function registerGlobalEvents() {
   window.openCreateReaderCardModal = openCreateReaderCardModal;
   window.handleReaderCardMssvInput = handleReaderCardMssvInput;
   window.handleCreateReaderCardSubmit = handleCreateReaderCardSubmit;
+  window.resetSystemParamsToDefault = resetSystemParamsToDefault;
 
   // Xử lý Quick Login Chip 1-click
   window.quickLogin = function(username, pass) {
@@ -735,10 +736,10 @@ function registerGlobalEvents() {
   window.handleCompleteReturn = function(asDebt) {
     executeReturnBook(asDebt, (fee, isDebt) => {
       if (isDebt) {
-        showToast(`Đã trả sách và ghi nhận nợ ${fee.toLocaleString()} đ vào thẻ độc giả!`, "warning");
+        showToast(`Đã trả sách và ghi nhận nợ ${fee.toLocaleString('vi-VN')} đ vào thẻ độc giả!`, "warning");
       } else {
         triggerConfetti();
-        showToast(`Đã tiếp nhận sách và thu ${fee.toLocaleString()} đ tiền mặt thành công!`, "success");
+        showToast(`Đã tiếp nhận sách và thu ${fee.toLocaleString('vi-VN')} đ tiền mặt thành công!`, "success");
       }
       
       const returnInp = document.getElementById('return-copy-input');
@@ -778,7 +779,7 @@ function registerGlobalEvents() {
 
     if (mode === 'SETTLE_ALL') {
       const settleAmount = Number(d.totalReaderDebt || d.amount);
-      if (amtDisplay) amtDisplay.textContent = `${settleAmount.toLocaleString()} đ`;
+      if (amtDisplay) amtDisplay.textContent = `${settleAmount.toLocaleString('vi-VN')} đ`;
       
       if (alertBox) alertBox.className = 'alert-banner alert-banner-success';
       if (alertIcon) alertIcon.className = 'fa-solid fa-circle-check';
@@ -791,8 +792,8 @@ function registerGlobalEvents() {
     } else if (mode === 'PARTIAL_ITEM') {
       const partialVal = Number(partialInput ? partialInput.value : 0) || 0;
       const remain = Math.max(0, Number(d.amount) - partialVal);
-      if (partialRemainingLabel) partialRemainingLabel.textContent = `${remain.toLocaleString()} đ`;
-      if (amtDisplay) amtDisplay.textContent = `${partialVal.toLocaleString()} đ`;
+      if (partialRemainingLabel) partialRemainingLabel.textContent = `${remain.toLocaleString('vi-VN')} đ`;
+      if (amtDisplay) amtDisplay.textContent = `${partialVal.toLocaleString('vi-VN')} đ`;
 
       if (alertBox) alertBox.className = 'alert-banner alert-banner-warning';
       if (alertIcon) alertIcon.className = 'fa-solid fa-triangle-exclamation';
@@ -805,14 +806,14 @@ function registerGlobalEvents() {
     } else {
       // FULL_ITEM
       const itemAmount = Number(d.amount);
-      if (amtDisplay) amtDisplay.textContent = `${itemAmount.toLocaleString()} đ`;
+      if (amtDisplay) amtDisplay.textContent = `${itemAmount.toLocaleString('vi-VN')} đ`;
 
       if (d.readerDebtsCount > 1) {
         const otherCount = d.readerDebtsCount - 1;
         const otherDebt = d.totalReaderDebt - itemAmount;
         if (alertBox) alertBox.className = 'alert-banner alert-banner-warning';
         if (alertIcon) alertIcon.className = 'fa-solid fa-triangle-exclamation';
-        if (alertText) alertText.textContent = `Độc giả vẫn còn ${otherCount} khoản nợ khác (${otherDebt.toLocaleString()} đ). Thẻ độc giả tiếp tục TẠM KHÓA cho đến khi tất toán toàn bộ.`;
+        if (alertText) alertText.textContent = `Độc giả vẫn còn ${otherCount} khoản nợ khác (${otherDebt.toLocaleString('vi-VN')} đ). Thẻ độc giả tiếp tục TẠM KHÓA cho đến khi tất toán toàn bộ.`;
         if (confirmBtn) {
           confirmBtn.textContent = 'Xác nhận thu nợ khoản này (Giữ tạm khóa)';
           confirmBtn.style.background = '#0284c7';
@@ -874,7 +875,7 @@ function registerGlobalEvents() {
 
     if (d.readerDebtsCount > 1) {
       if (multiNotice) multiNotice.style.display = 'block';
-      if (multiText) multiText.textContent = `Độc giả này đang có ${d.readerDebtsCount} khoản nợ chưa tất toán (tổng nợ: ${d.totalReaderDebt.toLocaleString()} đ).`;
+      if (multiText) multiText.textContent = `Độc giả này đang có ${d.readerDebtsCount} khoản nợ chưa tất toán (tổng nợ: ${d.totalReaderDebt.toLocaleString('vi-VN')} đ).`;
     } else {
       if (multiNotice) multiNotice.style.display = 'none';
     }
@@ -887,7 +888,7 @@ function registerGlobalEvents() {
       optionsBox.style.display = (hasMultipleDebts || isLargeDebt) ? 'block' : 'none';
     }
 
-    if (optFullAmount) optFullAmount.textContent = `${Number(d.amount).toLocaleString()} đ`;
+    if (optFullAmount) optFullAmount.textContent = `${Number(d.amount).toLocaleString('vi-VN')} đ`;
 
     if (optPartialContainer) {
       optPartialContainer.style.display = isLargeDebt ? 'block' : 'none';
@@ -898,7 +899,7 @@ function registerGlobalEvents() {
 
     if (optAllContainer) {
       optAllContainer.style.display = hasMultipleDebts ? 'block' : 'none';
-      if (optAllAmount) optAllAmount.textContent = `${d.totalReaderDebt.toLocaleString()} đ`;
+      if (optAllAmount) optAllAmount.textContent = `${d.totalReaderDebt.toLocaleString('vi-VN')} đ`;
       if (optAllCount) optAllCount.textContent = `${d.readerDebtsCount}`;
     }
 
@@ -921,9 +922,9 @@ function registerGlobalEvents() {
           closeModal('modal-receipt');
           if (res.isCardUnlocked) {
             triggerConfetti();
-            showToast(`✅ Đã thu ${res.amountPaid.toLocaleString()} đ và mở khóa thẻ độc giả ${d.readerName} thành công!`, "success");
+            showToast(`✅ Đã thu ${res.amountPaid.toLocaleString('vi-VN')} đ và mở khóa thẻ độc giả ${d.readerName} thành công!`, "success");
           } else {
-            showToast(`✅ Đã thu ${res.amountPaid.toLocaleString()} đ từ độc giả ${d.readerName} (Còn nợ ${res.remainingDebt.toLocaleString()} đ, thẻ tiếp tục tạm khóa).`, "info");
+            showToast(`✅ Đã thu ${res.amountPaid.toLocaleString('vi-VN')} đ từ độc giả ${d.readerName} (Còn nợ ${res.remainingDebt.toLocaleString('vi-VN')} đ, thẻ tiếp tục tạm khóa).`, "info");
           }
           renderDebtsScreen();
         });
@@ -1048,12 +1049,19 @@ function registerGlobalEvents() {
   window.handleSaveParamsForm = function() {
     const loanDays = document.getElementById('param-loan-days')?.value;
     const maxBooks = document.getElementById('param-max-books')?.value;
-    const fine = document.getElementById('param-fine-per-day')?.value.replace(/\D/g, '');
+    const fine = document.getElementById('param-fine-per-day')?.value;
     const renewals = document.getElementById('param-max-renewals')?.value;
     const renewalDays = document.getElementById('param-renewal-days')?.value;
+    const holdHours = document.getElementById('param-hold-hours')?.value;
+    const maxDebt = document.getElementById('param-max-debt')?.value;
 
-    saveSystemParams({ loanDays, maxBooks, fine, renewals, renewalDays });
+    saveSystemParams({ loanDays, maxBooks, fine, renewals, renewalDays, holdHours, maxDebt });
     showToast("✅ Đã lưu cấu hình tham số vận hành thư viện thành công!", "success");
+  };
+
+  window.handleResetParamsDefault = function() {
+    resetSystemParamsToDefault();
+    showToast("Đã khôi phục các tham số về giá trị mặc định!", "info");
   };
 
   window.handleCreateNewBackup = function() {
