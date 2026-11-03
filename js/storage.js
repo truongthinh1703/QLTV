@@ -247,6 +247,58 @@ export function sanitizeDB(dbData) {
         l.readerClass = "50.01.SPTIN.B";
         modified = true;
       }
+
+      // Tự động chuẩn hóa trạng thái quá hạn / trong hạn theo thời gian thực (chống lỗi đóng băng mockup)
+      if (l.dueDate && typeof l.dueDate === 'string') {
+        const parts = l.dueDate.split('/');
+        if (parts.length === 3) {
+          const dueDay = parseInt(parts[0], 10);
+          const dueMonth = parseInt(parts[1], 10) - 1;
+          const dueYear = parseInt(parts[2], 10);
+          const startOfDueDay = new Date(dueYear, dueMonth, dueDay);
+          const now = new Date();
+          const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          const msPerDay = 24 * 60 * 60 * 1000;
+          const diffDays = Math.round((startOfToday.getTime() - startOfDueDay.getTime()) / msPerDay);
+
+          if (diffDays > 0) {
+            if (l.overdueDays !== diffDays || l.statusBadge !== 'badge-red') {
+              l.overdueDays = diffDays;
+              l.statusBadge = 'badge-red';
+              l.statusText = `Quá hạn ${diffDays} ngày`;
+              l.actionText = 'Tiếp nhận trả sách →';
+              modified = true;
+            }
+          } else {
+            const remainingDays = Math.abs(diffDays);
+            if (l.overdueDays !== 0) {
+              l.overdueDays = 0;
+              modified = true;
+            }
+            if (l.renewed) {
+              if (l.statusBadge !== 'badge-green' || l.statusText !== 'Đã gia hạn (+7 ngày)') {
+                l.statusBadge = 'badge-green';
+                l.statusText = 'Đã gia hạn (+7 ngày)';
+                modified = true;
+              }
+            } else if (remainingDays <= 1) {
+              const newText = remainingDays === 0 ? 'Hết hạn hôm nay' : 'Còn 1 ngày';
+              if (l.statusBadge !== 'badge-yellow' || l.statusText !== newText) {
+                l.statusBadge = 'badge-yellow';
+                l.statusText = newText;
+                modified = true;
+              }
+            } else {
+              const newText = `Trong hạn · Còn ${remainingDays} ngày`;
+              if (l.statusBadge !== 'badge-green' || l.statusText !== newText) {
+                l.statusBadge = 'badge-green';
+                l.statusText = newText;
+                modified = true;
+              }
+            }
+          }
+        }
+      }
     });
   }
 
@@ -294,7 +346,7 @@ export function saveDB(data) {
  * Khôi phục dữ liệu gốc chuẩn để Thầy Cô/Hội Đồng đối soát chấm điểm
  */
 export function resetDB() {
-  const fresh = JSON.parse(JSON.stringify(INITIAL_DB));
+  const fresh = sanitizeDB(JSON.parse(JSON.stringify(INITIAL_DB)));
   saveDB(fresh);
   if (typeof window !== 'undefined') {
     window.HCMUE_DB = fresh;

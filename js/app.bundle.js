@@ -475,10 +475,10 @@ const INITIAL_DB = {
       readerClass: "50.01.SPTIN.B",
       borrowDate: "15/10/2026",
       dueDate: "29/10/2026",
-      overdueDays: 0,
-      statusBadge: "badge-yellow",
-      statusText: "Còn 1 ngày",
-      actionText: "Xem lượt mượn"
+      overdueDays:  5,
+      statusBadge: "badge-red",
+      statusText: "Quá hạn 5 ngày",
+      actionText: "Tiếp nhận trả sách →"
     },
     {
       id: "LOAN-004",
@@ -944,6 +944,58 @@ function sanitizeDB(dbData) {
         l.readerClass = "50.01.SPTIN.B";
         modified = true;
       }
+
+      // Tự động chuẩn hóa trạng thái quá hạn / trong hạn theo thời gian thực (chống lỗi đóng băng mockup)
+      if (l.dueDate && typeof l.dueDate === 'string') {
+        const parts = l.dueDate.split('/');
+        if (parts.length === 3) {
+          const dueDay = parseInt(parts[0], 10);
+          const dueMonth = parseInt(parts[1], 10) - 1;
+          const dueYear = parseInt(parts[2], 10);
+          const startOfDueDay = new Date(dueYear, dueMonth, dueDay);
+          const now = new Date();
+          const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          const msPerDay = 24 * 60 * 60 * 1000;
+          const diffDays = Math.round((startOfToday.getTime() - startOfDueDay.getTime()) / msPerDay);
+
+          if (diffDays > 0) {
+            if (l.overdueDays !== diffDays || l.statusBadge !== 'badge-red') {
+              l.overdueDays = diffDays;
+              l.statusBadge = 'badge-red';
+              l.statusText = `Quá hạn ${diffDays} ngày`;
+              l.actionText = 'Tiếp nhận trả sách →';
+              modified = true;
+            }
+          } else {
+            const remainingDays = Math.abs(diffDays);
+            if (l.overdueDays !== 0) {
+              l.overdueDays = 0;
+              modified = true;
+            }
+            if (l.renewed) {
+              if (l.statusBadge !== 'badge-green' || l.statusText !== 'Đã gia hạn (+7 ngày)') {
+                l.statusBadge = 'badge-green';
+                l.statusText = 'Đã gia hạn (+7 ngày)';
+                modified = true;
+              }
+            } else if (remainingDays <= 1) {
+              const newText = remainingDays === 0 ? 'Hết hạn hôm nay' : 'Còn 1 ngày';
+              if (l.statusBadge !== 'badge-yellow' || l.statusText !== newText) {
+                l.statusBadge = 'badge-yellow';
+                l.statusText = newText;
+                modified = true;
+              }
+            } else {
+              const newText = `Trong hạn · Còn ${remainingDays} ngày`;
+              if (l.statusBadge !== 'badge-green' || l.statusText !== newText) {
+                l.statusBadge = 'badge-green';
+                l.statusText = newText;
+                modified = true;
+              }
+            }
+          }
+        }
+      }
     });
   }
 
@@ -991,7 +1043,7 @@ function saveDB(data) {
  * Khôi phục dữ liệu gốc chuẩn để Thầy Cô/Hội Đồng đối soát chấm điểm
  */
 function resetDB() {
-  const fresh = JSON.parse(JSON.stringify(INITIAL_DB));
+  const fresh = sanitizeDB(JSON.parse(JSON.stringify(INITIAL_DB)));
   saveDB(fresh);
   if (typeof window !== 'undefined') {
     window.HCMUE_DB = fresh;
@@ -1268,8 +1320,10 @@ function renderDashboard() {
 
   // Tính toán KPI
   const totalTitles = db.titles.length + 1244; // Hiển thị 1,248 theo mockup
-  const availableCopies = 3892;
-  const borrowingCopies = 412;
+  const baseAvail = 3880;
+  const baseBorrow = 410;
+  const borrowingCopies = baseBorrow + (db.activeLoans ? db.activeLoans.length : 0);
+  const availableCopies = baseAvail + (db.copies ? db.copies.filter(c => c.status === 'SAN_SANG').length : 0);
   const pendingDebt = db.debts.reduce((sum, d) => sum + Number(d.amount), 0);
 
   const kpiTotalTitles = document.getElementById('kpi-total-titles');
@@ -1287,6 +1341,41 @@ function renderDashboard() {
   if (!tbody) return;
 
   tbody.innerHTML = db.activeLoans.map(loan => {
+    // Tự động chuẩn hóa trạng thái hạn trả thời gian thực
+    if (loan.dueDate && typeof loan.dueDate === 'string') {
+      const parts = loan.dueDate.split('/');
+      if (parts.length === 3) {
+        const dueDay = parseInt(parts[0], 10);
+        const dueMonth = parseInt(parts[1], 10) - 1;
+        const dueYear = parseInt(parts[2], 10);
+        const startOfDueDay = new Date(dueYear, dueMonth, dueDay);
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const msPerDay = 24 * 60 * 60 * 1000;
+        const diffDays = Math.round((startOfToday.getTime() - startOfDueDay.getTime()) / msPerDay);
+
+        if (diffDays > 0) {
+          loan.overdueDays = diffDays;
+          loan.statusBadge = 'badge-red';
+          loan.statusText = `Quá hạn ${diffDays} ngày`;
+          loan.actionText = 'Tiếp nhận trả sách →';
+        } else {
+          const remainingDays = Math.abs(diffDays);
+          loan.overdueDays = 0;
+          if (loan.renewed) {
+            loan.statusBadge = 'badge-green';
+            loan.statusText = 'Đã gia hạn (+7 ngày)';
+          } else if (remainingDays <= 1) {
+            loan.statusBadge = 'badge-yellow';
+            loan.statusText = remainingDays === 0 ? 'Hết hạn hôm nay' : 'Còn 1 ngày';
+          } else {
+            loan.statusBadge = 'badge-green';
+            loan.statusText = `Trong hạn · Còn ${remainingDays} ngày`;
+          }
+        }
+      }
+    }
+
     let actionBtnHtml = '';
     if (loan.overdueDays > 0) {
       // Quá hạn: Nút tiếp nhận / xử lý trả sách màu đỏ nhạt soft-danger
@@ -1344,7 +1433,7 @@ function openRenewCounterModal(copyCode) {
   if (greetingEl) {
     greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
   }
-  
+
   // Tìm kiếm lượt mượn tương ứng
   let targetLoan = db.activeLoans ? db.activeLoans.find(l => l.copyCode && l.copyCode.toUpperCase() === copyCode.toUpperCase()) : null;
   if (!targetLoan && db.loans) {
@@ -1494,13 +1583,19 @@ function renewLoanAtDashboard(copyCode) {
   mutateDB(draft => {
     const loan = draft.activeLoans.find(l => l.copyCode.toUpperCase() === copyCode.toUpperCase());
     if (loan) {
-      // Tính hạn mới (+7 ngày)
-      if (copyCode === 'AI-004') {
-        loan.dueDate = '05/11/2026';
-      } else if (copyCode === 'WEB-001') {
-        loan.dueDate = '15/11/2026';
-      } else {
-        loan.dueDate = '18/11/2026';
+      // Tính hạn mới (+7 ngày hoặc theo cấu hình)
+      const renewDays = Number(draft.parameters?.renewalDays || 7);
+      try {
+        const parts = (loan.dueDate || '').split('/');
+        if (parts.length === 3) {
+          const d = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+          d.setDate(d.getDate() + renewDays);
+          const dd = String(d.getDate()).padStart(2, '0');
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          loan.dueDate = `${dd}/${mm}/${d.getFullYear()}`;
+        }
+      } catch (e) {
+        console.error('Lỗi cộng hạn gia hạn:', e);
       }
       loan.renewed = true;
       loan.renewCount = (loan.renewCount || 0) + 1;
@@ -1540,14 +1635,14 @@ function renderBorrowScreen() {
   if (!hasInitializedBorrowDemo && pendingBorrowCopies.length === 0) {
     const db = getDB();
 
-  // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
-  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
-  const userName = user?.name || 'Nguyễn Trường Thịnh';
-  const todayStr = getTodayVN();
-  const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
-  if (greetingEl) {
-    greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
-  }
+    // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
+    const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    const userName = user?.name || 'Nguyễn Trường Thịnh';
+    const todayStr = getTodayVN();
+    const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
+    if (greetingEl) {
+      greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
+    }
     const c1 = db.copies.find(c => c.code === 'CNPM-002');
     const c2 = db.copies.find(c => c.code === 'CSDL-004');
     const isL1Free = c1 && c1.status === 'SAN_SANG' && !db.activeLoans.some(l => l.copyCode.toUpperCase() === 'CNPM-002');
@@ -1576,8 +1671,8 @@ function verifyBorrowReader() {
   const cardInput = document.getElementById('borrow-reader-input');
   const cardCode = (cardInput && cardInput.value && cardInput.value.trim() ? cardInput.value.trim() : 'THE-5001102');
 
-  const reader = db.accounts.find(a => 
-    (a.cardId && a.cardId.toUpperCase() === cardCode.toUpperCase()) || 
+  const reader = db.accounts.find(a =>
+    (a.cardId && a.cardId.toUpperCase() === cardCode.toUpperCase()) ||
     (a.staffId && a.staffId.toUpperCase() === cardCode.toUpperCase()) ||
     (a.username && a.username.toUpperCase() === cardCode.toUpperCase())
   );
@@ -1624,8 +1719,8 @@ function verifyBorrowReader() {
   }
 
   // 2. Kiểm tra sách quá hạn
-  const overdueLoans = db.activeLoans.filter(l => 
-    (l.readerCard === reader.cardId || l.readerName === reader.name) && 
+  const overdueLoans = db.activeLoans.filter(l =>
+    (l.readerCard === reader.cardId || l.readerName === reader.name) &&
     (l.overdueDays > 0 || (l.statusBadge && l.statusBadge.includes('red')))
   );
   const hasNoOverdue = overdueLoans.length === 0;
@@ -1652,9 +1747,9 @@ function verifyBorrowReader() {
     maxBooks,
     currentLoans: readerCurrentLoans,
     ineligibleReason: !isCardActive ? (!isCardNotExpired ? `Thẻ đã hết hạn sử dụng (${reader.cardExpiry})` : "Thẻ đang bị tạm khóa") :
-                      !hasNoOverdue ? `Đang có ${overdueLoans.length} cuốn sách quá hạn chưa trả` :
-                      !hasNoDebt ? `Còn công nợ chưa tất toán (${totalDebt.toLocaleString('vi-VN')} đ)` :
-                      !hasQuotaAvailable ? `Đã mượn đủ số lượng tối đa (${currentLoanCount}/${maxBooks} cuốn)` : ""
+      !hasNoOverdue ? `Đang có ${overdueLoans.length} cuốn sách quá hạn chưa trả` :
+        !hasNoDebt ? `Còn công nợ chưa tất toán (${totalDebt.toLocaleString('vi-VN')} đ)` :
+          !hasQuotaAvailable ? `Đã mượn đủ số lượng tối đa (${currentLoanCount}/${maxBooks} cuốn)` : ""
   };
 
   // Hiển thị thông tin độc giả
@@ -1712,9 +1807,9 @@ function addCopyCodeToBorrow(copyCodeInput) {
   }
 
   if (!verifiedBorrowReader.isEligible) {
-    return { 
-      success: false, 
-      message: `Độc giả không đủ điều kiện mượn sách: ${verifiedBorrowReader.ineligibleReason || 'Vi phạm quy định thư viện'}!` 
+    return {
+      success: false,
+      message: `Độc giả không đủ điều kiện mượn sách: ${verifiedBorrowReader.ineligibleReason || 'Vi phạm quy định thư viện'}!`
     };
   }
 
@@ -1748,17 +1843,17 @@ function addCopyCodeToBorrow(copyCodeInput) {
   // 3. KIỂM TRA BẢN SAO ĐANG ĐƯỢC MƯỢN TRONG HỆ THỐNG (CHỐNG MƯỢN TRÙNG / DÙNG CHUNG MÃ)
   const activeLoan = db.activeLoans.find(l => l.copyCode.toUpperCase() === code);
   if (activeLoan) {
-    return { 
-      success: false, 
-      message: `⛔ Không thể mượn: Bản sao "${code}" đang được độc giả ${activeLoan.readerName} (${activeLoan.readerCard}) mượn, chưa trả lại thư viện!` 
+    return {
+      success: false,
+      message: `⛔ Không thể mượn: Bản sao "${code}" đang được độc giả ${activeLoan.readerName} (${activeLoan.readerCard}) mượn, chưa trả lại thư viện!`
     };
   }
 
   // 4. KIỂM TRA TRẠNG THÁI VẬT LÝ CỦA BẢN SAO
   if (copy.status !== 'SAN_SANG') {
-    return { 
-      success: false, 
-      message: `⛔ Bản sao "${code}" không sẵn sàng cho mượn (Hiện đang ở trạng thái: "${copy.statusLabel || copy.status}")!` 
+    return {
+      success: false,
+      message: `⛔ Bản sao "${code}" không sẵn sàng cho mượn (Hiện đang ở trạng thái: "${copy.statusLabel || copy.status}")!`
     };
   }
 
@@ -1788,9 +1883,9 @@ function addCopyCodeToBorrow(copyCodeInput) {
   const maxBooks = verifiedBorrowReader.maxBooks || 3;
   const currentLoansCount = verifiedBorrowReader.currentLoanCount || 0;
   if (currentLoansCount + pendingBorrowCopies.length >= maxBooks) {
-    return { 
-      success: false, 
-      message: `⛔ Đã đạt giới hạn tối đa ${maxBooks} cuốn/độc giả. Độc giả đang mượn ${currentLoansCount} cuốn và phiếu đã chọn ${pendingBorrowCopies.length} cuốn!` 
+    return {
+      success: false,
+      message: `⛔ Đã đạt giới hạn tối đa ${maxBooks} cuốn/độc giả. Độc giả đang mượn ${currentLoansCount} cuốn và phiếu đã chọn ${pendingBorrowCopies.length} cuốn!`
     };
   }
 
@@ -2138,7 +2233,7 @@ function handleReturnSearchInput(searchQuery) {
   const qClean = removeVietnameseTones(q);
 
   // 2. Tra cứu theo ĐỘC GIẢ (Hỗ trợ tra cứu theo tên hoặc mã thẻ sinh viên, nhạy từ 1-2 ký tự)
-  const matchingReaders = (Array.isArray(db.accounts) ? db.accounts : []).filter(a => 
+  const matchingReaders = (Array.isArray(db.accounts) ? db.accounts : []).filter(a =>
     removeVietnameseTones(a.name).includes(qClean) ||
     removeVietnameseTones(a.cardId || '').includes(qClean) ||
     removeVietnameseTones(a.staffId || '').includes(qClean)
@@ -2161,7 +2256,7 @@ function handleReturnSearchInput(searchQuery) {
     matchingReaders.forEach(reader => {
       const readerCard = reader.cardId || reader.staffId || '';
       // Tìm các cuốn sách mà độc giả này THỰC SỰ ĐANG MƯỢN trong CSDL
-      const readerLoans = allLoansList.filter(l => 
+      const readerLoans = allLoansList.filter(l =>
         (l.readerCard && l.readerCard.toUpperCase() === readerCard.toUpperCase()) ||
         removeVietnameseTones(l.readerName) === removeVietnameseTones(reader.name)
       );
@@ -2182,8 +2277,8 @@ function handleReturnSearchInput(searchQuery) {
           </div>
           <div class="return-dd-reader-books">
             ${readerLoans.length > 0 ? readerLoans.map(l => {
-              const isOverdue = l.overdueDays > 0;
-              return `
+        const isOverdue = l.overdueDays > 0;
+        return `
                 <div class="return-dd-book-row" 
                      onmousedown="event.preventDefault(); window.handleSelectReturnLoanFromDropdown('${l.copyCode}', '${escapeHTML(readerCard)}')"
                      onclick="window.handleSelectReturnLoanFromDropdown('${l.copyCode}', '${escapeHTML(readerCard)}')"
@@ -2204,7 +2299,7 @@ function handleReturnSearchInput(searchQuery) {
                   </div>
                 </div>
               `;
-            }).join('') : `
+      }).join('') : `
               <div style="padding: 10px 14px; font-size: 12px; color: #64748b; font-style: italic; background: #f8fafc; border: 1px dashed #e2e8f0; border-radius: 6px; margin: 6px 0 6px 44px;">
                 <i class="fa-solid fa-circle-info" style="color: #3b82f6; margin-right: 6px;"></i>Độc giả hiện không có sách nào đang mượn cần trả.
               </div>
@@ -2219,7 +2314,7 @@ function handleReturnSearchInput(searchQuery) {
   }
 
   // 3. Tra cứu theo ĐẦU SÁCH (Chuẩn Mockup 08A: Hiển thị các bản sao thực tế đang được mượn)
-  const matchingTitles = (Array.isArray(db.titles) ? db.titles : []).filter(t => 
+  const matchingTitles = (Array.isArray(db.titles) ? db.titles : []).filter(t =>
     removeVietnameseTones(t.title).includes(qClean) ||
     removeVietnameseTones(t.id).includes(qClean) ||
     removeVietnameseTones(t.isbn || '').includes(qClean)
@@ -2265,10 +2360,10 @@ function handleReturnSearchInput(searchQuery) {
     const classClean = removeVietnameseTones(l.readerClass);
 
     return codeClean.includes(qClean) ||
-           cardClean.includes(qClean) ||
-           nameClean.includes(qClean) ||
-           titleClean.includes(qClean) ||
-           classClean.includes(qClean);
+      cardClean.includes(qClean) ||
+      nameClean.includes(qClean) ||
+      titleClean.includes(qClean) ||
+      classClean.includes(qClean);
   });
 
   if (matches.length > 0) {
@@ -2326,8 +2421,8 @@ function lookupReturnLoan(searchQuery, preferredCard) {
 
   // 1. Nếu có preferredCard từ dropdown, tìm chính xác kết hợp mã sách + mã thẻ
   if (preferredCard) {
-    loan = allLoans.find(l => 
-      l.copyCode.toUpperCase() === qUpper && 
+    loan = allLoans.find(l =>
+      l.copyCode.toUpperCase() === qUpper &&
       l.readerCard && l.readerCard.toUpperCase() === preferredCard.toUpperCase()
     );
   }
@@ -2344,7 +2439,7 @@ function lookupReturnLoan(searchQuery, preferredCard) {
 
   // 4. Tìm theo tên độc giả hoặc tựa sách trong allLoans
   if (!loan) {
-    loan = allLoans.find(l => 
+    loan = allLoans.find(l =>
       removeVietnameseTones(l.readerName).includes(qClean) ||
       removeVietnameseTones(l.titleName).includes(qClean)
     );
@@ -2381,7 +2476,7 @@ function lookupReturnLoan(searchQuery, preferredCard) {
       window.showToast(`Bản sao ${copyInWarehouse.code} hiện ở trạng thái "${copyInWarehouse.statusLabel}" (không có ai đang mượn).`, 'info');
     }
   } else {
-    const readerInDB = db.accounts?.find(a => 
+    const readerInDB = db.accounts?.find(a =>
       (a.cardId && a.cardId.toUpperCase() === qUpper) ||
       (a.staffId && a.staffId.toUpperCase() === qUpper) ||
       removeVietnameseTones(a.name) === qClean
@@ -2655,7 +2750,7 @@ function renderActiveReturnState() {
 
       ${(() => {
         const allActiveLoans = getAllActiveReturnLoans(db);
-        const readerActiveLoans = allActiveLoans.filter(l => 
+        const readerActiveLoans = allActiveLoans.filter(l =>
           (loan.readerCard && l.readerCard && l.readerCard.toUpperCase() === loan.readerCard.toUpperCase()) ||
           (l.readerName === loan.readerName)
         );
@@ -2668,8 +2763,8 @@ function renderActiveReturnState() {
             </div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
               ${readerActiveLoans.map(otherLoan => {
-                const isCurrent = otherLoan.copyCode.toUpperCase() === loan.copyCode.toUpperCase();
-                return `
+          const isCurrent = otherLoan.copyCode.toUpperCase() === loan.copyCode.toUpperCase();
+          return `
                   <button type="button" class="btn ${isCurrent ? 'btn-primary' : 'btn-outline'}" 
                     style="font-size: 12px; padding: 4px 10px; border-radius: 6px; cursor: pointer;"
                     onclick="window.lookupReturnLoan('${otherLoan.copyCode}', '${loan.readerCard}')"
@@ -2677,7 +2772,7 @@ function renderActiveReturnState() {
                     ${escapeHTML(otherLoan.copyCode)} ${isCurrent ? '(Đang chọn)' : ''}
                   </button>
                 `;
-              }).join('')}
+        }).join('')}
             </div>
           </div>
         `;
@@ -2929,15 +3024,15 @@ function executeReturnBook(asDebt = false, onDone) {
 
     // 4. Nếu ghi nhận công nợ (độc giả chưa trả tiền ngay)
     const returnReason = `Trả sách ${loan.copyCode} (${selectedConditionIndex === 0 ? 'Trễ hạn' : selectedConditionIndex === 1 ? 'Hư hỏng' : 'Làm mất'})`;
-    
+
     // Kiểm tra xem độc giả này đã có khoản nợ nào liên quan tới mã bản sao này chưa
-    const existingDebtIndex = draft.debts.findIndex(d => 
-      ((d.readerCard && d.readerCard.toUpperCase() === (loan.readerCard || '').toUpperCase()) || 
-       (d.readerName && d.readerName === loan.readerName)) &&
+    const existingDebtIndex = draft.debts.findIndex(d =>
+      ((d.readerCard && d.readerCard.toUpperCase() === (loan.readerCard || '').toUpperCase()) ||
+        (d.readerName && d.readerName === loan.readerName)) &&
       d.reason && d.reason.includes(loan.copyCode)
     );
 
-    const acc = draft.accounts.find(a => 
+    const acc = draft.accounts.find(a =>
       (a.cardId && a.cardId.toUpperCase() === (loan.readerCard || '').toUpperCase()) ||
       (a.staffId && a.staffId.toUpperCase() === (loan.readerCard || '').toUpperCase()) ||
       (a.username && a.username.toUpperCase() === (loan.readerCard || '').toUpperCase()) ||
@@ -2993,6 +3088,23 @@ function executeReturnBook(asDebt = false, onDone) {
       }
     }
 
+    if (!asDebt && totalFee > 0 && draft.reports) {
+      draft.reports.finesCollected = (Number(draft.reports.finesCollected) || 0) + totalFee;
+      if (draft.reports.facultyStats) {
+        const deptKey = acc?.departmentKey || 'CNTT';
+        const fStat = draft.reports.facultyStats.find(f =>
+          (f.key && f.key === deptKey) ||
+          (deptKey === 'CNTT' && f.faculty?.includes('Công nghệ Thông tin')) ||
+          (deptKey === 'TOAN_TIN' && f.faculty?.includes('Toán - Tin')) ||
+          (deptKey === 'NGOAI_NGU' && f.faculty?.includes('Tiếng Anh'))
+        );
+        if (fStat) {
+          fStat.paidFines = (Number(fStat.paidFines || fStat.collected) || 0) + totalFee;
+          fStat.collected = (Number(fStat.collected) || 0) + totalFee;
+        }
+      }
+    }
+
     // 5. Đồng bộ vào Lịch sử mượn - trả cá nhân của độc giả (Screen 20)
     draft.studentHistory = draft.studentHistory || [];
     draft.studentHistory.unshift({
@@ -3034,7 +3146,7 @@ function renderDebtsScreen() {
     greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
   }
   const totalDebt = db.debts.reduce((sum, d) => sum + Number(d.amount), 0);
-  
+
   // Đếm chính xác số lượng độc giả duy nhất bị nợ
   const uniqueDebtorCards = new Set(db.debts.map(d => (d.readerCard || d.readerName).toUpperCase()));
   const totalDebtors = uniqueDebtorCards.size;
@@ -3068,9 +3180,9 @@ function renderDebtsScreen() {
 
   tbody.innerHTML = db.debts.map(item => {
     // 1. Tra cứu tài khoản sinh viên thực tế để lấy trạng thái thẻ chính xác
-    const acc = db.accounts.find(a => 
-      (a.cardId && a.cardId.toUpperCase() === (item.readerCard || '').toUpperCase()) || 
-      (a.staffId && a.staffId.toUpperCase() === (item.readerCard || '').toUpperCase()) || 
+    const acc = db.accounts.find(a =>
+      (a.cardId && a.cardId.toUpperCase() === (item.readerCard || '').toUpperCase()) ||
+      (a.staffId && a.staffId.toUpperCase() === (item.readerCard || '').toUpperCase()) ||
       (a.username && a.username.toUpperCase() === (item.readerCard || '').toUpperCase()) ||
       (a.name && a.name === item.readerName)
     );
@@ -3114,7 +3226,7 @@ function getDebtReceiptDetails(debtId) {
   const currentDebt = db.debts.find(d => d.id === debtId) || db.debts[0];
   if (!currentDebt) return null;
 
-  const readerDebts = db.debts.filter(d => 
+  const readerDebts = db.debts.filter(d =>
     (d.readerCard && d.readerCard.toUpperCase() === (currentDebt.readerCard || '').toUpperCase()) ||
     (d.readerName === currentDebt.readerName)
   );
@@ -3164,9 +3276,9 @@ function settleDebt(debtId, options, onDone) {
     resultInfo.readerName = readerName;
 
     // Tìm tài khoản sinh viên trong draft.accounts
-    const acc = draft.accounts.find(a => 
-      (a.cardId && a.cardId.toUpperCase() === (readerCard || '').toUpperCase()) || 
-      (a.staffId && a.staffId.toUpperCase() === (readerCard || '').toUpperCase()) || 
+    const acc = draft.accounts.find(a =>
+      (a.cardId && a.cardId.toUpperCase() === (readerCard || '').toUpperCase()) ||
+      (a.staffId && a.staffId.toUpperCase() === (readerCard || '').toUpperCase()) ||
       (a.username && a.username.toUpperCase() === (readerCard || '').toUpperCase()) ||
       (a.name && a.name === readerName)
     );
@@ -3175,7 +3287,7 @@ function settleDebt(debtId, options, onDone) {
 
     if (opts.mode === 'SETTLE_ALL') {
       // 1. Tất toán gộp tất cả các khoản nợ của độc giả này
-      const allDebtsOfReader = draft.debts.filter(d => 
+      const allDebtsOfReader = draft.debts.filter(d =>
         (d.readerCard && d.readerCard.toUpperCase() === (readerCard || '').toUpperCase()) ||
         (d.readerName === readerName)
       );
@@ -3184,7 +3296,7 @@ function settleDebt(debtId, options, onDone) {
       // Xóa tất cả các khoản nợ của độc giả này khỏi draft.debts
       draft.debts = draft.debts.filter(d => {
         const isMatch = (readerCard && d.readerCard && d.readerCard.toUpperCase() === readerCard.toUpperCase()) ||
-                        (readerName && d.readerName === readerName);
+          (readerName && d.readerName === readerName);
         return !isMatch;
       });
 
@@ -3220,7 +3332,7 @@ function settleDebt(debtId, options, onDone) {
       }
 
       // Kiểm tra xem độc giả này còn khoản nợ nào khác trong draft.debts không
-      const remainingDebtsOfReader = draft.debts.filter(d => 
+      const remainingDebtsOfReader = draft.debts.filter(d =>
         (d.readerCard && d.readerCard.toUpperCase() === (readerCard || '').toUpperCase()) ||
         (d.readerName === readerName)
       );
@@ -3250,7 +3362,7 @@ function settleDebt(debtId, options, onDone) {
     if (draft.reports) {
       draft.reports.finesCollected = (Number(draft.reports.finesCollected) || 0) + actualPaid;
       if (draft.reports.facultyStats) {
-        const fStat = draft.reports.facultyStats.find(f => 
+        const fStat = draft.reports.facultyStats.find(f =>
           (deptKey === 'CNTT' && f.faculty.includes('Công nghệ Thông tin')) ||
           (deptKey === 'TOAN_TIN' && f.faculty.includes('Toán - Tin')) ||
           (deptKey === 'NGOAI_NGU' && f.faculty.includes('Tiếng Anh')) ||

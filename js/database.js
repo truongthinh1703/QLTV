@@ -469,10 +469,10 @@ export const INITIAL_DB = {
       readerClass: "50.01.SPTIN.B",
       borrowDate: "15/10/2026",
       dueDate: "29/10/2026",
-      overdueDays: 0,
-      statusBadge: "badge-yellow",
-      statusText: "Còn 1 ngày",
-      actionText: "Xem lượt mượn"
+      overdueDays:  5,
+      statusBadge: "badge-red",
+      statusText: "Quá hạn 5 ngày",
+      actionText: "Tiếp nhận trả sách →"
     },
     {
       id: "LOAN-004",
