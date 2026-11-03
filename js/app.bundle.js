@@ -338,6 +338,19 @@ const INITIAL_DB = {
       borrowerCard: "",
       condition: "BINH_THUONG"
     },
+    {
+      code: "CNPM-007",
+      titleId: "DS-01",
+      titleName: "Kỹ nghệ phần mềm",
+      shelf: "Kệ K03 - Ngăn 2",
+      price: 85000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
 
     // CSDL PostgreSQL (4 bản sao: 2 sẵn sàng, 1 đang mượn, 1 hư hỏng)
     {
@@ -393,6 +406,19 @@ const INITIAL_DB = {
       borrowerCard: "",
       condition: "BINH_THUONG"
     },
+    {
+      code: "CSDL-015",
+      titleId: "DS-02",
+      titleName: "Hệ quản trị CSDL PostgreSQL",
+      shelf: "Kệ K02 - Ngăn 1",
+      price: 95000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
 
     // AI & Web
     {
@@ -419,6 +445,19 @@ const INITIAL_DB = {
       statusBadge: "badge-yellow",
       borrowerName: "Huỳnh Nguyễn Huyền Trân",
       borrowerCard: "THE-50011077",
+      condition: "BINH_THUONG"
+    },
+    {
+      code: "AI-009",
+      titleId: "DS-03",
+      titleName: "Nhập môn Trí tuệ Nhân tạo",
+      shelf: "Dãy K04 - Kệ 4 - Ngăn 3",
+      price: 110000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
       condition: "BINH_THUONG"
     },
     {
@@ -930,6 +969,19 @@ function sanitizeDB(dbData) {
         modified = true;
       } else if (c.borrowerName === "Huỳnh Nguyễn Huyền Trân" && c.borrowerCard === "THE-5001104") {
         c.borrowerCard = "THE-50011077";
+        modified = true;
+      }
+    });
+
+    // Tự động bổ sung 3 bản sao kiểm kê nếu thiếu trong LocalStorage hiện tại
+    const missingInventoryCopies = [
+      { code: "CNPM-007", titleId: "DS-01", titleName: "Kỹ nghệ phần mềm", shelf: "Kệ K03 - Ngăn 2", price: 85000, status: "SAN_SANG", statusLabel: "Sẵn sàng cho mượn", statusBadge: "badge-green", borrowerName: "—", borrowerCard: "", condition: "BINH_THUONG" },
+      { code: "AI-009", titleId: "DS-03", titleName: "Nhập môn Trí tuệ Nhân tạo", shelf: "Dãy K04 - Kệ 4 - Ngăn 3", price: 110000, status: "SAN_SANG", statusLabel: "Sẵn sàng cho mượn", statusBadge: "badge-green", borrowerName: "—", borrowerCard: "", condition: "BINH_THUONG" },
+      { code: "CSDL-015", titleId: "DS-02", titleName: "Hệ quản trị CSDL PostgreSQL", shelf: "Kệ K02 - Ngăn 1", price: 95000, status: "SAN_SANG", statusLabel: "Sẵn sàng cho mượn", statusBadge: "badge-green", borrowerName: "—", borrowerCard: "", condition: "BINH_THUONG" }
+    ];
+    missingInventoryCopies.forEach(rc => {
+      if (!dbData.copies.some(c => c.code === rc.code)) {
+        dbData.copies.push(rc);
         modified = true;
       }
     });
@@ -6666,8 +6718,39 @@ function registerGlobalEvents() {
         cp.borrowerCard = '';
         cp.note = 'Chờ sửa bìa';
       }
+
+      if (cp) {
+        const targetTitle = draft.titles.find(t => t.id === cp.titleId);
+        if (targetTitle) {
+          if (cp.status === 'SAN_SANG') {
+            targetTitle.availableCopies = Math.min(targetTitle.totalCopies || 999, (targetTitle.availableCopies || 0) + 1);
+          } else if (cp.status === 'HU_HONG' && targetTitle.availableCopies > 0) {
+            targetTitle.availableCopies -= 1;
+          }
+        }
+      }
     }, 'EDIT_COPY_STATUS');
     showToast(`Đã cập nhật trạng thái bản sao ${copyCode}!`, 'info');
+    if (typeof renderCopiesScreen === 'function') renderCopiesScreen();
+    if (typeof renderMasterTitlesScreen === 'function') renderMasterTitlesScreen();
+  };
+
+  window.handleAddCategoryPrompt = function() {
+    const name = prompt("Nhập tên thể loại sách mới (ví dụ: Khoa học Dữ liệu):");
+    if (!name || !name.trim()) return;
+    const scope = prompt("Nhập mô tả phạm vi chuyên ngành:") || "Tài liệu chuyên ngành";
+    mutateDB(draft => {
+      const newId = `TL-${String((draft.categories ? draft.categories.length : 0) + 1).padStart(2, '0')}`;
+      draft.categories = draft.categories || [];
+      draft.categories.push({
+        id: newId,
+        name: name.trim(),
+        scope: scope.trim(),
+        bookCount: 0
+      });
+    }, 'ADD_CATEGORY');
+    if (window.renderCategoriesScreen) window.renderCategoriesScreen();
+    if (window.showToast) window.showToast(`Đã thêm thành công thể loại: ${name.trim()}!`, 'success');
   };
 
   window.handleEditCategory = function(catId) {

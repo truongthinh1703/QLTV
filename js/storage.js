@@ -236,6 +236,19 @@ export function sanitizeDB(dbData) {
         modified = true;
       }
     });
+
+    // Tự động bổ sung 3 bản sao kiểm kê nếu thiếu trong LocalStorage hiện tại
+    const missingInventoryCopies = [
+      { code: "CNPM-007", titleId: "DS-01", titleName: "Kỹ nghệ phần mềm", shelf: "Kệ K03 - Ngăn 2", price: 85000, status: "SAN_SANG", statusLabel: "Sẵn sàng cho mượn", statusBadge: "badge-green", borrowerName: "—", borrowerCard: "", condition: "BINH_THUONG" },
+      { code: "AI-009", titleId: "DS-03", titleName: "Nhập môn Trí tuệ Nhân tạo", shelf: "Dãy K04 - Kệ 4 - Ngăn 3", price: 110000, status: "SAN_SANG", statusLabel: "Sẵn sàng cho mượn", statusBadge: "badge-green", borrowerName: "—", borrowerCard: "", condition: "BINH_THUONG" },
+      { code: "CSDL-015", titleId: "DS-02", titleName: "Hệ quản trị CSDL PostgreSQL", shelf: "Kệ K02 - Ngăn 1", price: 95000, status: "SAN_SANG", statusLabel: "Sẵn sàng cho mượn", statusBadge: "badge-green", borrowerName: "—", borrowerCard: "", condition: "BINH_THUONG" }
+    ];
+    missingInventoryCopies.forEach(rc => {
+      if (!dbData.copies.some(c => c.code === rc.code)) {
+        dbData.copies.push(rc);
+        modified = true;
+      }
+    });
   }
   if (Array.isArray(dbData.activeLoans)) {
     dbData.activeLoans.forEach(l => {

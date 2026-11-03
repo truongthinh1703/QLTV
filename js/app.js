@@ -1364,8 +1364,39 @@ function registerGlobalEvents() {
         cp.borrowerCard = '';
         cp.note = 'Chờ sửa bìa';
       }
+
+      if (cp) {
+        const targetTitle = draft.titles.find(t => t.id === cp.titleId);
+        if (targetTitle) {
+          if (cp.status === 'SAN_SANG') {
+            targetTitle.availableCopies = Math.min(targetTitle.totalCopies || 999, (targetTitle.availableCopies || 0) + 1);
+          } else if (cp.status === 'HU_HONG' && targetTitle.availableCopies > 0) {
+            targetTitle.availableCopies -= 1;
+          }
+        }
+      }
     }, 'EDIT_COPY_STATUS');
     showToast(`Đã cập nhật trạng thái bản sao ${copyCode}!`, 'info');
+    if (typeof renderCopiesScreen === 'function') renderCopiesScreen();
+    if (typeof renderMasterTitlesScreen === 'function') renderMasterTitlesScreen();
+  };
+
+  window.handleAddCategoryPrompt = function() {
+    const name = prompt("Nhập tên thể loại sách mới (ví dụ: Khoa học Dữ liệu):");
+    if (!name || !name.trim()) return;
+    const scope = prompt("Nhập mô tả phạm vi chuyên ngành:") || "Tài liệu chuyên ngành";
+    mutateDB(draft => {
+      const newId = `TL-${String((draft.categories ? draft.categories.length : 0) + 1).padStart(2, '0')}`;
+      draft.categories = draft.categories || [];
+      draft.categories.push({
+        id: newId,
+        name: name.trim(),
+        scope: scope.trim(),
+        bookCount: 0
+      });
+    }, 'ADD_CATEGORY');
+    if (window.renderCategoriesScreen) window.renderCategoriesScreen();
+    if (window.showToast) window.showToast(`Đã thêm thành công thể loại: ${name.trim()}!`, 'success');
   };
 
   window.handleEditCategory = function(catId) {
