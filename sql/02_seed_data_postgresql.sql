@@ -90,7 +90,9 @@ INSERT INTO phieu_muon (ma_phieu_muon, ma_the, ma_thu_thu_lap, ngay_muon, han_tr
 ('PM-2026-001', 'THE-5001106', 'TK-THUTHU-01', '2026-10-01', '2026-10-15', 'Có sách quá hạn'),
 ('PM-2026-002', 'THE-50011065', 'TK-THUTHU-01', '2026-10-13', '2026-10-27', 'Có sách quá hạn'),
 ('PM-2026-003', 'THE-50011077', 'TK-THUTHU-01', '2026-10-15', '2026-10-29', 'Đang mượn'),
-('PM-2026-004', 'THE-5001102', 'TK-THUTHU-01', '2026-10-25', '2026-11-08', 'Đang mượn')
+('PM-2026-004', 'THE-5001102', 'TK-THUTHU-01', '2026-10-25', '2026-11-08', 'Đang mượn'),
+('PM-2026-005', 'THE-5001109', 'TK-THUTHU-01', '2026-10-05', '2026-10-19', 'Có sách quá hạn'),
+('PM-2026-006', 'THE-5001115', 'TK-THUTHU-01', '2026-10-10', '2026-10-24', 'Đã hoàn tất')
 ON CONFLICT (ma_phieu_muon) DO NOTHING;
 
 -- 9. Nạp Chi tiết phiếu mượn (chi_tiet_phieu_muon)
@@ -98,14 +100,16 @@ INSERT INTO chi_tiet_phieu_muon (id, ma_phieu_muon, ma_ban_sao, han_tra_hien_tai
 ('CTPM-001', 'PM-2026-001', 'CNPM-001', '2026-10-15', 0, NULL, NULL, 'Đang mượn'),
 ('CTPM-002', 'PM-2026-002', 'CSDL-002', '2026-10-27', 0, NULL, NULL, 'Đang mượn'),
 ('CTPM-003', 'PM-2026-003', 'AI-004', '2026-10-29', 0, NULL, NULL, 'Đang mượn'),
-('CTPM-004', 'PM-2026-004', 'WEB-001', '2026-11-08', 0, NULL, NULL, 'Đang mượn')
+('CTPM-004', 'PM-2026-004', 'WEB-001', '2026-11-08', 0, NULL, NULL, 'Đang mượn'),
+('CTPM-005', 'PM-2026-005', 'AI-002', '2026-10-19', 0, '2026-10-27', 'Bình thường', 'Đã trả'),
+('CTPM-006', 'PM-2026-006', 'CNPM-001', '2026-10-24', 0, '2026-10-22', 'Mất sách', 'Bồi thường mất-hỏng')
 ON CONFLICT (id) DO NOTHING;
 
 -- 10. Nạp Phiếu phạt & Công nợ (phieu_phat)
 -- Tổng công nợ còn nợ: 16.000 + 404.000 + 180.000 = Đúng 600.000 đ
 INSERT INTO phieu_phat (ma_khoan_no, ma_phieu_muon, ma_ban_sao, ma_the, loai_phat, so_ngay_tre, so_tien_phat, so_tien_da_thu, so_tien_con_no, ly_do, ngay_phat_sinh, trang_thai_thanh_toan) VALUES
-('NO-001', 'PM-2026-001', 'AI-002', 'THE-5001109', 'Phạt trả trễ hạn', 8, 16000, 0, 16000, 'Quá hạn 8 ngày cuốn AI-002', '2026-10-20', 'Chưa thanh toán'),
-('NO-002', 'PM-2026-001', 'CNPM-001', 'THE-5001115', 'Bồi thường sách hỏng-mất', 0, 404000, 0, 404000, 'Bồi thường mất sách Mạng máy tính', '2026-10-22', 'Chưa thanh toán'),
+('NO-001', 'PM-2026-005', 'AI-002', 'THE-5001109', 'Phạt trả trễ hạn', 8, 16000, 0, 16000, 'Quá hạn 8 ngày cuốn AI-002', '2026-10-20', 'Chưa thanh toán'),
+('NO-002', 'PM-2026-006', 'CNPM-001', 'THE-5001115', 'Bồi thường sách hỏng-mất', 0, 404000, 0, 404000, 'Bồi thường mất sách Mạng máy tính', '2026-10-22', 'Chưa thanh toán'),
 ('NO-003', 'PM-2026-002', 'CSDL-002', 'THE-50011065', 'Bồi thường sách hỏng-mất', 1, 180000, 0, 180000, 'Quá hạn & bồi thường rách sách CSDL-002', '2026-10-28', 'Chưa thanh toán')
 ON CONFLICT (ma_khoan_no) DO NOTHING;
 
