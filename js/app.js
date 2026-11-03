@@ -1290,15 +1290,20 @@ function registerGlobalEvents() {
   };
 
   window.handleExtendReaderCard = function(username) {
+    let nextYear = 2028;
     mutateDB(draft => {
-      const acc = draft.accounts.find(a => a.username === username);
+      const acc = draft.accounts.find(a => a.username === username || a.cardId === username);
       if (acc) {
-        acc.cardExpiry = '30/06/2028';
+        const parts = (acc.cardExpiry || '30/06/2027').split('/');
+        nextYear = parts.length === 3 ? parseInt(parts[2], 10) + 1 : 2028;
+        acc.cardExpiry = `30/06/${nextYear}`;
       }
     });
-    triggerConfetti();
-    showToast(`✅ Đã gia hạn thẻ độc giả ${username} thêm 1 năm (Hạn mới: 30/06/2028)!`, 'success');
-    renderReadersScreen();
+    if (typeof triggerConfetti === 'function') triggerConfetti();
+    if (window.showToast) {
+      window.showToast(`✅ Đã gia hạn thẻ độc giả ${username} thêm 1 năm (Hạn mới: 30/06/${nextYear})!`, 'success');
+    }
+    if (typeof renderReadersScreen === 'function') renderReadersScreen();
   };
 
   window.handleEditTitle = function(titleId) {

@@ -5,729 +5,1506 @@
 // SECTION: js/database.js
 // ==========================================
 // =============================================================================
+
 // DATABASE.JS: INITIAL RECONCILED DATA STORE (CHƯƠNG 4 & CHƯƠNG 5)
+
 // =============================================================================
 
+
+
 const INITIAL_DB = {
+
   // 1. Quản lý tài khoản (RBAC)
+
   accounts: [
+
     {
+
       id: "admin01",
+
       username: "admin01",
+
       password: "123456",
+
       name: "Trần Văn Quản Trị",
+
       staffId: "QT-HCMUE-01",
+
       role: "ADMIN",
+
       email: "admin@hcmue.edu.vn",
+
       phone: "0903123456",
+
       avatarText: "AD",
+
       status: "KICH_HOAT",
+
       lastLogin: "28/10/2026 14:15"
+
     },
+
     {
+
       id: "thuthu01",
+
       username: "thuthu01",
+
       password: "123456",
+
       name: "Nguyễn Trường Thịnh",
+
       staffId: "50.01.103.072",
+
       role: "THU_THU",
+
       email: "thinhnt@hcmue.edu.vn",
+
       phone: "0918112233",
+
       avatarText: "TT",
+
       status: "KICH_HOAT",
+
       shift: "Thủ thư ca 1",
+
       lastLogin: "28/10/2026 07:30"
+
     },
+
     {
+
       id: "50.01.103.002",
+
       username: "50.01.103.002",
+
       password: "123456",
+
       name: "Nguyễn Ngọc Hồng An",
+
       staffId: "50.01.103.002",
+
       cardId: "THE-5001102",
+
       role: "DOC_GIA",
+
       email: "an.nnh@student.hcmue.edu.vn",
+
       className: "50.01.SPTIN.B",
+
       department: "Khoa CNTT - SPTIN.B",
+
       departmentKey: "CNTT",
+
       status: "KICH_HOAT",
+
       cardStatus: "HOAT_DONG",
+
       cardExpiry: "30/06/2027",
+
       issueDate: "15/09/2023",
+
       debt: 0,
+
       avatarText: "HA"
+
     },
+
     {
+
       id: "50.01.103.061",
+
       username: "50.01.103.061",
+
       password: "123456",
+
       name: "Lê Nguyễn Thanh Phương",
+
       staffId: "50.01.103.061",
+
       cardId: "THE-5001106",
+
       role: "DOC_GIA",
+
       email: "phuong.lnt@student.hcmue.edu.vn",
+
       className: "50.01.SPTIN.B",
+
       department: "Khoa CNTT - SPTIN.B",
+
       departmentKey: "CNTT",
+
       status: "KICH_HOAT",
+
       cardStatus: "HOAT_DONG",
+
       cardExpiry: "30/06/2027",
+
       issueDate: "15/09/2023",
+
       debt: 0,
+
       avatarText: "TP"
+
     },
+
     {
+
       id: "50.01.103.099",
+
       username: "50.01.103.099",
+
       password: "123456",
+
       name: "Trần Quốc Bảo",
+
       staffId: "50.01.103.099",
+
       cardId: "THE-5001109",
+
       role: "DOC_GIA",
+
       email: "bao.tq@student.hcmue.edu.vn",
+
       className: "50.01.SPTIN.A",
+
       department: "Khoa CNTT - SPTIN.A",
+
       departmentKey: "CNTT",
+
       status: "KICH_HOAT",
+
       cardStatus: "TAM_KHOA_NO",
+
       cardExpiry: "30/06/2027",
+
       issueDate: "15/09/2023",
+
       debt: 16000,
+
       reason: "Quá hạn 8 ngày cuốn AI-002",
+
       avatarText: "QB"
+
     },
+
     {
+
       id: "50.01.103.115",
+
       username: "50.01.103.115",
+
       password: "123456",
+
       name: "Đặng Hoàng Khang",
+
       staffId: "50.01.103.115",
+
       cardId: "THE-5001115",
+
       role: "DOC_GIA",
+
       email: "khang.dh@student.hcmue.edu.vn",
+
       className: "50.01.SPTIN.C",
+
       department: "Khoa CNTT - SPTIN.C",
+
       departmentKey: "CNTT",
+
       status: "KICH_HOAT",
+
       cardStatus: "TAM_KHOA_NO",
+
       cardExpiry: "30/06/2027",
+
       issueDate: "15/09/2023",
+
       debt: 404000,
+
       reason: "Bồi thường mất sách Mạng máy tính",
+
       avatarText: "HK"
+
     },
+
     {
+
       id: "50.01.103.065",
+
       username: "50.01.103.065",
+
       password: "123456",
+
       name: "Nguyễn Đức Anh Tài",
+
       staffId: "50.01.103.065",
+
       cardId: "THE-50011065",
+
       role: "DOC_GIA",
+
       email: "tai.nda@student.hcmue.edu.vn",
+
       className: "50.01.SPTIN.B",
+
       department: "Khoa Toán - Tin học - Lớp 50.01.SPTIN.B",
+
       departmentKey: "TOAN_TIN",
+
       status: "KICH_HOAT",
+
       cardStatus: "TAM_KHOA_NO",
+
       cardExpiry: "30/06/2027",
+
       issueDate: "15/09/2023",
+
       debt: 180000,
+
       reason: "Quá hạn & bồi thường rách sách CSDL-002",
+
       avatarText: "AT"
+
     },
+
     {
+
       id: "50.01.103.077",
+
       username: "50.01.103.077",
+
       password: "123456",
+
       name: "Huỳnh Nguyễn Huyền Trân",
+
       staffId: "50.01.103.077",
+
       cardId: "THE-50011077",
+
       role: "DOC_GIA",
+
       email: "tran.hnh@student.hcmue.edu.vn",
+
       className: "50.01.SPTIN.B",
+
       department: "Khoa Toán - Tin học - SPTIN.B",
+
       departmentKey: "TOAN_TIN",
+
       status: "KICH_HOAT",
+
       cardStatus: "HOAT_DONG",
+
       cardExpiry: "30/06/2027",
+
       issueDate: "15/09/2023",
+
       debt: 0,
+
       avatarText: "HT"
+
     }
+
   ],
+
+
 
   // 2. Danh mục Thể loại sách
+
   categories: [
+
     {
+
       id: "TL-CNTT",
+
       code: "TL-CNTT",
+
       name: "Công nghệ thông tin",
+
       scope: "Giáo trình lập trình, phần mềm, mạng máy tính",
+
       bookCount: 450,
+
       status: "Đang sử dụng"
+
     },
+
     {
+
       id: "TL-TOAN",
+
       code: "TL-TOAN",
+
       name: "Toán - Tin học",
+
       scope: "Giải tích, đại số tuyến tính, phương pháp tính",
+
       bookCount: 320,
+
       status: "Đang sử dụng"
+
     },
+
     {
+
       id: "TL-SPGD",
+
       code: "TL-SPGD",
+
       name: "Sư phạm & Giáo dục học",
+
       scope: "Tâm lý học lứa tuổi, phương pháp giảng dạy",
+
       bookCount: 280,
+
       status: "Đang sử dụng"
+
     },
+
     {
+
       id: "TL-NN",
+
       code: "TL-NN",
+
       name: "Ngoại ngữ",
+
       scope: "Tiếng Anh chuyên ngành, IELTS, ngữ pháp",
+
       bookCount: 198,
+
       status: "Đang sử dụng"
+
     }
+
   ],
+
+
 
   // 3. Đầu sách mẹ
+
   titles: [
+
     {
+
       id: "DS-01",
+
       isbn: "978-604-0-12345-6",
+
       title: "Kỹ nghệ phần mềm (Tập 1)",
+
       author: "Roger S. Pressman",
+
       category: "CNTT",
+
       categoryId: "TL-CNTT",
+
       publisher: "NXB Giáo Dục",
+
       year: 2024,
+
       totalCopies: 5,
+
       availableCopies: 3,
+
       shelfLocation: "Dãy K03 - Kệ 2 - Ngăn 2",
+
       coverTag: "GIÁO TRÌNH ĐẠI HỌC",
+
       coverTitle: "KỸ NGHỆ PHẦN MỀM",
+
       coverSub: "TẬP 1 · 2024",
+
       pdfFile: "assets/sample.pdf",
+
       summary: "Giáo trình chuẩn quốc tế về các mô hình phát triển phần mềm, phân tích yêu cầu, thiết kế kiến trúc và quy trình Agile Scrum."
+
     },
+
     {
+
       id: "DS-02",
+
       isbn: "978-604-0-98765-4",
+
       title: "Hệ quản trị CSDL PostgreSQL",
+
       author: "Abraham Silberschatz",
+
       category: "CNTT",
+
       categoryId: "TL-CNTT",
+
       publisher: "NXB Giáo Dục",
+
       year: 2023,
+
       totalCopies: 4,
+
       availableCopies: 2,
+
       shelfLocation: "Kệ K02 - Ngăn 1",
+
       coverTag: "GIÁO TRÌNH ĐẠI HỌC",
+
       coverTitle: "HỆ QUẢN TRỊ CSDL POSTGRESQL",
+
       coverSub: "2023",
+
       pdfFile: "assets/sample.pdf",
+
       summary: "Kiến trúc hệ quản trị cơ sở dữ liệu quan hệ mã nguồn mở, chuẩn hóa dữ liệu 3NF, B-tree indexing và lập trình lưu trữ hàm."
+
     },
+
     {
+
       id: "DS-03",
+
       isbn: "978-604-0-45678-9",
+
       title: "Nhập môn Trí tuệ Nhân tạo",
+
       author: "Stuart Russell, Peter Norvig",
+
       category: "CNTT",
+
       categoryId: "TL-CNTT",
+
       publisher: "NXB ĐHQG",
+
       year: 2023,
+
       totalCopies: 4,
+
       availableCopies: 3,
+
       shelfLocation: "Dãy K04 - Kệ 4 - Ngăn 3",
+
       coverTag: "GIÁO TRÌNH ĐẠI HỌC",
+
       coverTitle: "TRÍ TUỆ NHÂN TẠO",
+
       coverSub: "2023",
+
       pdfFile: "assets/sample.pdf",
+
       summary: "Lý thuyết nền tảng về thuật toán tìm kiếm, biểu diễn tri thức, máy học và mạng nơ-ron học sâu."
+
     },
+
     {
+
       id: "DS-04",
+
       isbn: "978-604-0-33211-2",
+
       title: "Lập trình Web nâng cao",
+
       author: "Jon Duckett",
+
       category: "CNTT",
+
       categoryId: "TL-CNTT",
+
       publisher: "NXB Khoa Học & Kỹ Thuật",
+
       year: 2024,
+
       totalCopies: 3,
+
       availableCopies: 2,
+
       shelfLocation: "Dãy K03 - Kệ 1 - Ngăn 1",
+
       coverTag: "SÁCH CHUYÊN NGÀNH",
+
       coverTitle: "LẬP TRÌNH WEB NÂNG CAO",
+
       coverSub: "2024",
+
       pdfFile: "assets/sample.pdf",
+
       summary: "Xây dựng các ứng dụng Web hiện đại chuẩn HTML5, CSS3, ES6+ Modules và Single Page Application không phụ thuộc framework."
+
     }
+
   ],
+
+
 
   // 4. Bản sao sách vật lý
+
   copies: [
+
     // Kỹ nghệ phần mềm (5 bản sao: 3 sẵn sàng, 1 đang mượn, 1 hư hỏng)
+
     {
+
       code: "CNPM-001",
+
       titleId: "DS-01",
+
       titleName: "Kỹ nghệ phần mềm (Tập 1)",
+
       shelf: "Kệ K03 - Ngăn 2",
+
       price: 85000,
+
       status: "DANG_MUON",
+
       statusLabel: "Đang mượn",
+
       statusBadge: "badge-yellow",
+
       borrowerName: "Lê Nguyễn Thanh Phương",
+
       borrowerCard: "THE-5001106",
+
       condition: "BINH_THUONG"
+
     },
+
     {
+
       code: "CNPM-002",
+
       titleId: "DS-01",
+
       titleName: "Kỹ nghệ phần mềm (Tập 1)",
+
       shelf: "Kệ K03 - Ngăn 2",
+
       price: 85000,
+
       status: "SAN_SANG",
+
       statusLabel: "Sẵn sàng cho mượn",
+
       statusBadge: "badge-green",
+
       borrowerName: "—",
+
       borrowerCard: "",
+
       condition: "BINH_THUONG"
+
     },
+
     {
+
       code: "CNPM-003",
+
       titleId: "DS-01",
+
       titleName: "Kỹ nghệ phần mềm (Tập 1)",
+
       shelf: "Kệ K03 - Ngăn 2",
+
       price: 85000,
+
       status: "SAN_SANG",
+
       statusLabel: "Sẵn sàng cho mượn",
+
       statusBadge: "badge-green",
+
       borrowerName: "—",
+
       borrowerCard: "",
+
       condition: "BINH_THUONG"
+
     },
+
     {
+
       code: "CNPM-004",
+
       titleId: "DS-01",
+
       titleName: "Kỹ nghệ phần mềm (Tập 1)",
+
       shelf: "Kệ K03 - Ngăn 2",
+
       price: 85000,
+
       status: "HU_HONG",
+
       statusLabel: "Hư hỏng",
+
       statusBadge: "badge-purple",
+
       borrowerName: "—",
+
       borrowerCard: "",
+
       note: "Chờ dán lại bìa sách.",
+
       condition: "HU_HONG"
+
     },
+
     {
+
       code: "CNPM-005",
+
       titleId: "DS-01",
+
       titleName: "Kỹ nghệ phần mềm (Tập 1)",
+
       shelf: "Kệ K03 - Ngăn 2",
+
       price: 85000,
+
       status: "SAN_SANG",
+
       statusLabel: "Sẵn sàng cho mượn",
+
       statusBadge: "badge-green",
+
       borrowerName: "—",
+
       borrowerCard: "",
+
       condition: "BINH_THUONG"
+
     },
+
     {
+
       code: "CNPM-007",
+
       titleId: "DS-01",
+
       titleName: "Kỹ nghệ phần mềm",
+
       shelf: "Kệ K03 - Ngăn 2",
+
       price: 85000,
+
       status: "SAN_SANG",
+
       statusLabel: "Sẵn sàng cho mượn",
+
       statusBadge: "badge-green",
+
       borrowerName: "—",
+
       borrowerCard: "",
+
       condition: "BINH_THUONG"
+
     },
+
+
 
     // CSDL PostgreSQL (4 bản sao: 2 sẵn sàng, 1 đang mượn, 1 hư hỏng)
+
     {
+
       code: "CSDL-001",
+
       titleId: "DS-02",
+
       titleName: "Hệ quản trị CSDL PostgreSQL",
+
       shelf: "Kệ K02 - Ngăn 1",
+
       price: 95000,
+
       status: "SAN_SANG",
+
       statusLabel: "Sẵn sàng cho mượn",
+
       statusBadge: "badge-green",
+
       borrowerName: "—",
+
       borrowerCard: "",
+
       condition: "BINH_THUONG"
+
     },
+
     {
+
       code: "CSDL-002",
+
       titleId: "DS-02",
+
       titleName: "Hệ quản trị CSDL PostgreSQL",
+
       shelf: "Kệ K02 - Ngăn 1",
+
       price: 95000,
+
       status: "DANG_MUON",
+
       statusLabel: "Đang mượn",
+
       statusBadge: "badge-yellow",
+
       borrowerName: "Nguyễn Đức Anh Tài",
+
       borrowerCard: "THE-50011065",
+
       condition: "HU_HONG"
+
     },
+
     {
+
       code: "CSDL-003",
+
       titleId: "DS-02",
+
       titleName: "Hệ quản trị CSDL PostgreSQL",
+
       shelf: "Kệ K02 - Ngăn 1",
+
       price: 95000,
+
       status: "HU_HONG",
+
       statusLabel: "Hư hỏng",
+
       statusBadge: "badge-purple",
+
       borrowerName: "—",
+
       borrowerCard: "",
+
       note: "Hỏng gáy sách",
+
       condition: "HU_HONG"
+
     },
+
     {
+
       code: "CSDL-004",
+
       titleId: "DS-02",
+
       titleName: "Hệ quản trị CSDL PostgreSQL",
+
       shelf: "Kệ K02 - Ngăn 1",
+
       price: 95000,
+
       status: "SAN_SANG",
+
       statusLabel: "Sẵn sàng cho mượn",
+
       statusBadge: "badge-green",
+
       borrowerName: "—",
+
       borrowerCard: "",
+
       condition: "BINH_THUONG"
+
     },
+
     {
+
       code: "CSDL-015",
+
       titleId: "DS-02",
+
       titleName: "Hệ quản trị CSDL PostgreSQL",
+
       shelf: "Kệ K02 - Ngăn 1",
+
       price: 95000,
+
       status: "SAN_SANG",
+
       statusLabel: "Sẵn sàng cho mượn",
+
       statusBadge: "badge-green",
+
       borrowerName: "—",
+
       borrowerCard: "",
+
       condition: "BINH_THUONG"
+
     },
+
+
 
     // AI & Web
+
     {
+
       code: "AI-001",
+
       titleId: "DS-03",
+
       titleName: "Nhập môn Trí tuệ Nhân tạo",
+
       shelf: "Dãy K04 - Kệ 4 - Ngăn 3",
+
       price: 110000,
+
       status: "SAN_SANG",
+
       statusLabel: "Sẵn sàng cho mượn",
+
       statusBadge: "badge-green",
+
       borrowerName: "—",
+
       borrowerCard: "",
+
       condition: "BINH_THUONG"
+
     },
+
     {
+
       code: "AI-004",
+
       titleId: "DS-03",
+
       titleName: "Nhập môn Trí tuệ Nhân tạo",
+
       shelf: "Dãy K04 - Kệ 4 - Ngăn 3",
+
       price: 110000,
+
       status: "DANG_MUON",
+
       statusLabel: "Đang mượn",
+
       statusBadge: "badge-yellow",
+
       borrowerName: "Huỳnh Nguyễn Huyền Trân",
+
       borrowerCard: "THE-50011077",
+
       condition: "BINH_THUONG"
+
     },
+
     {
+
       code: "AI-009",
+
       titleId: "DS-03",
+
       titleName: "Nhập môn Trí tuệ Nhân tạo",
+
       shelf: "Dãy K04 - Kệ 4 - Ngăn 3",
+
       price: 110000,
+
       status: "SAN_SANG",
+
       statusLabel: "Sẵn sàng cho mượn",
+
       statusBadge: "badge-green",
+
       borrowerName: "—",
+
       borrowerCard: "",
+
       condition: "BINH_THUONG"
+
     },
+
     {
+
       code: "WEB-001",
+
       titleId: "DS-04",
+
       titleName: "Lập trình Web nâng cao",
+
       shelf: "Dãy K03 - Kệ 1 - Ngăn 1",
+
       price: 120000,
+
       status: "DANG_MUON",
+
       statusLabel: "Đang mượn",
+
       statusBadge: "badge-yellow",
+
       borrowerName: "Nguyễn Ngọc Hồng An",
+
       borrowerCard: "THE-5001102",
+
       condition: "BINH_THUONG"
+
+    },
+
+    {
+
+      code: "WEB-002",
+
+      titleId: "DS-04",
+
+      titleName: "Lập trình Web nâng cao",
+
+      shelf: "Dãy K03 - Kệ 1 - Ngăn 1",
+
+      price: 120000,
+
+      status: "SAN_SANG",
+
+      statusLabel: "Sẵn sàng cho mượn",
+
+      statusBadge: "badge-green",
+
+      borrowerName: "—",
+
+      borrowerCard: "",
+
+      condition: "BINH_THUONG"
+
+    },
+
+    {
+
+      code: "WEB-003",
+
+      titleId: "DS-04",
+
+      titleName: "Lập trình Web nâng cao",
+
+      shelf: "Dãy K03 - Kệ 1 - Ngăn 1",
+
+      price: 120000,
+
+      status: "SAN_SANG",
+
+      statusLabel: "Sẵn sàng cho mượn",
+
+      statusBadge: "badge-green",
+
+      borrowerName: "—",
+
+      borrowerCard: "",
+
+      condition: "BINH_THUONG"
+
     }
+
   ],
+
+
 
   // 5. Các lượt mượn đang diễn ra
+
   activeLoans: [
+
     {
+
       id: "LOAN-001",
+
       copyCode: "CNPM-001",
+
       titleName: "Kỹ nghệ phần mềm (Tập 1)",
+
       readerName: "Lê Nguyễn Thanh Phương",
+
       readerCard: "THE-5001106",
+
       readerClass: "50.01.SPTIN.B",
+
       borrowDate: "01/10/2026",
+
       dueDate: "15/10/2026",
+
       overdueDays: 13,
+
       statusBadge: "badge-red",
+
       statusText: "Quá hạn 13 ngày",
+
       actionText: "Tiếp nhận trả sách →"
+
     },
+
     {
+
       id: "LOAN-002",
+
       copyCode: "CSDL-002",
+
       titleName: "Hệ quản trị CSDL PostgreSQL",
+
       readerName: "Nguyễn Đức Anh Tài",
+
       readerCard: "THE-50011065",
+
       readerClass: "50.01.SPTIN.B",
+
       borrowDate: "13/10/2026",
+
       dueDate: "27/10/2026",
+
       overdueDays: 1,
+
       statusBadge: "badge-red",
+
       statusText: "Quá hạn 1 ngày",
+
       actionText: "Xử lý trả sách →"
+
     },
+
     {
+
       id: "LOAN-003",
+
       copyCode: "AI-004",
+
       titleName: "Nhập môn Trí tuệ Nhân tạo",
+
       readerName: "Huỳnh Nguyễn Huyền Trân",
+
       readerCard: "THE-50011077",
+
       readerClass: "50.01.SPTIN.B",
+
       borrowDate: "15/10/2026",
+
       dueDate: "29/10/2026",
+
       overdueDays:  5,
+
       statusBadge: "badge-red",
+
       statusText: "Quá hạn 5 ngày",
+
       actionText: "Tiếp nhận trả sách →"
+
     },
+
     {
+
       id: "LOAN-004",
+
       copyCode: "WEB-001",
+
       titleName: "Lập trình Web nâng cao",
+
       readerName: "Nguyễn Ngọc Hồng An",
+
       readerCard: "THE-5001102",
+
       readerClass: "50.01.SPTIN.B",
+
       borrowDate: "25/10/2026",
+
       dueDate: "08/11/2026",
+
       overdueDays: 0,
+
       statusBadge: "badge-green",
+
       statusText: "Trong hạn · Còn 11 ngày",
+
       actionText: "Xem lượt mượn",
+
       renewed: false,
+
       renewCount: 0
+
     }
+
   ],
+
+
 
   // 6. Lịch sử mượn trả sinh viên (Hoàn tất giao dịch)
+
   studentHistory: [
+
     {
+
       readerCard: "THE-5001102",
+
       readerName: "Nguyễn Ngọc Hồng An",
+
       code: "PM-2026-041 · CTDL-003",
+
       title: "Cấu trúc dữ liệu",
+
       borrowDate: "10/09/2026",
+
       returnDate: "24/09/2026",
+
       status: "Trả đúng hạn",
+
       statusBadge: "badge-green",
+
       fee: "0 đ",
+
       paymentStatus: "Đã hoàn tất"
+
     },
+
     {
+
       readerCard: "THE-5001102",
+
       readerName: "Nguyễn Ngọc Hồng An",
+
       code: "PM-2026-065 · OOP-002",
+
       title: "Lập trình hướng đối tượng",
+
       borrowDate: "01/10/2026",
+
       returnDate: "17/10/2026",
+
       status: "Quá hạn 2 ngày",
+
       statusBadge: "badge-red",
+
       fee: "4,000 đ",
+
       paymentStatus: "Đã tất toán biên lai"
+
     },
+
     {
+
       readerCard: "THE-50011065",
+
       readerName: "Nguyễn Đức Anh Tài",
+
       code: "PM-2026-012 · GT1-001",
+
       title: "Giải tích 1",
+
       borrowDate: "05/09/2026",
+
       returnDate: "19/09/2026",
+
       status: "Trả đúng hạn",
+
       statusBadge: "badge-green",
+
       fee: "0 đ",
+
       paymentStatus: "Đã hoàn tất"
+
     },
+
     {
+
       readerCard: "THE-5001106",
+
       readerName: "Lê Nguyễn Thanh Phương",
+
       code: "PM-2026-028 · XSTK-001",
+
       title: "Xác suất thống kê",
+
       borrowDate: "12/09/2026",
+
       returnDate: "26/09/2026",
+
       status: "Trả đúng hạn",
+
       statusBadge: "badge-green",
+
       fee: "0 đ",
+
       paymentStatus: "Đã hoàn tất"
+
     }
+
   ],
+
+
 
   // 7. Công nợ phạt tồn đọng (Khớp chuẩn 600.000 đ)
+
   debts: [
+
     {
+
       id: "DEBT-01",
+
       readerName: "Trần Quốc Bảo",
+
       readerCard: "THE-5001109",
+
       readerClass: "50.01.SPTIN.A",
+
       dept: "Khoa Công nghệ Thông tin",
+
       deptKey: "CNTT",
+
       reason: "Quá hạn 8 ngày cuốn AI-002",
+
       amount: 16000,
+
       cardStatus: "Tạm khóa",
+
       action: "Thu tiền & Mở khóa thẻ",
+
       receiptCode: "BL-2026-089"
+
     },
+
     {
+
       id: "DEBT-02",
+
       readerName: "Đặng Hoàng Khang",
+
       readerCard: "THE-5001115",
+
       readerClass: "50.01.SPTIN.C",
+
       dept: "Khoa Công nghệ Thông tin",
+
       deptKey: "CNTT",
+
       reason: "Bồi thường mất sách Mạng máy tính",
+
       amount: 404000,
+
       cardStatus: "Tạm khóa",
+
       action: "Thu nợ từng phần / Toàn bộ",
+
       receiptCode: "BL-2026-090"
+
     },
+
     {
+
       id: "DEBT-03",
+
       readerName: "Nguyễn Đức Anh Tài",
+
       readerCard: "THE-50011065",
+
       readerClass: "50.01.SPTIN.B",
+
       dept: "Khoa Toán - Tin học",
+
       deptKey: "TOAN_TIN",
+
       reason: "Quá hạn & bồi thường rách sách CSDL-002",
+
       amount: 180000,
+
       cardStatus: "Tạm khóa",
+
       action: "Thu nợ",
+
       receiptCode: "BL-2026-091"
+
     }
+
   ],
+
+
 
   // 8. Đợt kiểm kê kho
+
   inventory: {
+
     batchCode: "KK-2026-Q4",
+
     leadName: "Nguyễn Trường Thịnh (Thủ thư ca 1)",
+
     staffId: "50.01.103.072 - Thủ thư ca 1",
+
     scope: "Dãy kệ K01 - K05",
+
     startDate: "25/10/2026",
+
     status: "Đang kiểm kê",
+
     statusBadge: "badge-blue",
+
     systemCopies: 3892,
+
     scannedCopies: 3889,
+
     matchedCopies: 3887,
+
     diffCopies: 3,
+
     diffNote: "2 thiếu/nghi mất · 1 sai vị trí kệ",
+
     anomalies: [
+
       {
+
         code: "CNPM-007",
+
         title: "Kỹ nghệ phần mềm",
+
         theoryShelf: "Kệ K03 - Ngăn 2",
+
         actualShelf: "Không tìm thấy trên kệ",
+
         conclusion: "Báo mất / Thất thoát",
+
         conclusionType: "LOSS",
+
         status: "PENDING"
+
       },
+
       {
+
         code: "AI-009",
+
         title: "Nhập môn Trí tuệ Nhân tạo",
+
         theoryShelf: "Kệ K04 - Ngăn 1",
+
         actualShelf: "Không tìm thấy trên kệ",
+
         conclusion: "Báo mất / Thất thoát",
+
         conclusionType: "LOSS",
+
         status: "PENDING"
+
       },
+
       {
+
         code: "CSDL-015",
+
         title: "Hệ quản trị CSDL PostgreSQL",
+
         theoryShelf: "Kệ K02 - Ngăn 1",
+
         actualShelf: "Nằm ở Kệ K05 - Ngăn 3",
+
         conclusion: "Sai vị trí kệ",
+
         conclusionType: "MISPLACED",
+
         status: "PENDING"
+
       }
+
     ]
+
   },
+
+
 
   // 9. Tham số vận hành hệ thống
+
   parameters: {
+
     loanDurationDays: 14,
+
     maxBooksPerReader: 3,
+
     overdueFinePerDay: 2000,
+
     maxOnlineRenewals: 1,
+
     renewalDays: 7,
+
     reservationHoldHours: 24,
+
     maxAllowedDebt: 50000
+
   },
 
+
+
   // 10. Tệp sao lưu CSDL PostgreSQL
+
   backups: [
+
     {
+
       id: "BK-01",
+
       filename: "backup_20261028_120000.sql.gz",
+
       checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+
       size: "14.8 MB",
+
       author: "admin01",
+
       createdAt: "28/10/2026 12:00:15"
+
     },
+
     {
+
       id: "BK-02",
+
       filename: "backup_20261025_000000.sql.gz",
+
       checksum: "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e",
+
       size: "14.2 MB",
+
       author: "System Auto Cron",
+
       createdAt: "25/10/2026 00:00:02"
+
     }
+
   ],
 
+
+
   // 11. Báo cáo thống kê tháng 10/2026
+
   reports: {
+
     fromDate: "2026-10-01",
+
     toDate: "2026-10-31",
+
     monthlyLoans: 845,
+
     monthlyReturns: 790,
+
     finesCollected: 3420000,
+
     compensationCollected: 850000,
+
     topBooks: [
+
       { title: "Kỹ nghệ phần mềm (Tập 1)", count: 142, percentage: 95 },
+
       { title: "Hệ quản trị CSDL PostgreSQL", count: 118, percentage: 79 },
+
       { title: "Nhập môn Trí tuệ Nhân tạo", count: 96, percentage: 64 }
+
     ],
+
     facultyStats: [
+
       { faculty: "Khoa Công nghệ Thông tin", collected: 1850000, pendingDebt: 420000 },
+
       { faculty: "Khoa Toán - Tin học", collected: 980000, pendingDebt: 180000 },
+
       { faculty: "Khoa Tiếng Anh", collected: 590000, pendingDebt: 0 }
+
     ]
+
   }
+
 };
+
+
 
 
 
@@ -735,394 +1512,788 @@ const INITIAL_DB = {
 // SECTION: js/storage.js
 // ==========================================
 // =============================================================================
+
 // STORAGE.JS: LOCALSTORAGE PERSISTENCE ENGINE & ATOMIC TRANSACTIONS (SINGLE SOURCE OF TRUTH)
+
 // =============================================================================
 
 
 
+
+
+
+
 const STORAGE_KEY = 'HCMUE_LIBRARY_DB';
+
 const LEGACY_STORAGE_KEY = 'HCMUE_LIBRARY_DB_PERSISTENCE';
 
+
+
 /**
+
  * Lấy toàn bộ cơ sở dữ liệu từ window.HCMUE_DB hoặc LocalStorage.
+
  * Nếu chưa tồn tại hoặc bị lỗi, tự động nạp INITIAL_DB gốc.
+
  */
+
 function getDB() {
+
   if (typeof window !== 'undefined' && window.HCMUE_DB) {
+
     return sanitizeDB(window.HCMUE_DB);
+
   }
+
+
 
   try {
+
     let raw = null;
+
     if (typeof localStorage !== 'undefined') {
+
       raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
+
     }
+
     
+
     let dbData;
+
     if (raw) {
+
       dbData = JSON.parse(raw);
+
     } else {
+
       dbData = JSON.parse(JSON.stringify(INITIAL_DB));
+
       saveDB(dbData);
+
     }
+
+
 
     dbData = sanitizeDB(dbData);
 
+
+
     if (typeof window !== 'undefined') {
+
       window.HCMUE_DB = dbData;
+
     }
+
     return dbData;
+
   } catch (err) {
+
     console.error("Lỗi khi đọc LocalStorage, khôi phục INITIAL_DB:", err);
+
     let dbData = JSON.parse(JSON.stringify(INITIAL_DB));
+
     dbData = sanitizeDB(dbData);
+
     saveDB(dbData);
+
     if (typeof window !== 'undefined') {
+
       window.HCMUE_DB = dbData;
+
     }
+
     return dbData;
+
   }
+
 }
 
+
+
 /**
+
  * Chuẩn hóa và làm sạch dữ liệu (Self-healing & Deduplication):
+
  * - Ngăn chặn tình trạng 1 độc giả có 2 khoản nợ trên cùng 1 mã bản sao (ví dụ: CSDL-002 của Nguyễn Đức Anh Tài)
+
  * - Tự động đồng bộ trường acc.debt và trạng thái thẻ tương ứng
+
  */
+
 function sanitizeDB(dbData) {
+
   if (!dbData || !Array.isArray(dbData.debts)) return dbData;
+
   let modified = false;
 
+
+
   const seenCopyByReader = new Map();
+
   const cleanedDebts = [];
 
+
+
   for (const debt of dbData.debts) {
+
     const cardKey = (debt.readerCard || debt.readerName || '').toUpperCase();
+
     const match = debt.reason ? debt.reason.match(/([A-Z]+-\d+)/) : null;
+
     const copyKey = match ? match[1].toUpperCase() : null;
 
+
+
     if (copyKey) {
+
       const combinedKey = `${cardKey}::${copyKey}`;
+
       if (seenCopyByReader.has(combinedKey)) {
+
         // Đã có một khoản nợ cho cùng độc giả và cùng cuốn sách này!
+
         // Nếu khoản nợ hiện tại là DEBT-03 (khoản gốc chuẩn 180k), thay thế khoản trước đó bằng DEBT-03
+
         if (debt.id === 'DEBT-03') {
+
           const prevIdx = cleanedDebts.findIndex(d => seenCopyByReader.get(combinedKey) === d.id);
+
           if (prevIdx >= 0) cleanedDebts.splice(prevIdx, 1);
+
           cleanedDebts.push(debt);
+
           seenCopyByReader.set(combinedKey, debt.id);
+
         }
+
         modified = true;
+
         continue;
+
       }
+
       seenCopyByReader.set(combinedKey, debt.id);
+
     }
+
     cleanedDebts.push(debt);
+
   }
+
+
 
   if (modified) {
+
     dbData.debts = cleanedDebts;
+
   }
+
+
 
   // Đồng bộ trường debt và cardStatus trong accounts
+
   if (Array.isArray(dbData.accounts)) {
+
     dbData.accounts.forEach(acc => {
+
       const cardId = (acc.cardId || acc.staffId || acc.username || '').toUpperCase();
+
       const readerDebts = dbData.debts.filter(d => 
+
         (d.readerCard && d.readerCard.toUpperCase() === cardId) ||
+
         (d.readerName && d.readerName === acc.name)
+
       );
+
       const actualDebt = readerDebts.reduce((sum, d) => sum + Number(d.amount), 0);
+
       
+
       if (acc.role === 'DOC_GIA' || acc.debt !== undefined) {
+
         if (acc.debt !== actualDebt) {
+
           acc.debt = actualDebt;
+
           modified = true;
+
         }
+
         if (actualDebt === 0 && acc.cardStatus === 'TAM_KHOA_NO') {
+
           acc.cardStatus = 'HOAT_DONG';
+
           acc.status = 'KICH_HOAT';
+
           modified = true;
+
         } else if (actualDebt > 0 && acc.cardStatus !== 'TAM_KHOA_NO') {
+
           acc.cardStatus = 'TAM_KHOA_NO';
+
           acc.status = 'KHOA';
+
           modified = true;
+
         }
+
       }
+
     });
+
   }
+
+
 
   // 3. Chuẩn hóa và làm sạch bản sao copies & activeLoans (Chống phantom loans và ghi chú hư hỏng thành độc giả)
+
   if (Array.isArray(dbData.copies)) {
+
     dbData.copies.forEach(c => {
+
       if (c.status !== 'DANG_MUON') {
+
         if (c.borrowerName && c.borrowerName !== '—') {
+
           if (!c.note) c.note = c.borrowerName;
+
           c.borrowerName = '—';
+
           modified = true;
+
         }
+
         if (c.borrowerCard) {
+
           c.borrowerCard = '';
+
           modified = true;
+
         }
+
       }
+
     });
+
   }
+
+
 
   // Loại bỏ các lượt mượn rác hoặc bản sao không còn đang mượn khỏi activeLoans
+
   if (Array.isArray(dbData.activeLoans)) {
+
     const validLoans = dbData.activeLoans.filter(l => {
+
       if (!l || !l.copyCode) return false;
+
       const rName = (l.readerName || '').trim();
+
       if (!rName || rName === '—' || rName.startsWith('Chờ dán') || rName.startsWith('Hỏng gáy') || rName.startsWith('Đã thanh lý')) {
+
         modified = true;
+
         return false;
+
       }
+
       if (Array.isArray(dbData.copies)) {
+
         const copy = dbData.copies.find(c => c.code.toUpperCase() === l.copyCode.toUpperCase());
+
         if (copy && copy.status !== 'DANG_MUON') {
+
           modified = true;
+
           return false;
+
         }
+
       }
+
       return true;
+
     });
+
+
 
     if (validLoans.length !== dbData.activeLoans.length) {
+
       dbData.activeLoans = validLoans;
+
       modified = true;
+
     }
+
   }
+
+
 
   // 4. Tự động đồng bộ chuẩn MSSV / Mã thẻ Chương 4 (THE-5001108 -> THE-50011065, THE-5001104 -> THE-50011077)
+
   if (Array.isArray(dbData.accounts)) {
+
     dbData.accounts.forEach(a => {
+
       // Đảm bảo sinh viên có thể đăng nhập xem lịch sử cá nhân (cardStatus vẫn là TAM_KHOA_NO)
+
       if (a.role === 'DOC_GIA' && a.status === 'KHOA' && a.cardStatus === 'TAM_KHOA_NO') {
+
         a.status = 'KICH_HOAT';
+
         modified = true;
+
       }
+
     });
+
+
 
     const tai = dbData.accounts.find(a => a.name === "Nguyễn Đức Anh Tài");
+
     if (tai && (tai.cardId === "THE-5001108" || tai.username === "50.01.103.108" || tai.status === "KHOA")) {
+
       tai.id = "50.01.103.065";
+
       tai.username = "50.01.103.065";
+
       tai.staffId = "50.01.103.065";
+
       tai.cardId = "THE-50011065";
+
       tai.className = "50.01.SPTIN.B";
+
       tai.status = "KICH_HOAT";
+
       tai.cardStatus = "TAM_KHOA_NO";
+
       modified = true;
+
     }
+
     const tran = dbData.accounts.find(a => a.name === "Huỳnh Nguyễn Huyền Trân");
+
     if (tran && (tran.cardId === "THE-5001104" || tran.username === "50.01.103.042")) {
+
       tran.id = "50.01.103.077";
+
       tran.username = "50.01.103.077";
+
       tran.staffId = "50.01.103.077";
+
       tran.cardId = "THE-50011077";
+
       tran.className = "50.01.SPTIN.B";
+
       modified = true;
+
     }
+
   }
+
+
 
   // 5. Tự động cập nhật readerCard cho studentHistory
+
   if (Array.isArray(dbData.studentHistory)) {
+
     dbData.studentHistory.forEach(h => {
+
       if (!h.readerCard) {
+
         if (h.code && (h.code.includes('CTDL-003') || h.code.includes('OOP-002'))) {
+
           h.readerCard = "THE-5001102";
+
           h.readerName = "Nguyễn Ngọc Hồng An";
+
           modified = true;
+
         }
+
       }
+
     });
+
     // Đảm bảo có lịch sử cho Tài nếu chưa có
+
     if (!dbData.studentHistory.some(h => h.readerCard === "THE-50011065")) {
+
       dbData.studentHistory.push({
+
         readerCard: "THE-50011065",
+
         readerName: "Nguyễn Đức Anh Tài",
+
         code: "PM-2026-012 · GT1-001",
+
         title: "Giải tích 1",
+
         borrowDate: "05/09/2026",
+
         returnDate: "19/09/2026",
+
         status: "Trả đúng hạn",
+
         statusBadge: "badge-green",
+
         fee: "0 đ",
+
         paymentStatus: "Đã hoàn tất"
+
       });
+
       modified = true;
+
     }
+
   }
+
   if (Array.isArray(dbData.debts)) {
+
     dbData.debts.forEach(d => {
+
       if (d.readerName === "Nguyễn Đức Anh Tài" && d.readerCard === "THE-5001108") {
+
         d.readerCard = "THE-50011065";
+
         modified = true;
+
       }
+
     });
+
   }
+
   if (Array.isArray(dbData.copies)) {
+
     dbData.copies.forEach(c => {
+
       if (c.borrowerName === "Nguyễn Đức Anh Tài" && c.borrowerCard === "THE-5001108") {
+
         c.borrowerCard = "THE-50011065";
+
         modified = true;
+
       } else if (c.borrowerName === "Huỳnh Nguyễn Huyền Trân" && c.borrowerCard === "THE-5001104") {
+
         c.borrowerCard = "THE-50011077";
+
         modified = true;
+
       }
+
     });
+
+
 
     // Tự động bổ sung 3 bản sao kiểm kê nếu thiếu trong LocalStorage hiện tại
+
     const missingInventoryCopies = [
+
       { code: "CNPM-007", titleId: "DS-01", titleName: "Kỹ nghệ phần mềm", shelf: "Kệ K03 - Ngăn 2", price: 85000, status: "SAN_SANG", statusLabel: "Sẵn sàng cho mượn", statusBadge: "badge-green", borrowerName: "—", borrowerCard: "", condition: "BINH_THUONG" },
+
       { code: "AI-009", titleId: "DS-03", titleName: "Nhập môn Trí tuệ Nhân tạo", shelf: "Dãy K04 - Kệ 4 - Ngăn 3", price: 110000, status: "SAN_SANG", statusLabel: "Sẵn sàng cho mượn", statusBadge: "badge-green", borrowerName: "—", borrowerCard: "", condition: "BINH_THUONG" },
-      { code: "CSDL-015", titleId: "DS-02", titleName: "Hệ quản trị CSDL PostgreSQL", shelf: "Kệ K02 - Ngăn 1", price: 95000, status: "SAN_SANG", statusLabel: "Sẵn sàng cho mượn", statusBadge: "badge-green", borrowerName: "—", borrowerCard: "", condition: "BINH_THUONG" }
+
+      { code: "CSDL-015", titleId: "DS-02", titleName: "Hệ quản trị CSDL PostgreSQL", shelf: "Kệ K02 - Ngăn 1", price: 95000, status: "SAN_SANG", statusLabel: "Sẵn sàng cho mượn", statusBadge: "badge-green", borrowerName: "—", borrowerCard: "", condition: "BINH_THUONG" },
+
+      { code: "WEB-002", titleId: "DS-04", titleName: "Lập trình Web nâng cao", shelf: "Dãy K03 - Kệ 1 - Ngăn 1", price: 120000, status: "SAN_SANG", statusLabel: "Sẵn sàng cho mượn", statusBadge: "badge-green", borrowerName: "—", borrowerCard: "", condition: "BINH_THUONG" },
+
+      { code: "WEB-003", titleId: "DS-04", titleName: "Lập trình Web nâng cao", shelf: "Dãy K03 - Kệ 1 - Ngăn 1", price: 120000, status: "SAN_SANG", statusLabel: "Sẵn sàng cho mượn", statusBadge: "badge-green", borrowerName: "—", borrowerCard: "", condition: "BINH_THUONG" }
+
     ];
+
     missingInventoryCopies.forEach(rc => {
+
       if (!dbData.copies.some(c => c.code === rc.code)) {
+
         dbData.copies.push(rc);
+
         modified = true;
+
       }
+
     });
+
   }
+
   if (Array.isArray(dbData.activeLoans)) {
+
     dbData.activeLoans.forEach(l => {
+
       if (l.readerName === "Nguyễn Đức Anh Tài" && l.readerCard === "THE-5001108") {
+
         l.readerCard = "THE-50011065";
+
         modified = true;
+
       } else if (l.readerName === "Huỳnh Nguyễn Huyền Trân" && l.readerCard === "THE-5001104") {
+
         l.readerCard = "THE-50011077";
+
         l.readerClass = "50.01.SPTIN.B";
+
         modified = true;
+
       }
+
+
 
       // Tự động chuẩn hóa trạng thái quá hạn / trong hạn theo thời gian thực (chống lỗi đóng băng mockup)
+
       if (l.dueDate && typeof l.dueDate === 'string') {
+
         const parts = l.dueDate.split('/');
+
         if (parts.length === 3) {
+
           const dueDay = parseInt(parts[0], 10);
+
           const dueMonth = parseInt(parts[1], 10) - 1;
+
           const dueYear = parseInt(parts[2], 10);
+
           const startOfDueDay = new Date(dueYear, dueMonth, dueDay);
+
           const now = new Date();
+
           const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
           const msPerDay = 24 * 60 * 60 * 1000;
+
           const diffDays = Math.round((startOfToday.getTime() - startOfDueDay.getTime()) / msPerDay);
 
+
+
           if (diffDays > 0) {
+
             if (l.overdueDays !== diffDays || l.statusBadge !== 'badge-red') {
+
               l.overdueDays = diffDays;
+
               l.statusBadge = 'badge-red';
+
               l.statusText = `Quá hạn ${diffDays} ngày`;
+
               l.actionText = 'Tiếp nhận trả sách →';
+
               modified = true;
+
             }
+
           } else {
+
             const remainingDays = Math.abs(diffDays);
+
             if (l.overdueDays !== 0) {
+
               l.overdueDays = 0;
+
               modified = true;
+
             }
+
             if (l.renewed) {
+
               if (l.statusBadge !== 'badge-green' || l.statusText !== 'Đã gia hạn (+7 ngày)') {
+
                 l.statusBadge = 'badge-green';
+
                 l.statusText = 'Đã gia hạn (+7 ngày)';
+
                 modified = true;
+
               }
+
             } else if (remainingDays <= 1) {
+
               const newText = remainingDays === 0 ? 'Hết hạn hôm nay' : 'Còn 1 ngày';
+
               if (l.statusBadge !== 'badge-yellow' || l.statusText !== newText) {
+
                 l.statusBadge = 'badge-yellow';
+
                 l.statusText = newText;
+
                 modified = true;
+
               }
+
             } else {
+
               const newText = `Trong hạn · Còn ${remainingDays} ngày`;
+
               if (l.statusBadge !== 'badge-green' || l.statusText !== newText) {
+
                 l.statusBadge = 'badge-green';
+
                 l.statusText = newText;
+
                 modified = true;
+
               }
+
             }
+
           }
+
         }
+
       }
+
     });
+
   }
+
+
 
   // 5. Chuẩn hóa tham số vận hành dbData.parameters
+
   if (!dbData.parameters) {
+
     dbData.parameters = { ...INITIAL_DB.parameters };
+
     modified = true;
+
   } else {
+
     if (dbData.parameters.reservationHoldHours === undefined) {
+
       dbData.parameters.reservationHoldHours = 24;
+
       modified = true;
+
     }
+
     if (dbData.parameters.maxAllowedDebt === undefined) {
+
       dbData.parameters.maxAllowedDebt = 50000;
+
       modified = true;
+
     }
+
   }
+
+
 
   if (modified && typeof localStorage !== 'undefined') {
+
     try {
+
       localStorage.setItem(STORAGE_KEY, JSON.stringify(dbData));
+
     } catch (e) {}
+
   }
+
+
 
   return dbData;
+
 }
 
+
+
 /**
+
  * Lưu dữ liệu bền vững vào LocalStorage và cập nhật window.HCMUE_DB
+
  */
+
 function saveDB(data) {
+
   try {
+
     if (typeof window !== 'undefined') {
+
       window.HCMUE_DB = data;
+
     }
+
     if (typeof localStorage !== 'undefined') {
+
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
     }
+
   } catch (err) {
+
     console.error("Lỗi ghi LocalStorage:", err);
+
   }
+
 }
 
+
+
 /**
+
  * Khôi phục dữ liệu gốc chuẩn để Thầy Cô/Hội Đồng đối soát chấm điểm
+
  */
+
 function resetDB() {
+
   const fresh = sanitizeDB(JSON.parse(JSON.stringify(INITIAL_DB)));
+
   saveDB(fresh);
+
   if (typeof window !== 'undefined') {
+
     window.HCMUE_DB = fresh;
+
     window.dispatchEvent(new CustomEvent('hcmue:data-changed', { 
+
       detail: { action: 'RESET_DB', db: fresh, timestamp: Date.now() } 
+
     }));
+
   }
+
   return fresh;
+
 }
 
+
+
 /**
+
  * Cập nhật một phần của cơ sở dữ liệu một cách an toàn và kích hoạt Reactive Event toàn cục
+
  */
+
 function mutateDB(mutatorFn, actionName = 'DATA_CHANGED') {
+
   const current = getDB();
+
   mutatorFn(current);
+
   saveDB(current);
+
   
+
   if (typeof window !== 'undefined') {
+
     window.HCMUE_DB = current;
+
     window.dispatchEvent(new CustomEvent('hcmue:data-changed', { 
+
       detail: { action: actionName, db: current, timestamp: Date.now() } 
+
     }));
+
   }
+
   
+
   return current;
+
 }
+
+
 
 
 
@@ -4897,476 +6068,967 @@ function handleCreateAccountSubmit() {
 // SECTION: js/modules/student.js
 // ==========================================
 // =============================================================================
+
 // STUDENT.JS: CỔNG SINH VIÊN, ĐỌC THỬ PDF & GIA HẠN TRỰC TUYẾN (UC14, UC16, UC17, UC20)
+
 // =============================================================================
 
 
 
 
 
+
+
+
+
+
+
 let currentPdfPage = 1;
+
 const totalPdfPages = 10;
+
 let currentPreviewBookTitle = "Kỹ nghệ phần mềm (Tập 1)";
 
+let currentPreviewBookId = "DS-01";
+
+
+
 /**
+
  * Screen 19: Tra cứu tài liệu thư viện UC16
+
  */
+
 function renderStudentSearchScreen() {
+
   const db = getDB();
+
   const searchInput = document.getElementById('student-search-input');
+
   const kw = (searchInput ? searchInput.value : '').toLowerCase().trim();
 
+
+
   let filtered = db.titles;
+
   if (kw) {
+
     filtered = filtered.filter(t => 
+
       t.title.toLowerCase().includes(kw) || 
+
       t.author.toLowerCase().includes(kw) || 
+
       t.isbn.toLowerCase().includes(kw)
+
     );
+
   }
+
+
 
   const container = document.getElementById('student-books-grid');
+
   if (!container) return;
 
+
+
   container.innerHTML = filtered.map(t => {
+
     const copies = db.copies.filter(c => c.titleId === t.id);
-    const totalCount = copies.length || t.totalCopies;
-    const availCount = copies.filter(c => c.status === 'SAN_SANG').length || t.availableCopies;
+
+    const totalCount = copies.length > 0 ? copies.length : (t.totalCopies || 0);
+
+    const availCount = copies.length > 0 ? copies.filter(c => c.status === 'SAN_SANG').length : (t.availableCopies || 0);
+
+
 
     return `
+
       <div class="book-card-horizontal">
+
         <div class="book-mockup-cover">
+
           <span class="book-mockup-tag">${escapeHTML(t.coverTag || 'GIÁO TRÌNH ĐẠI HỌC')}</span>
+
           <div class="book-mockup-title">${escapeHTML(t.coverTitle || t.title.toUpperCase())}</div>
+
           <span class="book-mockup-year">${escapeHTML(t.coverSub || `${t.year}`)}</span>
+
         </div>
+
         <div class="book-card-info">
+
           <div>
+
             <div class="book-card-title">${escapeHTML(t.title)}</div>
+
             <div class="book-card-author">${escapeHTML(t.author)} · ${escapeHTML(t.year)}</div>
+
             <div style="margin-bottom: 12px;">
+
               <span class="badge badge-green">Còn ${availCount}/${totalCount} cuốn sẵn sàng</span>
+
             </div>
+
             <div class="book-card-location">
+
               <i class="fa-solid fa-location-dot" style="color: var(--hcmue-navy);"></i>
+
               <span>${escapeHTML(t.shelfLocation)}</span>
+
             </div>
+
           </div>
+
           <div style="margin-top: 16px;">
+
             <button class="btn btn-danger btn-sm" onclick="window.handleOpenPdfPreview('${t.id}')">
+
               <i class="fa-regular fa-file-pdf"></i> Đọc thử PDF mẫu
+
             </button>
+
           </div>
+
         </div>
+
       </div>
+
     `;
+
   }).join('');
+
 }
 
+
+
 /**
+
  * Screen 19b: Mở Modal đọc thử PDF UC20
+
  */
+
 function openPdfPreviewModal(titleId = 'DS-01') {
+
   const db = getDB();
-  const title = db.titles.find(t => t.id === titleId) || db.titles[0];
-  currentPreviewBookTitle = title.title;
+
+  const title = (db.titles || []).find(t => t.id === titleId || t.title === titleId) || db.titles[0];
+
+  currentPreviewBookId = title ? title.id : titleId;
+
+  currentPreviewBookTitle = title ? title.title : "Kỹ nghệ phần mềm (Tập 1)";
+
   currentPdfPage = 1;
 
+
+
   const titleHeader = document.getElementById('pdf-modal-book-title');
+
   if (titleHeader) titleHeader.textContent = currentPreviewBookTitle;
 
+
+
   renderPdfViewer();
+
 }
+
+
 
 function setPdfPage(pageNum) {
+
   if (pageNum < 1 || pageNum > totalPdfPages) return;
+
   currentPdfPage = pageNum;
+
   renderPdfViewer();
+
 }
+
+
 
 function changePdfPage(delta) {
+
   setPdfPage(currentPdfPage + delta);
+
 }
+
+
 
 function renderPdfViewer() {
+
   const pageIndicator = document.getElementById('pdf-page-indicator');
+
   if (pageIndicator) pageIndicator.textContent = `${currentPdfPage} / ${totalPdfPages} trang`;
 
+
+
   // Render Thumbnails Sidebar
+
   const thumbsContainer = document.getElementById('pdf-thumbs-container');
+
   if (thumbsContainer) {
+
     thumbsContainer.innerHTML = Array.from({ length: totalPdfPages }, (_, i) => i + 1).map(p => `
+
       <div class="pdf-thumb-item ${currentPdfPage === p ? 'active' : ''}" onclick="window.handleSelectPdfPage(${p})">
+
         Trang ${p}
+
       </div>
+
     `).join('');
+
   }
+
+
 
   // Render Main Page Content Sheet
+
   const sheetContainer = document.getElementById('pdf-page-content-sheet');
+
   if (sheetContainer) {
+
+    const db = getDB();
+
+    const currentTitle = (db.titles || []).find(t => t.id === currentPreviewBookId || t.title === currentPreviewBookTitle) || {};
+
+    const bookAuthor = currentTitle.author || 'Tác giả chuyên ngành';
+
+    const bookPublisher = `${currentTitle.publisher || 'Nhà xuất bản Giáo Dục'} · ${currentTitle.year || '2024'}`;
+
+    const bookTitleDisplay = (currentTitle.title || currentPreviewBookTitle || 'TÀI LIỆU THƯ VIỆN').toUpperCase();
+
+    const bookSub = currentTitle.coverSub || `Ấn bản năm ${currentTitle.year || '2024'}`;
+
+    const bookSummary = currentTitle.summary || 'Tài liệu đọc thử dành cho học tập và nghiên cứu của sinh viên Trường Đại học Sư phạm TP.HCM. Bản xem trước minh họa được giới hạn trong 10 trang đầu của tài liệu theo đúng bản quyền sở hữu trí tuệ.';
+
+
+
     sheetContainer.innerHTML = `
+
       <div class="pdf-watermark-overlay">
+
         THƯ VIỆN ĐH SƯ PHẠM TP.HCM<br>BẢN ĐỌC THỬ TRỰC TUYẾN
+
       </div>
+
       <div style="position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column;">
+
         <div style="font-size: 11px; font-weight: 700; color: var(--text-subtle); letter-spacing: 1px; text-transform: uppercase;">
-          ROGER S. PRESSMAN
+
+          ${escapeHTML(bookAuthor)}
+
         </div>
+
         <div style="font-size: 26px; font-weight: 800; color: var(--hcmue-navy); margin-top: 12px; line-height: 1.2;">
-          ${escapeHTML(currentPreviewBookTitle.toUpperCase())}
+
+          ${escapeHTML(bookTitleDisplay)}
+
         </div>
+
         <div style="font-size: 16px; font-weight: 600; color: var(--text-muted); margin-top: 6px;">
-          Tập 1 · Ấn bản tái bản 2024
+
+          ${escapeHTML(bookSub)}
+
         </div>
+
         <div style="width: 48px; height: 3px; background-color: var(--hcmue-crimson); margin: 20px 0;"></div>
+
         
+
         <div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">
+
           Giới thiệu tài liệu & Mục lục tóm tắt
+
         </div>
+
         <div style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;">
-          Tài liệu đọc thử dành cho học tập và nghiên cứu của sinh viên Trường Đại học Sư phạm TP.HCM. Bản xem trước minh họa được giới hạn trong 10 trang đầu của tài liệu theo đúng bản quyền sở hữu trí tuệ.
+
+          ${escapeHTML(bookSummary)}
+
         </div>
+
         
+
         <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: auto;">
+
           <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Nội dung trang ${currentPdfPage}:</div>
+
           <p style="font-size: 12px; color: var(--text-main); line-height: 1.6;">
-            - Mô hình quy trình phát triển phần mềm Agile và Scrum.<br>
-            - Phân tích và đặc tả yêu cầu người dùng (Software Requirements Specification - SRS).<br>
-            - Thiết kế kiến trúc hướng dịch vụ và mô hình hóa quan hệ thực thể 3NF.<br>
-            - Tiêu chuẩn an toàn thông tin và kiểm thử chức năng tự động.
+
+            - Trích đoạn chương mục lý thuyết chuyên ngành: ${escapeHTML(bookTitleDisplay)}.<br>
+
+            - Phân tích và đặc tả hệ thống theo tiêu chuẩn đào tạo Trường Đại học Sư phạm TP.HCM.<br>
+
+            - Bài tập ứng dụng thực hành và hướng dẫn giải mẫu chi tiết.<br>
+
+            - Tài liệu tham khảo và câu hỏi thảo luận cuối chương.
+
           </p>
+
         </div>
+
+
 
         <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-subtle); border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 24px;">
-          <span>Nhà xuất bản Giáo Dục · 2024</span>
+
+          <span>${escapeHTML(bookPublisher)}</span>
+
           <span>BẢN XEM TRƯỚC TĨNH · TRANG ${currentPdfPage} / ${totalPdfPages}</span>
+
         </div>
+
       </div>
+
     `;
+
   }
+
 }
 
+
+
 /**
+
  * Screen 20 & 20b: Sách đang mượn & Lịch sử cá nhân UC14 UC17
+
  */
+
 function renderStudentLoansScreen() {
+
   const db = getDB();
+
   const curUser = getCurrentUser();
+
   
+
   // Lấy dữ liệu mới nhất của người dùng từ CSDL db.accounts
+
   let dbUser = null;
+
   if (curUser) {
+
     dbUser = db.accounts.find(a => 
+
       a.username === curUser.username || 
+
       (a.staffId && a.staffId === curUser.username) ||
+
       (a.cardId && a.cardId === curUser.cardId) ||
+
       a.name === curUser.name
+
     ) || curUser;
+
   } else {
+
     // Mặc định sinh viên mẫu nếu chưa đăng nhập
+
     dbUser = db.accounts.find(a => a.cardId === 'THE-5001102') || {
+
       name: "Nguyễn Ngọc Hồng An",
+
       staffId: "50.01.103.002",
+
       cardId: "THE-5001102",
+
       className: "50.01.SPTIN.B",
+
       debt: 0
+
     };
+
   }
+
+
 
   // 1. Cập nhật thông tin độc giả trên subheader dưới ribbon (Sửa lỗi hiển thị tên An khi đăng nhập Tài)
+
   const readerInfoEl = document.getElementById('student-loans-reader-info');
+
   if (readerInfoEl && dbUser) {
+
     const mssv = dbUser.staffId || dbUser.username || '50.01.103.002';
+
     const card = dbUser.cardId || 'THE-5001102';
+
     const cls = dbUser.className ? ` · Lớp: ${dbUser.className}` : '';
+
     readerInfoEl.textContent = `${dbUser.name} · MSSV: ${mssv} · Thẻ: ${card}${cls}`;
+
   }
+
+
 
   // 2. Lọc danh sách sách đang mượn CHÍNH XÁC của độc giả này
+
   let studentLoans = [];
+
   if (dbUser) {
+
     const userCard = (dbUser.cardId || '').toUpperCase();
+
     const userMssv = (dbUser.staffId || dbUser.username || '').toUpperCase();
+
     const userName = (dbUser.name || '').trim().toLowerCase();
 
+
+
     studentLoans = db.activeLoans.filter(l => {
+
       const loanCard = (l.readerCard || '').toUpperCase();
+
       const loanName = (l.readerName || '').trim().toLowerCase();
+
       return (userCard && loanCard === userCard) ||
+
              (userMssv && loanCard === userMssv) ||
+
              (userName && loanName === userName);
+
     });
+
   }
+
+
 
   // Lưu ý: Tuyệt đối KHÔNG fallback sang sách của Hồng An nếu sinh viên này không mượn cuốn nào!
+
   // Chỉ fallback nếu hệ thống hoàn toàn không có phiên người dùng đăng nhập nào.
+
   if (!curUser && studentLoans.length === 0) {
+
     studentLoans = db.activeLoans.filter(l => l.readerCard === 'THE-5001102' || l.readerName === 'Nguyễn Ngọc Hồng An');
+
   }
+
+
 
   // 3. Tính toán các chỉ số động để hiển thị Banner điều kiện (3 Condition check badges)
+
   const overdueLoans = studentLoans.filter(l => l.overdueDays > 0 || (l.statusBadge && l.statusBadge.includes('red')));
+
   const isOverdue = overdueLoans.length > 0;
+
   const debtAmt = Number(dbUser ? dbUser.debt : 0) || 0;
+
   const hasDebt = debtAmt > 0;
+
   const hasRenewed = studentLoans.some(l => l.renewed || (l.renewCount && l.renewCount >= 1));
 
+
+
   const statusBannerEl = document.getElementById('student-loans-status-banner');
+
   if (statusBannerEl) {
+
     const hasIssue = isOverdue || hasDebt;
+
     statusBannerEl.className = hasIssue ? 'alert-banner' : 'alert-banner alert-banner-success';
+
     statusBannerEl.style.cssText = `display: flex; gap: 32px; background: ${hasIssue ? '#fef2f2' : '#f0fdf4'}; border: 1px solid ${hasIssue ? '#fecaca' : '#bbf7d0'}; margin-bottom: 24px; padding: 12px 18px; border-radius: 8px;`;
 
+
+
     statusBannerEl.innerHTML = `
+
       <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: ${isOverdue ? '#dc2626' : '#16a34a'};">
+
         <i class="fa-solid ${isOverdue ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i>
+
         <span>${isOverdue ? `Có ${overdueLoans.length} cuốn quá hạn (${overdueLoans.map(o => o.copyCode).join(', ')})` : 'Sách còn hạn'}</span>
+
       </div>
+
       <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: ${hasDebt ? '#dc2626' : '#16a34a'};">
+
         <i class="fa-solid ${hasDebt ? 'fa-circle-xmark' : 'fa-circle-check'}"></i>
+
         <span>${hasDebt ? `Công nợ: ${debtAmt.toLocaleString()} đ (Thẻ tạm khóa)` : 'Công nợ: 0 đ'}</span>
+
       </div>
+
       <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: ${hasRenewed ? '#0284c7' : '#16a34a'};">
+
         <i class="fa-solid ${hasRenewed ? 'fa-clock-rotate-left' : 'fa-circle-check'}"></i>
+
         <span>${hasRenewed ? 'Đã gia hạn (1/1 lần)' : 'Chưa quá 1 lần gia hạn'}</span>
+
       </div>
+
     `;
+
   }
+
+
 
   // 4. Banner thông báo gia hạn thành công (Ảnh 20b)
+
   const alertContainer = document.getElementById('student-renew-success-alert');
+
   const lastRenewedLoan = studentLoans.find(l => l.renewed);
+
   if (lastRenewedLoan) {
+
     if (alertContainer) {
+
       alertContainer.style.display = 'flex';
+
       alertContainer.innerHTML = `
+
         <i class="fa-solid fa-circle-check" style="font-size: 18px; color: var(--hcmue-green);"></i>
+
         <span>Gia hạn thành công +7 ngày. Hạn trả mới: <strong>${escapeHTML(lastRenewedLoan.dueDate)}</strong>. Bạn đã sử dụng 1/1 lần gia hạn của cuốn <strong>${escapeHTML(lastRenewedLoan.copyCode)}</strong>.</span>
+
       `;
+
     }
+
   } else {
+
     if (alertContainer) alertContainer.style.display = 'none';
+
   }
+
+
 
   // 5. Cập nhật số lượng sách đang giữ
+
   const descEl = document.querySelector('#screen-student-loans .hcmue-card-desc');
+
   if (descEl) {
+
     descEl.textContent = `Bạn đang giữ ${studentLoans.length}/3 cuốn. Gia hạn trực tuyến tối đa 1 lần cho mỗi lượt mượn.`;
+
   }
+
+
 
   // 6. Bảng sách đang mượn hiện tại
+
   const currentTbody = document.getElementById('student-current-loans-tbody');
+
   if (currentTbody) {
+
     if (studentLoans.length === 0) {
+
       currentTbody.innerHTML = `
+
         <tr>
+
           <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px 16px;">
+
             <i class="fa-solid fa-book-open" style="font-size: 28px; color: #cbd5e1; margin-bottom: 8px; display: block;"></i>
+
             Bạn hiện không có sách nào đang mượn tại thư viện.
+
           </td>
+
         </tr>
+
       `;
+
     } else {
+
       currentTbody.innerHTML = studentLoans.map(loan => {
+
         const isRenewed = !!loan.renewed || (loan.renewCount && loan.renewCount >= 1);
+
         const isLoanOverdue = loan.overdueDays > 0 || (loan.statusBadge && loan.statusBadge.includes('red'));
 
+
+
         // Logic nút thao tác chuẩn nghiệp vụ & phòng chống lỗi
+
         let actionBtnHtml = '';
+
         if (isRenewed) {
+
           actionBtnHtml = `
+
             <button class="btn btn-sm" disabled style="background: #e2e8f0; color: #94a3b8; border-color: #cbd5e1; cursor: not-allowed;">
+
               <i class="fa-solid fa-check"></i> Đã gia hạn
+
             </button>
+
           `;
+
         } else if (isLoanOverdue) {
+
           actionBtnHtml = `
+
             <button class="btn btn-sm" disabled style="background: #fee2e2; color: #dc2626; border-color: #fca5a5; cursor: not-allowed;" title="Sách đã quá hạn, vui lòng mang sách đến quầy thư viện trả và nộp phạt!">
+
               <i class="fa-solid fa-ban"></i> Quá hạn (Đến quầy)
+
             </button>
+
           `;
+
         } else if (hasDebt) {
+
           actionBtnHtml = `
+
             <button class="btn btn-sm" disabled style="background: #fee2e2; color: #dc2626; border-color: #fca5a5; cursor: not-allowed;" title="Thẻ đang có công nợ tồn đọng (${debtAmt.toLocaleString()} đ). Vui lòng thanh toán tại quầy trước khi gia hạn!">
+
               <i class="fa-solid fa-lock"></i> Thẻ nợ phạt
+
             </button>
+
           `;
+
         } else {
+
           actionBtnHtml = `
+
             <button class="btn btn-primary btn-sm btn-student-renew" 
+
               data-code="${escapeHTML(loan.copyCode)}"
+
               onclick="window.handleStudentRenewBook('${escapeHTML(loan.copyCode)}')">
+
               <i class="fa-solid fa-clock-rotate-left"></i> Gia hạn +7 ngày
+
             </button>
+
           `;
+
         }
+
+
 
         let badgeClass = 'badge-green';
+
         let badgeText = loan.statusText || 'Còn trong hạn';
+
         if (isRenewed) {
+
           badgeClass = 'badge-green';
+
           badgeText = 'Đã gia hạn +7 ngày';
+
         } else if (isLoanOverdue) {
+
           badgeClass = 'badge-red';
+
           badgeText = `Quá hạn ${loan.overdueDays || 1} ngày`;
+
         } else if (loan.statusBadge) {
+
           badgeClass = loan.statusBadge;
+
         }
+
+
 
         return `
+
           <tr>
+
             <td>
+
               <div class="cell-bold">${escapeHTML(loan.copyCode)}</div>
+
               <div class="cell-sub">${escapeHTML(loan.titleName)}</div>
+
             </td>
+
             <td>${escapeHTML(loan.borrowDate || '25/10/2026')}</td>
+
             <td><span class="cell-bold">${escapeHTML(loan.dueDate)}</span></td>
+
             <td>
+
               <span class="badge ${badgeClass}">${escapeHTML(badgeText)}</span>
+
             </td>
+
             <td>
+
               <span>${isRenewed ? '1/1 lần (Đã hết lượt)' : '0/1 lần'}</span>
+
             </td>
+
             <td>${actionBtnHtml}</td>
+
           </tr>
+
         `;
+
       }).join('');
+
     }
+
   }
+
+
 
   // 7. Bảng Lịch sử mượn trả đã hoàn tất (Lọc chính xác theo độc giả này)
+
   const historyTbody = document.getElementById('student-history-tbody');
+
   if (historyTbody) {
+
     const userHistory = (db.studentHistory || []).filter(h => {
+
       if (!dbUser) return true;
+
       const userCard = (dbUser.cardId || '').toUpperCase();
+
       const hCard = (h.readerCard || '').toUpperCase();
+
       const userName = (dbUser.name || '').trim().toLowerCase();
+
       const hName = (h.readerName || '').trim().toLowerCase();
+
       return (userCard && hCard === userCard) || (userName && hName === userName);
+
     });
 
+
+
     if (userHistory.length === 0) {
+
       historyTbody.innerHTML = `
+
         <tr>
+
           <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px 16px;">
+
             Độc giả chưa có giao dịch mượn trả nào hoàn tất trong lịch sử.
+
           </td>
+
         </tr>
+
       `;
+
     } else {
+
       historyTbody.innerHTML = userHistory.map(h => `
+
         <tr>
+
           <td>
+
             <div class="cell-bold">${escapeHTML(h.code)}</div>
+
             <div class="cell-sub">${escapeHTML(h.title)}</div>
+
           </td>
+
           <td>${escapeHTML(h.borrowDate)}</td>
+
           <td>${escapeHTML(h.returnDate)}</td>
+
           <td><span class="badge ${h.statusBadge}">${escapeHTML(h.status)}</span></td>
+
           <td>${escapeHTML(h.fee)}</td>
+
           <td><span class="badge badge-gray">${escapeHTML(h.paymentStatus)}</span></td>
+
         </tr>
+
       `).join('');
+
     }
+
   }
+
 }
 
+
+
 /**
+
  * Thực thi gia hạn sách +7 ngày (Chuyển sang trạng thái 20b) - Kiểm tra đa tầng (Hạng mục 4)
+
  */
+
 function executeStudentRenew(copyCode = 'WEB-001', onSuccess) {
+
   let targetCode = typeof copyCode === 'string' && copyCode ? copyCode : 'WEB-001';
+
   const db = getDB();
+
   const curUser = getCurrentUser();
+
   const acc = db.accounts.find(a => 
+
     (curUser && (a.username === curUser.username || a.staffId === curUser.username || a.cardId === curUser.cardId || a.name === curUser.name)) ||
+
     a.cardId === 'THE-5001102'
+
   );
 
+
+
   // 1. Kiểm tra công nợ độc giả: Nếu sinh viên đang có nợ phạt tồn đọng -> từ chối gia hạn, yêu cầu thanh toán trước
+
   if (acc && acc.debt > 0) {
+
     if (window.showToast) {
+
       window.showToast(`⛔ Không thể gia hạn: Thẻ của bạn đang có công nợ tồn đọng (${acc.debt.toLocaleString()} đ). Vui lòng thanh toán tại quầy trước!`, 'error');
+
     }
+
     return;
+
   }
+
+
 
   const existingLoan = db.activeLoans.find(l => l.copyCode.toUpperCase() === targetCode.toUpperCase());
+
   if (!existingLoan) {
+
     if (window.showToast) {
+
       window.showToast(`⚠️ Không tìm thấy bản ghi mượn của cuốn sách [${targetCode}]!`, 'warning');
+
     }
+
     return;
+
   }
+
+
 
   // 2. Kiểm tra số lần gia hạn hiện tại: bắt buộc < 1 lần
+
   if (existingLoan.renewed || (existingLoan.renewCount && existingLoan.renewCount >= 1)) {
+
     if (window.showToast) {
+
       window.showToast(`⛔ Cuốn sách [${targetCode}] đã gia hạn tối đa 1/1 lần quy định!`, 'warning');
+
     }
+
     return;
+
   }
+
+
 
   // 3. Kiểm tra quá hạn: Nếu sách đã quá hạn -> từ chối gia hạn, yêu cầu nộp phạt tại quầy
+
   if (existingLoan.overdueDays > 0 || (existingLoan.statusBadge && existingLoan.statusBadge.includes('red'))) {
+
     if (window.showToast) {
+
       window.showToast(`⛔ Không thể gia hạn: Cuốn sách [${targetCode}] đã quá hạn ${existingLoan.overdueDays} ngày. Vui lòng mang sách đến quầy trả và nộp phạt!`, 'error');
+
     }
+
     return;
+
   }
+
+
 
   mutateDB(draft => {
+
     let loan = draft.activeLoans.find(l => l.copyCode.toUpperCase() === targetCode.toUpperCase());
+
     if (loan && !loan.renewed) {
+
       let nextDateStr = '15/11/2026';
+
       try {
+
         const parts = loan.dueDate.split('/');
+
         if (parts.length === 3) {
+
           const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+
           d.setDate(d.getDate() + 7);
+
           const dd = String(d.getDate()).padStart(2, '0');
+
           const mm = String(d.getMonth() + 1).padStart(2, '0');
+
           const yyyy = d.getFullYear();
+
           nextDateStr = `${dd}/${mm}/${yyyy}`;
+
         }
+
       } catch (e) {
+
         nextDateStr = '15/11/2026';
+
       }
 
+
+
       loan.dueDate = nextDateStr;
+
       loan.renewed = true;
+
       loan.renewCount = 1;
+
       loan.statusText = "Đã gia hạn +7 ngày";
+
       loan.statusBadge = "badge-green";
+
     }
+
   }, 'STUDENT_RENEW');
 
+
+
   renderStudentLoansScreen();
+
   if (onSuccess) onSuccess();
+
 }
+
+
 
 /**
+
  * Screen 05: Trợ lý ảo AI Assistant
+
  */
+
 function handleAiQuery(queryText) {
+
   const q = String(queryText || '').toLowerCase().trim();
 
+
+
   if (q.includes("mượn") || q.includes("quy tắc") || q.includes("hướng dẫn")) {
+
     return "Theo quy định hiện hành: Mỗi độc giả được mượn tối đa 3 cuốn sách trong thời hạn 14 ngày. Bạn được gia hạn trực tuyến 1 lần (+7 ngày) nếu sách chưa quá hạn nhé!";
+
   }
+
   if (q.includes("phạt") || q.includes("quá hạn") || q.includes("tiền")) {
+
     return "Phí phạt trễ hạn được tính 2.000 đ/ngày cho mỗi cuốn sách. Nếu hư hỏng đền 50% giá bìa, mất sách đền 100% giá bìa.";
+
   }
+
   if (q.includes("gia hạn")) {
+
     return "Để gia hạn online: Bạn vào tab 'Sách đang mượn & Lịch sử cá nhân', tìm cuốn sách còn trong hạn và nhấn nút 'Gia hạn +7 ngày'. Mỗi cuốn chỉ được gia hạn 1 lần.";
+
   }
+
   if (q.includes("địa chỉ") || q.includes("ở đâu") || q.includes("thư viện")) {
+
     return "Thư viện Cơ sở 1: 280 An Dương Vương, Phường 4, Quận 5, TP. Hồ Chí Minh. Giờ mở cửa: 07:30 - 20:30 từ Thứ Hai đến Thứ Bảy.";
+
   }
+
   return `Chào bạn! Mình là AI Assistant của Thư viện ĐH Sư phạm TP.HCM. Bạn có thể hỏi mình về: thời hạn mượn sách, phí phạt trễ hạn, cách gia hạn sách online hoặc vị trí kệ sách nhé!`;
+
 }
+
 
 
 // ==========================================
@@ -6644,15 +8306,20 @@ function registerGlobalEvents() {
   };
 
   window.handleExtendReaderCard = function(username) {
+    let nextYear = 2028;
     mutateDB(draft => {
-      const acc = draft.accounts.find(a => a.username === username);
+      const acc = draft.accounts.find(a => a.username === username || a.cardId === username);
       if (acc) {
-        acc.cardExpiry = '30/06/2028';
+        const parts = (acc.cardExpiry || '30/06/2027').split('/');
+        nextYear = parts.length === 3 ? parseInt(parts[2], 10) + 1 : 2028;
+        acc.cardExpiry = `30/06/${nextYear}`;
       }
     });
-    triggerConfetti();
-    showToast(`✅ Đã gia hạn thẻ độc giả ${username} thêm 1 năm (Hạn mới: 30/06/2028)!`, 'success');
-    renderReadersScreen();
+    if (typeof triggerConfetti === 'function') triggerConfetti();
+    if (window.showToast) {
+      window.showToast(`✅ Đã gia hạn thẻ độc giả ${username} thêm 1 năm (Hạn mới: 30/06/${nextYear})!`, 'success');
+    }
+    if (typeof renderReadersScreen === 'function') renderReadersScreen();
   };
 
   window.handleEditTitle = function(titleId) {
