@@ -421,7 +421,7 @@ export function verifyBorrowReader() {
 
   // 3. Kiểm tra công nợ chưa tất toán
   const readerDebts = db.debts.filter(d => d.readerCard === reader.cardId);
-  const totalDebt = readerDebts.reduce((sum, d) => sum + Number(d.amount), 0) + (Number(reader.debt) || 0);
+  const totalDebt = reader.debt !== undefined ? Number(reader.debt) : readerDebts.reduce((sum, d) => sum + Number(d.amount), 0);
   const hasNoDebt = totalDebt === 0;
 
   // 4. Số lượng đang mượn và hạn mức
@@ -1708,6 +1708,11 @@ export function executeReturnBook(asDebt = false, onDone) {
         if (targetTitle) {
           targetTitle.availableCopies = Math.min(targetTitle.totalCopies || 999, (targetTitle.availableCopies || 0) + 1);
         }
+      } else if (newStatus === 'DA_MAT') {
+        const targetTitle = draft.titles.find(t => t.id === targetCopy.titleId);
+        if (targetTitle && targetTitle.totalCopies > 0) {
+          targetTitle.totalCopies -= 1;
+        }
       }
     }
 
@@ -1740,7 +1745,6 @@ export function executeReturnBook(asDebt = false, onDone) {
 
         if (acc) {
           acc.cardStatus = 'TAM_KHOA_NO';
-          acc.status = 'KHOA';
           acc.debt = Math.max(0, (Number(acc.debt) || 0) - oldAmount + totalFee);
         }
       } else {
@@ -1761,7 +1765,6 @@ export function executeReturnBook(asDebt = false, onDone) {
         // Khóa tài khoản
         if (acc) {
           acc.cardStatus = 'TAM_KHOA_NO';
-          acc.status = 'KHOA';
           acc.debt = (Number(acc.debt) || 0) + totalFee;
         }
       }
