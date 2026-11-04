@@ -1483,3 +1483,24 @@
 
 
 
+
+
+/* Screen 19: Student Search Autocomplete & Filter Pills */
+.student-search-dropdown.hidden {
+  display: none !important;
+}
+.student-search-dropdown-item {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.15s ease;
+}
+.student-search-dropdown-item:last-child {
+  border-bottom: none;
+}
+.student-search-dropdown-item:hover {
+  background-color: #f1f5f9;
+}

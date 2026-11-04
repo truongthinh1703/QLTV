@@ -6536,111 +6536,187 @@ let currentPreviewBookId = "DS-01";
 
 
 /**
-
  * Screen 19: Tra cứu tài liệu thư viện UC16
-
  */
-
 function renderStudentSearchScreen() {
-
   const db = getDB();
-
   const searchInput = document.getElementById('student-search-input');
-
   const kw = (searchInput ? searchInput.value : '').toLowerCase().trim();
 
-
-
-  let filtered = db.titles;
-
+  let filtered = db.titles || [];
   if (kw) {
-
     filtered = filtered.filter(t => 
-
       t.title.toLowerCase().includes(kw) || 
-
       t.author.toLowerCase().includes(kw) || 
-
       t.isbn.toLowerCase().includes(kw)
-
     );
-
+  }
+  
+  // Cập nhật số lượng tài liệu tìm thấy
+  const resultsInfo = document.getElementById('student-search-results-info') || 
+    document.querySelector('#screen-student-search div[style*="justify-content: space-between"] .cell-sub');
+  if (resultsInfo) {
+    resultsInfo.textContent = `${filtered.length} tài liệu · Sắp xếp: Liên quan nhất`;
   }
 
-
-
   const container = document.getElementById('student-books-grid');
-
   if (!container) return;
 
-
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 48px 16px; background: #fff; border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
+        <i class="fa-solid fa-book-open" style="font-size: 40px; color: var(--text-light); margin-bottom: 12px;"></i>
+        <div class="cell-bold" style="font-size: 16px; color: var(--text-secondary); margin-bottom: 4px;">Không tìm thấy tài liệu phù hợp</div>
+        <div class="cell-sub">Vui lòng thử tìm với từ khóa khác hoặc bấm nút "Tất cả" thể loại</div>
+      </div>
+    `;
+    return;
+  }
 
   container.innerHTML = filtered.map(t => {
-
-    const copies = db.copies.filter(c => c.titleId === t.id);
-
+    const copies = (db.copies || []).filter(c => c.titleId === t.id);
     const totalCount = copies.length > 0 ? copies.length : (t.totalCopies || 0);
-
     const availCount = copies.length > 0 ? copies.filter(c => c.status === 'SAN_SANG').length : (t.availableCopies || 0);
 
-
-
     return `
-
       <div class="book-card-horizontal">
-
         <div class="book-mockup-cover">
-
           <span class="book-mockup-tag">${escapeHTML(t.coverTag || 'GIÁO TRÌNH ĐẠI HỌC')}</span>
-
           <div class="book-mockup-title">${escapeHTML(t.coverTitle || t.title.toUpperCase())}</div>
-
           <span class="book-mockup-year">${escapeHTML(t.coverSub || `${t.year}`)}</span>
-
         </div>
-
         <div class="book-card-info">
-
           <div>
-
             <div class="book-card-title">${escapeHTML(t.title)}</div>
-
             <div class="book-card-author">${escapeHTML(t.author)} · ${escapeHTML(t.year)}</div>
-
             <div style="margin-bottom: 12px;">
-
-              <span class="badge badge-green">Còn ${availCount}/${totalCount} cuốn sẵn sàng</span>
-
+              <span class="badge ${availCount > 0 ? 'badge-green' : 'badge-red'}">Còn ${availCount}/${totalCount} cuốn sẵn sàng</span>
             </div>
-
             <div class="book-card-location">
-
               <i class="fa-solid fa-location-dot" style="color: var(--hcmue-navy);"></i>
-
               <span>${escapeHTML(t.shelfLocation)}</span>
-
             </div>
-
           </div>
-
           <div style="margin-top: 16px;">
-
             <button class="btn btn-danger btn-sm" onclick="window.handleOpenPdfPreview('${t.id}')">
-
               <i class="fa-regular fa-file-pdf"></i> Đọc thử PDF mẫu
-
             </button>
-
           </div>
-
         </div>
-
       </div>
-
     `;
-
   }).join('');
+}
 
+/**
+ * Hộp gợi ý tìm kiếm tức thì (Search Autocomplete Dropdown) UC16
+ */
+function handleStudentSearchInput(event) {
+  const inputEl = document.getElementById('student-search-input');
+  const kw = (event && event.target ? event.target.value : (inputEl ? inputEl.value : '')).trim().toLowerCase();
+  const dropdown = document.getElementById('student-search-dropdown');
+  const db = getDB();
+
+  if (!dropdown) {
+    renderStudentSearchScreen();
+    return;
+  }
+
+  if (kw.length === 0) {
+    dropdown.innerHTML = '';
+    dropdown.classList.add('hidden');
+    dropdown.style.display = 'none';
+    renderStudentSearchScreen();
+    return;
+  }
+
+  // Tìm các sách trong db.titles có tiêu đề, tác giả hoặc ISBN khớp từ khóa
+  const matches = (db.titles || []).filter(t => 
+    t.title.toLowerCase().includes(kw) || 
+    t.author.toLowerCase().includes(kw) || 
+    t.isbn.toLowerCase().includes(kw)
+  );
+
+  if (matches.length === 0) {
+    dropdown.innerHTML = `
+      <div style="padding: 14px 16px; color: var(--text-secondary); font-size: 13px; text-align: center;">
+        <i class="fa-solid fa-magnifying-glass" style="margin-right: 6px; opacity: 0.6;"></i>
+        Không có gợi ý phù hợp cho "<strong>${escapeHTML(kw)}</strong>"
+      </div>
+    `;
+    dropdown.classList.remove('hidden');
+    dropdown.style.display = 'block';
+  } else {
+    dropdown.innerHTML = matches.slice(0, 6).map(t => {
+      const copies = (db.copies || []).filter(c => c.titleId === t.id);
+      const availCount = copies.length > 0 ? copies.filter(c => c.status === 'SAN_SANG').length : (t.availableCopies || 0);
+      const totalCount = copies.length > 0 ? copies.length : (t.totalCopies || 0);
+      const safeTitle = t.title.replace(/'/g, "\\'");
+
+      return `
+        <div class="student-search-dropdown-item" onclick="window.handleSelectStudentBookSuggestion('${safeTitle}')">
+          <div style="flex: 1; min-width: 0; padding-right: 12px; text-align: left;">
+            <div style="font-weight: 600; color: var(--hcmue-navy); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              ${escapeHTML(t.title)}
+            </div>
+            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+              ${escapeHTML(t.author)} · ${escapeHTML(t.year)} · <span style="color: var(--text-primary); font-weight: 500;">${escapeHTML(t.category || t.categoryId)}</span>
+            </div>
+          </div>
+          <div style="flex-shrink: 0;">
+            <span class="badge ${availCount > 0 ? 'badge-green' : 'badge-red'}" style="font-size: 11px;">
+              Còn ${availCount}/${totalCount} cuốn
+            </span>
+          </div>
+        </div>
+      `;
+    }).join('');
+    dropdown.classList.remove('hidden');
+    dropdown.style.display = 'block';
+  }
+
+  // Tự động lọc danh sách sách bên dưới theo từ khóa
+  renderStudentSearchScreen();
+}
+
+/**
+ * Click chọn một gợi ý trong Autocomplete Dropdown
+ */
+function handleSelectStudentBookSuggestion(bookTitle) {
+  const searchInput = document.getElementById('student-search-input');
+  if (searchInput) {
+    searchInput.value = bookTitle;
+  }
+  const dropdown = document.getElementById('student-search-dropdown');
+  if (dropdown) {
+    dropdown.innerHTML = '';
+    dropdown.classList.add('hidden');
+    dropdown.style.display = 'none';
+  }
+  renderStudentSearchScreen();
+}
+
+/**
+ * Lọc nhanh theo Thể loại sách bằng Filter Pills
+ */
+function handleFilterStudentCategory(catId) {
+  selectedStudentCategoryId = catId || '';
+
+  // Cập nhật trạng thái active cho các nút Pill
+  const pills = document.querySelectorAll('.student-category-pills .btn-category-pill');
+  pills.forEach(btn => {
+    const onclickAttr = btn.getAttribute('onclick') || '';
+    const isAll = (selectedStudentCategoryId === '' && (onclickAttr.includes("('')") || onclickAttr.includes('("")')));
+    const isMatch = onclickAttr.includes(`('${selectedStudentCategoryId}')`) || onclickAttr.includes(`("${selectedStudentCategoryId}")`);
+
+    if (isAll || (selectedStudentCategoryId !== '' && isMatch)) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  renderStudentSearchScreen();
 }
 
 
@@ -8383,6 +8459,9 @@ function registerGlobalEvents() {
   window.renderStudentLoansScreen = renderStudentLoansScreen;
 
   window.renderStudentSearchScreen = renderStudentSearchScreen;
+  window.handleStudentSearchInput = handleStudentSearchInput;
+  window.handleFilterStudentCategory = handleFilterStudentCategory;
+  window.handleSelectStudentBookSuggestion = handleSelectStudentBookSuggestion;
 
   window.executeStudentRenew = executeStudentRenew;
 
@@ -10626,5 +10705,26 @@ if (document.readyState === 'loading') {
 
 }
 
+
+
+  // Click ra ngoài hoặc nhấn phím Escape tự động đóng Search Dropdown của sinh viên
+  document.addEventListener('click', function(e) {
+    const searchWrap = document.querySelector('.student-search-bar');
+    const dropdown = document.getElementById('student-search-dropdown');
+    if (dropdown && searchWrap && !searchWrap.contains(e.target)) {
+      dropdown.classList.add('hidden');
+      dropdown.style.display = 'none';
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' || e.keyCode === 27) {
+      const dropdown = document.getElementById('student-search-dropdown');
+      if (dropdown) {
+        dropdown.classList.add('hidden');
+        dropdown.style.display = 'none';
+      }
+    }
+  });
 
 })();

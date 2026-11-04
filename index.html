@@ -1583,11 +1583,13 @@
 
             <!-- Search Bar -->
             <div class="student-search-bar">
-              <div class="floating-input-wrap">
+              <div class="floating-input-wrap" style="position: relative;">
                 <span class="floating-label">Tên sách, tác giả hoặc ISBN</span>
                 <input type="text" id="student-search-input" class="floating-input" value="Kỹ nghệ phần mềm"
-                  oninput="window.handleSearchStudentBooks()">
+                  oninput="window.handleStudentSearchInput(event)" autocomplete="off">
                 <i class="fa-solid fa-magnifying-glass input-icon-right"></i>
+                <!-- Dropdown Gợi ý tìm kiếm tự động -->
+                <div id="student-search-dropdown" class="student-search-dropdown hidden" style="position: absolute; top: 100%; left: 0; right: 0; background: #ffffff; border: 1px solid var(--border-color); border-radius: 0 0 var(--radius-md) var(--radius-md); box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 1000; max-height: 280px; overflow-y: auto; margin-top: 4px; display: none;"></div>
               </div>
               <div class="cell-sub" style="margin-top: 8px;">Tra cứu tài liệu học tập · Giáo trình · Sách tham khảo
               </div>
@@ -1595,7 +1597,7 @@
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
               <span class="cell-bold" style="font-size: 15px;">Tài liệu phù hợp</span>
-              <span class="cell-sub">2 tài liệu · Sắp xếp: Liên quan nhất</span>
+              <span id="student-search-results-info" class="cell-sub">2 tài liệu · Sắp xếp: Liên quan nhất</span>
             </div>
 
             <!-- Books Grid -->
