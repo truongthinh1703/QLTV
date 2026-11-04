@@ -184,6 +184,14 @@ export const INITIAL_DB = {
       scope: "Tiếng Anh chuyên ngành, IELTS, ngữ pháp",
       bookCount: 198,
       status: "Đang sử dụng"
+    },
+    {
+      id: "TL-KHXH",
+      code: "TL-KHXH",
+      name: "Khoa học Xã hội",
+      scope: "Triết học, lý luận chính trị, khoa học xã hội và nhân văn",
+      bookCount: 165,
+      status: "Đang sử dụng"
     }
   ],
 
@@ -260,7 +268,115 @@ export const INITIAL_DB = {
       coverSub: "2024",
       pdfFile: "assets/sample.pdf",
       summary: "Xây dựng các ứng dụng Web hiện đại chuẩn HTML5, CSS3, ES6+ Modules và Single Page Application không phụ thuộc framework."
-    }
+    },
+    {
+      id: "DS-05",
+      isbn: "978-604-0-55667-1",
+      title: "Cấu trúc Dữ liệu và Giải thuật",
+      author: "Đinh Mạnh Tường",
+      category: "CNTT",
+      categoryId: "TL-CNTT",
+      publisher: "NXB Giáo Dục",
+      year: 2024,
+      totalCopies: 3,
+      availableCopies: 2,
+      shelfLocation: "Kệ K03 - Ngăn 3",
+      coverTag: "GIÁO TRÌNH ĐẠI HỌC",
+      coverTitle: "CẤU TRÚC DỮ LIỆU & GIẢI THUẬT",
+      coverSub: "2024",
+      pdfFile: "assets/sample.pdf",
+      summary: "Kiến trúc dữ liệu mảng, danh sách liên kết, ngăn xếp, hàng đợi, cây nhị phân, đồ thị và các thuật toán tìm kiếm, sắp xếp kinh điển tối ưu hiệu năng."
+    },
+    {
+      id: "DS-06",
+      isbn: "978-604-0-66778-2",
+      title: "Đại số Tuyến tính và Hình học Giải tích",
+      author: "Nguyễn Đình Trí",
+      category: "Toán - Tin học",
+      categoryId: "TL-TOAN",
+      publisher: "NXB Đại học Quốc gia",
+      year: 2023,
+      totalCopies: 3,
+      availableCopies: 3,
+      shelfLocation: "Kệ K01 - Ngăn 2",
+      coverTag: "GIÁO TRÌNH ĐẠI HỌC",
+      coverTitle: "ĐẠI SỐ TUYẾN TÍNH & HÌNH HỌC",
+      coverSub: "2023",
+      pdfFile: "assets/sample.pdf",
+      summary: "Trang bị kiến thức nền tảng về ma trận, định thức, hệ phương trình đại số tuyến tính, không gian vector, phép biến đổi tuyến tính và dạng toàn phương."
+    },
+    {
+      id: "DS-07",
+      isbn: "978-604-0-77889-3",
+      title: "Giáo trình Giáo dục học Đại cương",
+      author: "Trần Thị Hương",
+      category: "Sư phạm & GD",
+      categoryId: "TL-SPGD",
+      publisher: "NXB Đại học Sư phạm",
+      year: 2024,
+      totalCopies: 4,
+      availableCopies: 3,
+      shelfLocation: "Kệ K04 - Ngăn 1",
+      coverTag: "GIÁO TRÌNH SƯ PHẠM",
+      coverTitle: "GIÁO DỤC HỌC ĐẠI CƯƠNG",
+      coverSub: "2024",
+      pdfFile: "assets/sample.pdf",
+      summary: "Giáo trình cung cấp các nguyên lý cơ bản của giáo dục học, lý luận dạy học hiện đại, nguyên tắc giáo dục nhân cách học sinh và tổ chức hoạt động sư phạm."
+    },
+    {
+      id: "DS-08",
+      isbn: "978-604-0-88990-4",
+      title: "Tâm lý học Lứa tuổi và Sư phạm",
+      author: "Lê Văn Hồng",
+      category: "Sư phạm & GD",
+      categoryId: "TL-SPGD",
+      publisher: "NXB Đại học Sư phạm",
+      year: 2023,
+      totalCopies: 3,
+      availableCopies: 3,
+      shelfLocation: "Kệ K04 - Ngăn 2",
+      coverTag: "GIÁO TRÌNH SƯ PHẠM",
+      coverTitle: "TÂM LÝ HỌC LỨA TUỔI",
+      coverSub: "2023",
+      pdfFile: "assets/sample.pdf",
+      summary: "Nghiên cứu các quy luật phát triển tâm lý học sinh THCS và THPT, cơ sở tâm lý học của hoạt động lĩnh hội tri thức và hình thành phẩm chất nhà giáo mẫu mực."
+    },
+    {
+      id: "DS-09",
+      isbn: "978-0-19-457380-1",
+      title: "English for Computer Science",
+      author: "P. Charles Brown",
+      category: "Ngoại ngữ",
+      categoryId: "TL-NN",
+      publisher: "NXB Oxford University Press",
+      year: 2024,
+      totalCopies: 3,
+      availableCopies: 3,
+      shelfLocation: "Kệ K05 - Ngăn 1",
+      coverTag: "SÁCH NGOẠI NGỮ",
+      coverTitle: "ENGLISH FOR COMPUTER SCIENCE",
+      coverSub: "2024",
+      pdfFile: "assets/sample.pdf",
+      summary: "Tài liệu tiếng Anh chuyên ngành CNTT chuẩn quốc tế, rèn luyện kỹ năng đọc hiểu tài liệu phần mềm, kiến trúc máy tính, mạng và thuật ngữ kỹ thuật số."
+    },
+    {
+      id: "DS-10",
+      isbn: "978-604-57-5522-3",
+      title: "Triết học Mác - Lênin",
+      author: "Bộ Giáo dục và Đào tạo",
+      category: "Khoa học Xã hội",
+      categoryId: "TL-KHXH",
+      publisher: "NXB Chính trị Quốc gia Sự thật",
+      year: 2023,
+      totalCopies: 4,
+      availableCopies: 3,
+      shelfLocation: "Kệ K02 - Ngăn 4",
+      coverTag: "GIÁO TRÌNH ĐẠI HỌC",
+      coverTitle: "TRIẾT HỌC MÁC - LÊNIN",
+      coverSub: "2023",
+      pdfFile: "assets/sample.pdf",
+      summary: "Giáo trình chuẩn quốc gia dành cho bậc đại học, gồm thế giới quan và phương pháp luận triết học duy vật biện chứng và duy vật lịch sử."
+    }
   ],
 
   // 4. Bản sao sách vật lý
@@ -492,7 +608,279 @@ export const INITIAL_DB = {
       borrowerName: "—",
       borrowerCard: "",
       condition: "BINH_THUONG"
-    }
+    },
+
+    // Cấu trúc Dữ liệu và Giải thuật (DS-05: 3 bản sao: 2 sẵn sàng, 1 đang mượn)
+    {
+      code: "CTDL-001",
+      titleId: "DS-05",
+      titleName: "Cấu trúc Dữ liệu và Giải thuật",
+      shelf: "Kệ K03 - Ngăn 3",
+      price: 90000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+    {
+      code: "CTDL-002",
+      titleId: "DS-05",
+      titleName: "Cấu trúc Dữ liệu và Giải thuật",
+      shelf: "Kệ K03 - Ngăn 3",
+      price: 90000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+    {
+      code: "CTDL-003",
+      titleId: "DS-05",
+      titleName: "Cấu trúc Dữ liệu và Giải thuật",
+      shelf: "Kệ K03 - Ngăn 3",
+      price: 90000,
+      status: "DANG_MUON",
+      statusLabel: "Đang mượn",
+      statusBadge: "badge-yellow",
+      borrowerName: "Nguyễn Ngọc Hồng An",
+      borrowerCard: "THE-5001102",
+      condition: "BINH_THUONG"
+    },
+
+    // Đại số Tuyến tính và Hình học Giải tích (DS-06: 3 bản sao: 3 sẵn sàng)
+    {
+      code: "DSTT-001",
+      titleId: "DS-06",
+      titleName: "Đại số Tuyến tính và Hình học Giải tích",
+      shelf: "Kệ K01 - Ngăn 2",
+      price: 80000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+    {
+      code: "DSTT-002",
+      titleId: "DS-06",
+      titleName: "Đại số Tuyến tính và Hình học Giải tích",
+      shelf: "Kệ K01 - Ngăn 2",
+      price: 80000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+    {
+      code: "DSTT-003",
+      titleId: "DS-06",
+      titleName: "Đại số Tuyến tính và Hình học Giải tích",
+      shelf: "Kệ K01 - Ngăn 2",
+      price: 80000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+
+    // Giáo trình Giáo dục học Đại cương (DS-07: 4 bản sao: 3 sẵn sàng, 1 đang mượn)
+    {
+      code: "GDH-001",
+      titleId: "DS-07",
+      titleName: "Giáo trình Giáo dục học Đại cương",
+      shelf: "Kệ K04 - Ngăn 1",
+      price: 75000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+    {
+      code: "GDH-002",
+      titleId: "DS-07",
+      titleName: "Giáo trình Giáo dục học Đại cương",
+      shelf: "Kệ K04 - Ngăn 1",
+      price: 75000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+    {
+      code: "GDH-003",
+      titleId: "DS-07",
+      titleName: "Giáo trình Giáo dục học Đại cương",
+      shelf: "Kệ K04 - Ngăn 1",
+      price: 75000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+    {
+      code: "GDH-004",
+      titleId: "DS-07",
+      titleName: "Giáo trình Giáo dục học Đại cương",
+      shelf: "Kệ K04 - Ngăn 1",
+      price: 75000,
+      status: "DANG_MUON",
+      statusLabel: "Đang mượn",
+      statusBadge: "badge-yellow",
+      borrowerName: "Lê Nguyễn Thanh Phương",
+      borrowerCard: "THE-5001106",
+      condition: "BINH_THUONG"
+    },
+
+    // Tâm lý học Lứa tuổi và Sư phạm (DS-08: 3 bản sao: 3 sẵn sàng)
+    {
+      code: "TLH-001",
+      titleId: "DS-08",
+      titleName: "Tâm lý học Lứa tuổi và Sư phạm",
+      shelf: "Kệ K04 - Ngăn 2",
+      price: 70000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+    {
+      code: "TLH-002",
+      titleId: "DS-08",
+      titleName: "Tâm lý học Lứa tuổi và Sư phạm",
+      shelf: "Kệ K04 - Ngăn 2",
+      price: 70000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+    {
+      code: "TLH-003",
+      titleId: "DS-08",
+      titleName: "Tâm lý học Lứa tuổi và Sư phạm",
+      shelf: "Kệ K04 - Ngăn 2",
+      price: 70000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+
+    // English for Computer Science (DS-09: 3 bản sao: 3 sẵn sàng)
+    {
+      code: "ENG-001",
+      titleId: "DS-09",
+      titleName: "English for Computer Science",
+      shelf: "Kệ K05 - Ngăn 1",
+      price: 135000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+    {
+      code: "ENG-002",
+      titleId: "DS-09",
+      titleName: "English for Computer Science",
+      shelf: "Kệ K05 - Ngăn 1",
+      price: 135000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+    {
+      code: "ENG-003",
+      titleId: "DS-09",
+      titleName: "English for Computer Science",
+      shelf: "Kệ K05 - Ngăn 1",
+      price: 135000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+
+    // Triết học Mác - Lênin (DS-10: 4 bản sao: 3 sẵn sàng, 1 đang mượn)
+    {
+      code: "THML-001",
+      titleId: "DS-10",
+      titleName: "Triết học Mác - Lênin",
+      shelf: "Kệ K02 - Ngăn 4",
+      price: 65000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+    {
+      code: "THML-002",
+      titleId: "DS-10",
+      titleName: "Triết học Mác - Lênin",
+      shelf: "Kệ K02 - Ngăn 4",
+      price: 65000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+    {
+      code: "THML-003",
+      titleId: "DS-10",
+      titleName: "Triết học Mác - Lênin",
+      shelf: "Kệ K02 - Ngăn 4",
+      price: 65000,
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
+      condition: "BINH_THUONG"
+    },
+    {
+      code: "THML-004",
+      titleId: "DS-10",
+      titleName: "Triết học Mác - Lênin",
+      shelf: "Kệ K02 - Ngăn 4",
+      price: 65000,
+      status: "DANG_MUON",
+      statusLabel: "Đang mượn",
+      statusBadge: "badge-yellow",
+      borrowerName: "Huỳnh Nguyễn Huyền Trân",
+      borrowerCard: "THE-50011077",
+      condition: "BINH_THUONG"
+    }
   ],
 
   // 5. Các lượt mượn đang diễn ra
