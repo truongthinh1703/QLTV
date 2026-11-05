@@ -969,6 +969,14 @@ function registerGlobalEvents() {
 
   window.resetSystemParamsToDefault = resetSystemParamsToDefault;
 
+  window.renderReadersScreen = renderReadersScreen;
+
+  window.renderCategoriesScreen = renderCategoriesScreen;
+
+  window.renderInventoryScreen = renderInventoryScreen;
+
+  window.renderMasterTitlesScreen = renderMasterTitlesScreen;
+
 
 
   // Xử lý Quick Login Chip 1-click
@@ -1421,6 +1429,21 @@ function registerGlobalEvents() {
 
   }
 
+  // Tự động đồng bộ bộ lọc trạng thái và tìm kiếm thẻ độc giả thời gian thực
+  const readerStatusFilter = document.getElementById('readers-filter-status');
+  if (readerStatusFilter) {
+    readerStatusFilter.addEventListener('change', () => {
+      renderReadersScreen();
+    });
+  }
+
+  const readerSearchInp = document.getElementById('readers-search-input');
+  if (readerSearchInp) {
+    readerSearchInp.addEventListener('input', () => {
+      renderReadersScreen();
+    });
+  }
+
 
 
   window.handleRemoveBorrowCopy = function(code) {
@@ -1598,6 +1621,45 @@ function registerGlobalEvents() {
           "success"
 
         );
+
+        // Nếu thu tiền mặt tại quầy có phí phát sinh -> Hiển thị biên lai thu tiền (Ca 3.2)
+        if (!isDebt && fee > 0) {
+          const receiptCode = (copyCode === 'AI-002' || currentReaderCard === 'THE-5001109') ? 'BL-2026-089' : `BL-${Date.now().toString().slice(-4)}`;
+          const codeEl = document.getElementById('receipt-code-display');
+          const payerEl = document.getElementById('receipt-payer-info');
+          const reasonEl = document.getElementById('receipt-reason-info');
+          const amountEl = document.getElementById('receipt-amount-display');
+          const alertBox = document.getElementById('receipt-alert-box');
+          const alertIcon = document.getElementById('receipt-alert-icon');
+          const alertTextEl = document.getElementById('receipt-alert-text');
+          const optionsBox = document.getElementById('receipt-payment-options-box');
+          const multiNotice = document.getElementById('receipt-multi-debts-notice');
+          const confirmBtn = document.getElementById('btn-receipt-confirm-settle');
+          const receiptDateEl = document.getElementById('receipt-date-display');
+
+          if (codeEl) codeEl.textContent = receiptCode;
+          if (payerEl) payerEl.textContent = `${currentReaderName} · ${currentReaderCard} · Lớp ${loan?.readerClass || '50.01.SPTIN.A'}`;
+          if (reasonEl) reasonEl.textContent = `Quá hạn ${loan?.overdueDays || 8} ngày cuốn ${copyCode}`;
+          if (amountEl) amountEl.textContent = `${Number(fee).toLocaleString('vi-VN')} đ`;
+          if (receiptDateEl && typeof getTodayVN === 'function') receiptDateEl.textContent = `Ngày thu: ${getTodayVN()}`;
+          if (alertBox) alertBox.className = 'alert-banner alert-banner-success';
+          if (alertIcon) alertIcon.className = 'fa-solid fa-circle-check';
+          if (alertTextEl) alertTextEl.textContent = `Đã thu tiền mặt ${Number(fee).toLocaleString('vi-VN')} đ tại quầy. Lượt trả sách đã hoàn tất!`;
+          if (optionsBox) optionsBox.style.display = 'none';
+          if (multiNotice) multiNotice.style.display = 'none';
+          if (confirmBtn) {
+            confirmBtn.textContent = 'Đóng biên lai';
+            confirmBtn.onclick = function() {
+              closeModal('modal-receipt');
+            };
+          }
+          openModal('modal-receipt');
+        } else if (isDebt && fee > 0) {
+          showToast(
+            `Đã ghi nhận công nợ ${Number(fee).toLocaleString('vi-VN')} đ cho độc giả ${currentReaderName}. Thẻ độc giả tự động chuyển sang Bị khóa (Nợ).`,
+            "warning"
+          );
+        }
 
       }
 

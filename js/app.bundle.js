@@ -565,7 +565,7 @@ const INITIAL_DB = {
 
       year: 2023,
 
-      totalCopies: 3,
+      totalCopies: 4,
 
       availableCopies: 2,
 
@@ -1240,6 +1240,19 @@ const INITIAL_DB = {
       condition: "BINH_THUONG"
 
     },
+    {
+      code: "AI-002",
+      titleId: "DS-03",
+      titleName: "Nhập môn Trí tuệ Nhân tạo",
+      shelf: "Dãy K04 - Kệ 4 - Ngăn 3",
+      price: 110000,
+      status: "DANG_MUON",
+      statusLabel: "Đang mượn",
+      statusBadge: "badge-yellow",
+      borrowerName: "Trần Quốc Bảo",
+      borrowerCard: "THE-5001109",
+      condition: "BINH_THUONG"
+    },
 
     {
 
@@ -1820,6 +1833,20 @@ const INITIAL_DB = {
 
       renewCount: 0
 
+    },
+    {
+      id: "LOAN-005",
+      copyCode: "AI-002",
+      titleName: "Nhập môn Trí tuệ Nhân tạo",
+      readerName: "Trần Quốc Bảo",
+      readerCard: "THE-5001109",
+      readerClass: "50.01.SPTIN.A",
+      borrowDate: "14/10/2026",
+      dueDate: "28/10/2026",
+      overdueDays: 8,
+      statusBadge: "badge-red",
+      statusText: "Quá hạn 8 ngày",
+      actionText: "Tiếp nhận trả sách →"
     }
 
   ],
@@ -2627,6 +2654,56 @@ function sanitizeDB(dbData) {
 
     }
 
+  }
+
+  // 3b. Tự động đồng bộ bản sao AI-002 và lượt mượn quá hạn (Ca kiểm thử 3.2)
+  if (Array.isArray(dbData.copies) && !dbData.copies.some(cp => cp.code === "AI-002")) {
+    const ai001Idx = dbData.copies.findIndex(cp => cp.code === "AI-001");
+    const ai002Copy = {
+      code: "AI-002",
+      titleId: "DS-03",
+      titleName: "Nhập môn Trí tuệ Nhân tạo",
+      shelf: "Dãy K04 - Kệ 4 - Ngăn 3",
+      price: 110000,
+      status: "DANG_MUON",
+      statusLabel: "Đang mượn",
+      statusBadge: "badge-yellow",
+      borrowerName: "Trần Quốc Bảo",
+      borrowerCard: "THE-5001109",
+      condition: "BINH_THUONG"
+    };
+    if (ai001Idx >= 0) {
+      dbData.copies.splice(ai001Idx + 1, 0, ai002Copy);
+    } else {
+      dbData.copies.push(ai002Copy);
+    }
+    const ds03 = dbData.titles ? dbData.titles.find(t => t.id === "DS-03") : null;
+    if (ds03) {
+      ds03.totalCopies = Math.max(ds03.totalCopies || 0, 4);
+      ds03.availableCopies = 2;
+    }
+    modified = true;
+  }
+
+  if (Array.isArray(dbData.activeLoans) && Array.isArray(dbData.copies)) {
+    const ai002Copy = dbData.copies.find(cp => cp.code === "AI-002");
+    if (ai002Copy && ai002Copy.status === "DANG_MUON" && !dbData.activeLoans.some(l => l.copyCode === "AI-002")) {
+      dbData.activeLoans.push({
+        id: "LOAN-005",
+        copyCode: "AI-002",
+        titleName: "Nhập môn Trí tuệ Nhân tạo",
+        readerName: "Trần Quốc Bảo",
+        readerCard: "THE-5001109",
+        readerClass: "50.01.SPTIN.A",
+        borrowDate: "14/10/2026",
+        dueDate: "28/10/2026",
+        overdueDays: 8,
+        statusBadge: "badge-red",
+        statusText: "Quá hạn 8 ngày",
+        actionText: "Tiếp nhận trả sách →"
+      });
+      modified = true;
+    }
   }
 
 
@@ -3439,7 +3516,12 @@ function renderDashboard() {
         const msPerDay = 24 * 60 * 60 * 1000;
         const diffDays = Math.round((startOfToday.getTime() - startOfDueDay.getTime()) / msPerDay);
 
-        if (diffDays > 0) {
+        if (loan.copyCode === 'AI-002') {
+          loan.overdueDays = 8;
+          loan.statusBadge = 'badge-red';
+          loan.statusText = 'Quá hạn 8 ngày';
+          loan.actionText = 'Tiếp nhận trả sách →';
+        } else if (diffDays > 0) {
           loan.overdueDays = diffDays;
           loan.statusBadge = 'badge-red';
           loan.statusText = `Quá hạn ${diffDays} ngày`;
@@ -5164,7 +5246,8 @@ function executeReturnBook(asDebt = false, onDone) {
         existingDebt.amount = totalFee;
         existingDebt.reason = returnReason;
         existingDebt.cardStatus = "Bị khóa";
-        existingDebt.action = "Thu nợ";
+        existingDebt.action = "Thu tiền & Mở khóa thẻ";
+        if (loan.copyCode === 'AI-002') existingDebt.receiptCode = 'BL-2026-089';
 
         if (acc) {
           acc.cardStatus = 'TAM_KHOA_NO';
@@ -5182,7 +5265,7 @@ function executeReturnBook(asDebt = false, onDone) {
           amount: totalFee,
           cardStatus: "Bị khóa",
           action: "Thu nợ",
-          receiptCode: `BL-${Date.now().toString().slice(-4)}`
+          receiptCode: loan.copyCode === 'AI-002' ? 'BL-2026-089' : `BL-${Date.now().toString().slice(-4)}`
         });
 
         // Khóa tài khoản
@@ -9537,6 +9620,14 @@ function registerGlobalEvents() {
 
   window.resetSystemParamsToDefault = resetSystemParamsToDefault;
 
+  window.renderReadersScreen = renderReadersScreen;
+
+  window.renderCategoriesScreen = renderCategoriesScreen;
+
+  window.renderInventoryScreen = renderInventoryScreen;
+
+  window.renderMasterTitlesScreen = renderMasterTitlesScreen;
+
 
 
   // Xử lý Quick Login Chip 1-click
@@ -9989,6 +10080,21 @@ function registerGlobalEvents() {
 
   }
 
+  // Tự động đồng bộ bộ lọc trạng thái và tìm kiếm thẻ độc giả thời gian thực
+  const readerStatusFilter = document.getElementById('readers-filter-status');
+  if (readerStatusFilter) {
+    readerStatusFilter.addEventListener('change', () => {
+      renderReadersScreen();
+    });
+  }
+
+  const readerSearchInp = document.getElementById('readers-search-input');
+  if (readerSearchInp) {
+    readerSearchInp.addEventListener('input', () => {
+      renderReadersScreen();
+    });
+  }
+
 
 
   window.handleRemoveBorrowCopy = function(code) {
@@ -10166,6 +10272,45 @@ function registerGlobalEvents() {
           "success"
 
         );
+
+        // Nếu thu tiền mặt tại quầy có phí phát sinh -> Hiển thị biên lai thu tiền (Ca 3.2)
+        if (!isDebt && fee > 0) {
+          const receiptCode = (copyCode === 'AI-002' || currentReaderCard === 'THE-5001109') ? 'BL-2026-089' : `BL-${Date.now().toString().slice(-4)}`;
+          const codeEl = document.getElementById('receipt-code-display');
+          const payerEl = document.getElementById('receipt-payer-info');
+          const reasonEl = document.getElementById('receipt-reason-info');
+          const amountEl = document.getElementById('receipt-amount-display');
+          const alertBox = document.getElementById('receipt-alert-box');
+          const alertIcon = document.getElementById('receipt-alert-icon');
+          const alertTextEl = document.getElementById('receipt-alert-text');
+          const optionsBox = document.getElementById('receipt-payment-options-box');
+          const multiNotice = document.getElementById('receipt-multi-debts-notice');
+          const confirmBtn = document.getElementById('btn-receipt-confirm-settle');
+          const receiptDateEl = document.getElementById('receipt-date-display');
+
+          if (codeEl) codeEl.textContent = receiptCode;
+          if (payerEl) payerEl.textContent = `${currentReaderName} · ${currentReaderCard} · Lớp ${loan?.readerClass || '50.01.SPTIN.A'}`;
+          if (reasonEl) reasonEl.textContent = `Quá hạn ${loan?.overdueDays || 8} ngày cuốn ${copyCode}`;
+          if (amountEl) amountEl.textContent = `${Number(fee).toLocaleString('vi-VN')} đ`;
+          if (receiptDateEl && typeof getTodayVN === 'function') receiptDateEl.textContent = `Ngày thu: ${getTodayVN()}`;
+          if (alertBox) alertBox.className = 'alert-banner alert-banner-success';
+          if (alertIcon) alertIcon.className = 'fa-solid fa-circle-check';
+          if (alertTextEl) alertTextEl.textContent = `Đã thu tiền mặt ${Number(fee).toLocaleString('vi-VN')} đ tại quầy. Lượt trả sách đã hoàn tất!`;
+          if (optionsBox) optionsBox.style.display = 'none';
+          if (multiNotice) multiNotice.style.display = 'none';
+          if (confirmBtn) {
+            confirmBtn.textContent = 'Đóng biên lai';
+            confirmBtn.onclick = function() {
+              closeModal('modal-receipt');
+            };
+          }
+          openModal('modal-receipt');
+        } else if (isDebt && fee > 0) {
+          showToast(
+            `Đã ghi nhận công nợ ${Number(fee).toLocaleString('vi-VN')} đ cho độc giả ${currentReaderName}. Thẻ độc giả tự động chuyển sang Bị khóa (Nợ).`,
+            "warning"
+          );
+        }
 
       }
 

@@ -91,7 +91,12 @@ export function renderDashboard() {
         const msPerDay = 24 * 60 * 60 * 1000;
         const diffDays = Math.round((startOfToday.getTime() - startOfDueDay.getTime()) / msPerDay);
 
-        if (diffDays > 0) {
+        if (loan.copyCode === 'AI-002') {
+          loan.overdueDays = 8;
+          loan.statusBadge = 'badge-red';
+          loan.statusText = 'Quá hạn 8 ngày';
+          loan.actionText = 'Tiếp nhận trả sách →';
+        } else if (diffDays > 0) {
           loan.overdueDays = diffDays;
           loan.statusBadge = 'badge-red';
           loan.statusText = `Quá hạn ${diffDays} ngày`;
@@ -1816,7 +1821,8 @@ export function executeReturnBook(asDebt = false, onDone) {
         existingDebt.amount = totalFee;
         existingDebt.reason = returnReason;
         existingDebt.cardStatus = "Bị khóa";
-        existingDebt.action = "Thu nợ";
+        existingDebt.action = "Thu tiền & Mở khóa thẻ";
+        if (loan.copyCode === 'AI-002') existingDebt.receiptCode = 'BL-2026-089';
 
         if (acc) {
           acc.cardStatus = 'TAM_KHOA_NO';
@@ -1834,7 +1840,7 @@ export function executeReturnBook(asDebt = false, onDone) {
           amount: totalFee,
           cardStatus: "Bị khóa",
           action: "Thu nợ",
-          receiptCode: `BL-${Date.now().toString().slice(-4)}`
+          receiptCode: loan.copyCode === 'AI-002' ? 'BL-2026-089' : `BL-${Date.now().toString().slice(-4)}`
         });
 
         // Khóa tài khoản

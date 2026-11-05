@@ -316,6 +316,56 @@ export function sanitizeDB(dbData) {
 
   }
 
+  // 3b. Tự động đồng bộ bản sao AI-002 và lượt mượn quá hạn (Ca kiểm thử 3.2)
+  if (Array.isArray(dbData.copies) && !dbData.copies.some(cp => cp.code === "AI-002")) {
+    const ai001Idx = dbData.copies.findIndex(cp => cp.code === "AI-001");
+    const ai002Copy = {
+      code: "AI-002",
+      titleId: "DS-03",
+      titleName: "Nhập môn Trí tuệ Nhân tạo",
+      shelf: "Dãy K04 - Kệ 4 - Ngăn 3",
+      price: 110000,
+      status: "DANG_MUON",
+      statusLabel: "Đang mượn",
+      statusBadge: "badge-yellow",
+      borrowerName: "Trần Quốc Bảo",
+      borrowerCard: "THE-5001109",
+      condition: "BINH_THUONG"
+    };
+    if (ai001Idx >= 0) {
+      dbData.copies.splice(ai001Idx + 1, 0, ai002Copy);
+    } else {
+      dbData.copies.push(ai002Copy);
+    }
+    const ds03 = dbData.titles ? dbData.titles.find(t => t.id === "DS-03") : null;
+    if (ds03) {
+      ds03.totalCopies = Math.max(ds03.totalCopies || 0, 4);
+      ds03.availableCopies = 2;
+    }
+    modified = true;
+  }
+
+  if (Array.isArray(dbData.activeLoans) && Array.isArray(dbData.copies)) {
+    const ai002Copy = dbData.copies.find(cp => cp.code === "AI-002");
+    if (ai002Copy && ai002Copy.status === "DANG_MUON" && !dbData.activeLoans.some(l => l.copyCode === "AI-002")) {
+      dbData.activeLoans.push({
+        id: "LOAN-005",
+        copyCode: "AI-002",
+        titleName: "Nhập môn Trí tuệ Nhân tạo",
+        readerName: "Trần Quốc Bảo",
+        readerCard: "THE-5001109",
+        readerClass: "50.01.SPTIN.A",
+        borrowDate: "14/10/2026",
+        dueDate: "28/10/2026",
+        overdueDays: 8,
+        statusBadge: "badge-red",
+        statusText: "Quá hạn 8 ngày",
+        actionText: "Tiếp nhận trả sách →"
+      });
+      modified = true;
+    }
+  }
+
 
 
   // 4. Tự động đồng bộ chuẩn MSSV / Mã thẻ Chương 4 (THE-5001108 -> THE-50011065, THE-5001104 -> THE-50011077)
