@@ -776,25 +776,34 @@ export function saveDB(data) {
  */
 
 export function resetDB() {
+  // 1. Giữ lại danh mục bản sao lưu hiện có trước khi reset
+  let existingBackups = [];
+  try {
+    const current = getDB();
+    if (current && Array.isArray(current.backups)) {
+      existingBackups = current.backups;
+    }
+  } catch (e) {
+    console.warn("Không thể trích xuất backups cũ:", e);
+  }
 
+  // 2. Nạp dữ liệu chuẩn ban đầu
   const fresh = sanitizeDB(JSON.parse(JSON.stringify(INITIAL_DB)));
+
+  // 3. Bảo toàn danh sách bản sao lưu đã tạo (không xóa các tệp người dùng vừa backup)
+  if (existingBackups.length > 0) {
+    fresh.backups = existingBackups;
+  }
 
   saveDB(fresh);
 
   if (typeof window !== 'undefined') {
-
     window.HCMUE_DB = fresh;
-
-    window.dispatchEvent(new CustomEvent('hcmue:data-changed', { 
-
-      detail: { action: 'RESET_DB', db: fresh, timestamp: Date.now() } 
-
+    window.dispatchEvent(new CustomEvent('hcmue:data-changed', {
+      detail: { action: 'RESET_DATABASE', db: fresh, timestamp: Date.now() }
     }));
-
   }
-
   return fresh;
-
 }
 
 

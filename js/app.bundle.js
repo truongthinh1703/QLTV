@@ -2237,6 +2237,73 @@ const INITIAL_DB = {
 
 };
 
+// =============================================================================
+// TẠO DỮ LIỆU SNAPSHOT THỰC TẾ CHO CÁC BẢN SAO LƯU CÓ SẴN (UC06)
+// =============================================================================
+if (INITIAL_DB && Array.isArray(INITIAL_DB.backups)) {
+  // Snapshot 1: 28/10/2026 (trạng thái CSDL chuẩn hiện tại với các lượt mượn & công nợ đang hoạt động)
+  const snapshotData28 = {
+    accounts: JSON.parse(JSON.stringify(INITIAL_DB.accounts)),
+    categories: JSON.parse(JSON.stringify(INITIAL_DB.categories)),
+    titles: JSON.parse(JSON.stringify(INITIAL_DB.titles)),
+    copies: JSON.parse(JSON.stringify(INITIAL_DB.copies)),
+    activeLoans: JSON.parse(JSON.stringify(INITIAL_DB.activeLoans)),
+    studentHistory: JSON.parse(JSON.stringify(INITIAL_DB.studentHistory)),
+    debts: JSON.parse(JSON.stringify(INITIAL_DB.debts)),
+    inventory: JSON.parse(JSON.stringify(INITIAL_DB.inventory)),
+    parameters: JSON.parse(JSON.stringify(INITIAL_DB.parameters)),
+    reports: JSON.parse(JSON.stringify(INITIAL_DB.reports))
+  };
+
+  // Snapshot 2: 25/10/2026 (trạng thái kho sách nguyên vẹn sơ khai trước khi lưu thông: 0 mượn, 0 nợ)
+  const pristineAccounts = JSON.parse(JSON.stringify(INITIAL_DB.accounts)).map(a => {
+    a.debt = 0;
+    if (a.cardStatus === 'TAM_KHOA_NO' || a.cardStatus === 'Bị khóa') {
+      a.cardStatus = 'HOAT_DONG';
+    }
+    return a;
+  });
+
+  const pristineTitles = JSON.parse(JSON.stringify(INITIAL_DB.titles)).map(t => {
+    t.availableCopies = t.totalCopies || 0;
+    return t;
+  });
+
+  const pristineCopies = JSON.parse(JSON.stringify(INITIAL_DB.copies)).map(c => {
+    c.status = 'SAN_SANG';
+    c.statusLabel = 'Sẵn sàng cho mượn';
+    c.statusBadge = 'badge-green';
+    c.borrowerName = '—';
+    c.borrowerCard = '';
+    c.note = '';
+    return c;
+  });
+
+  const snapshotData25 = {
+    accounts: pristineAccounts,
+    categories: JSON.parse(JSON.stringify(INITIAL_DB.categories)),
+    titles: pristineTitles,
+    copies: pristineCopies,
+    activeLoans: [],
+    studentHistory: [],
+    debts: [],
+    inventory: JSON.parse(JSON.stringify(INITIAL_DB.inventory)),
+    parameters: JSON.parse(JSON.stringify(INITIAL_DB.parameters)),
+    reports: {
+      ...JSON.parse(JSON.stringify(INITIAL_DB.reports)),
+      monthlyLoans: 840,
+      monthlyReturns: 790
+    }
+  };
+
+  if (INITIAL_DB.backups[0]) {
+    INITIAL_DB.backups[0].snapshot = snapshotData28;
+  }
+  if (INITIAL_DB.backups[1]) {
+    INITIAL_DB.backups[1].snapshot = snapshotData25;
+  }
+}
+
 
 
 
@@ -3022,25 +3089,34 @@ function saveDB(data) {
  */
 
 function resetDB() {
+  // 1. Giữ lại danh mục bản sao lưu hiện có trước khi reset
+  let existingBackups = [];
+  try {
+    const current = getDB();
+    if (current && Array.isArray(current.backups)) {
+      existingBackups = current.backups;
+    }
+  } catch (e) {
+    console.warn("Không thể trích xuất backups cũ:", e);
+  }
 
+  // 2. Nạp dữ liệu chuẩn ban đầu
   const fresh = sanitizeDB(JSON.parse(JSON.stringify(INITIAL_DB)));
+
+  // 3. Bảo toàn danh sách bản sao lưu đã tạo (không xóa các tệp người dùng vừa backup)
+  if (existingBackups.length > 0) {
+    fresh.backups = existingBackups;
+  }
 
   saveDB(fresh);
 
   if (typeof window !== 'undefined') {
-
     window.HCMUE_DB = fresh;
-
-    window.dispatchEvent(new CustomEvent('hcmue:data-changed', { 
-
-      detail: { action: 'RESET_DB', db: fresh, timestamp: Date.now() } 
-
+    window.dispatchEvent(new CustomEvent('hcmue:data-changed', {
+      detail: { action: 'RESET_DATABASE', db: fresh, timestamp: Date.now() }
     }));
-
   }
-
   return fresh;
-
 }
 
 
@@ -6780,22 +6856,29 @@ function deleteBackup(backupId) {
 }
 
 function createNewBackup(authorName = 'admin01') {
+  const db = getDB();
   const now = new Date();
   const pad = n => n.toString().padStart(2, '0');
   const dateTag = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
   
+  // Tách riêng snapshot để không bị lặp đệ quy backups
+  const snapshotData = JSON.parse(JSON.stringify(db));
+  delete snapshotData.backups; // Không lưu lồng backups trong backups
+
   const newBackup = {
     id: `BK-${Date.now()}`,
     filename: `backup_${dateTag}.sql.gz`,
-    checksum: "7c1b52bc" + Math.random().toString(36).substring(2, 10) + "a89e41b9" + Math.random().toString(36).substring(2, 10),
+    checksum: "sha256:" + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10),
     size: "15.1 MB",
     author: authorName,
-    createdAt: `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
+    createdAt: `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`,
+    snapshot: snapshotData // Lưu toàn bộ CSDL sống động tại thời điểm này!
   };
 
   mutateDB(draft => {
+    draft.backups = draft.backups || [];
     draft.backups.unshift(newBackup);
-  });
+  }, 'CREATE_NEW_BACKUP');
 
   return newBackup;
 }
@@ -10952,157 +11035,120 @@ function registerGlobalEvents() {
 
 
   window.handleDownloadBackup = function(filename) {
+    const db = getDB();
+    const bk = db.backups?.find(b => b.filename === filename);
+    const exportPayload = bk?.snapshot || db;
 
-    showToast(`Bắt đầu tải về tệp sao lưu CSDL: ${filename}`, "info");
+    // Tạo nội dung file JSON dump CSDL hoàn chỉnh
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `${filename.replace(/\.sql(\.gz)?$/, '')}_hcmue_dump.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
 
-    try {
-      const db = getDB();
-      const content = JSON.stringify(db, null, 2);
-      const blob = new Blob([content], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename.endsWith('.json') ? filename : `${filename}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      console.warn('Lỗi tải file sao lưu:', e);
-    }
-
+    showToast(`✅ Đã tải về tệp sao lưu: ${filename} thành công!`, "success");
   };
-
-
 
   window.handleOpenRestoreAlertModal = function(backupId) {
-
     const bk = getBackupForRestore(backupId);
-
     if (!bk) return;
 
-
-
     const fileEl = document.getElementById('restore-alert-filename');
-
     const metaEl = document.getElementById('restore-alert-meta');
-
     const confirmBtn = document.getElementById('btn-confirm-restore-db');
 
-
-
     if (fileEl) fileEl.textContent = bk.filename;
-
     if (metaEl) metaEl.textContent = `${bk.size} · ${bk.createdAt} · ${bk.author}`;
 
-
-
     if (confirmBtn) {
-
       confirmBtn.onclick = function() {
-
         closeModal('modal-restore-alert');
-
-        showToast("Đang khôi phục dữ liệu từ bản sao lưu...", "warning");
+        showToast("Đang phục hồi CSDL từ bản sao lưu...", "warning");
 
         setTimeout(() => {
+          const currentDB = getDB();
+          const targetBackup = currentDB.backups?.find(b => b.id === backupId) || bk;
 
-          showToast(`✅ Đã phục hồi dữ liệu từ ${bk.filename} an toàn!`, "success");
+          if (targetBackup && targetBackup.snapshot) {
+            // Khôi phục dữ liệu: nạp snapshot nhưng giữ lại danh mục backups hiện tại
+            const restoredDB = JSON.parse(JSON.stringify(targetBackup.snapshot));
+            restoredDB.backups = currentDB.backups;
 
-          renderReportsScreen();
+            saveDB(restoredDB);
+            if (typeof window !== 'undefined') {
+              window.HCMUE_DB = restoredDB;
+            }
 
-        }, 600);
+            // Phát tín hiệu cập nhật toàn hệ thống
+            window.dispatchEvent(new CustomEvent('hcmue:data-changed', {
+              detail: { action: 'RESTORE_DATABASE_SUCCESS' }
+            }));
 
+            // Đồng bộ ngay màn hình Quản trị
+            const curUser = getCurrentUser();
+            if (curUser && typeof syncUserInterface === 'function') syncUserInterface(curUser);
+            renderBackupsScreen();
+            if (typeof renderReportsScreen === 'function') renderReportsScreen();
+            if (typeof renderDashboardScreen === 'function') renderDashboardScreen();
+
+            if (typeof triggerConfetti === 'function') triggerConfetti();
+            showToast(`✅ Phục hồi CSDL thành công từ bản sao lưu [${targetBackup.filename}]!`, "success");
+          } else {
+            showToast("⚠️ Bản sao lưu không có dữ liệu snapshot hợp lệ!", "error");
+          }
+        }, 500);
       };
-
     }
-
-
 
     openModal('modal-restore-alert');
-
   };
 
-
-
   window.handleUploadBackupFile = function(event) {
-
     const file = event.target?.files?.[0];
-
     if (!file) return;
 
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const uploadedData = JSON.parse(e.target.result);
+        
+        // Kiểm tra sơ bộ tính toàn vẹn của file sao lưu HCMUE
+        if (!uploadedData.accounts && !uploadedData.titles && !uploadedData.copies) {
+          showToast("⛔ Tệp không đúng định dạng sao lưu CSDL HCMUE!", "error");
+          return;
+        }
 
+        const cur = getCurrentUser();
+        const now = new Date();
+        const pad = n => n.toString().padStart(2, '0');
+        const timeStr = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
-    const confirmed = window.confirm("Bạn có muốn khôi phục dữ liệu từ tệp này không?");
+        const newUploadedBackup = {
+          id: `BK-UPLOAD-${Date.now()}`,
+          filename: file.name,
+          checksum: "sha256:up_" + Math.random().toString(36).substring(2, 10),
+          size: `${(file.size / 1024).toFixed(1)} KB`,
+          author: `${cur?.username || 'admin01'} (Tải lên)`,
+          createdAt: timeStr,
+          snapshot: uploadedData
+        };
 
-    if (!confirmed) {
+        mutateDB(draft => {
+          draft.backups = draft.backups || [];
+          draft.backups.unshift(newUploadedBackup);
+        }, 'UPLOAD_NEW_BACKUP');
 
-      event.target.value = '';
-
-      return;
-
-    }
-
-
-
-    showToast("Đang tải lên và phân tích tệp sao lưu...", "info");
-
-
-
-    setTimeout(() => {
-
-      const cur = getCurrentUser();
-
-      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-
-      const sizeStr = file.size >= 1024 * 1024 ? `${sizeMB} MB` : `${Math.max(1, Math.round(file.size / 1024))} KB`;
-
-      const now = new Date();
-
-      const pad = n => n.toString().padStart(2, '0');
-
-      const timeStr = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-
-
-
-      const uploadedBackup = {
-
-        id: `BK-${Date.now()}`,
-
-        filename: file.name,
-
-        checksum: "sha256:" + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10),
-
-        size: sizeStr,
-
-        author: `${cur?.username || 'admin01'} (Tải lên)`,
-
-        createdAt: timeStr
-
-      };
-
-
-
-      mutateDB(draft => {
-
-        draft.backups = draft.backups || [];
-
-        draft.backups.unshift(uploadedBackup);
-
-      }, 'RESTORE_FROM_UPLOADED_BACKUP');
-
-
-
-      renderBackupsScreen();
-
-      if (window.triggerConfetti) triggerConfetti();
-
-      showToast("Đã khôi phục dữ liệu mô phỏng thành công!", "success");
-
-      event.target.value = '';
-
-    }, 600);
-
+        renderBackupsScreen();
+        if (typeof triggerConfetti === 'function') triggerConfetti();
+        showToast(`✅ Đã tải lên và tích hợp bản sao lưu [${file.name}] thành công!`, "success");
+      } catch (err) {
+        showToast("⛔ Lỗi phân tích tệp sao lưu: " + err.message, "error");
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = ''; // Reset input file
   };
 
 

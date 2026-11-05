@@ -243,22 +243,29 @@ export function deleteBackup(backupId) {
 }
 
 export function createNewBackup(authorName = 'admin01') {
+  const db = getDB();
   const now = new Date();
   const pad = n => n.toString().padStart(2, '0');
   const dateTag = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
   
+  // Tách riêng snapshot để không bị lặp đệ quy backups
+  const snapshotData = JSON.parse(JSON.stringify(db));
+  delete snapshotData.backups; // Không lưu lồng backups trong backups
+
   const newBackup = {
     id: `BK-${Date.now()}`,
     filename: `backup_${dateTag}.sql.gz`,
-    checksum: "7c1b52bc" + Math.random().toString(36).substring(2, 10) + "a89e41b9" + Math.random().toString(36).substring(2, 10),
+    checksum: "sha256:" + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10),
     size: "15.1 MB",
     author: authorName,
-    createdAt: `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
+    createdAt: `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`,
+    snapshot: snapshotData // Lưu toàn bộ CSDL sống động tại thời điểm này!
   };
 
   mutateDB(draft => {
+    draft.backups = draft.backups || [];
     draft.backups.unshift(newBackup);
-  });
+  }, 'CREATE_NEW_BACKUP');
 
   return newBackup;
 }

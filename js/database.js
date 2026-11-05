@@ -2231,5 +2231,72 @@ export const INITIAL_DB = {
 
 };
 
+// =============================================================================
+// TẠO DỮ LIỆU SNAPSHOT THỰC TẾ CHO CÁC BẢN SAO LƯU CÓ SẴN (UC06)
+// =============================================================================
+if (INITIAL_DB && Array.isArray(INITIAL_DB.backups)) {
+  // Snapshot 1: 28/10/2026 (trạng thái CSDL chuẩn hiện tại với các lượt mượn & công nợ đang hoạt động)
+  const snapshotData28 = {
+    accounts: JSON.parse(JSON.stringify(INITIAL_DB.accounts)),
+    categories: JSON.parse(JSON.stringify(INITIAL_DB.categories)),
+    titles: JSON.parse(JSON.stringify(INITIAL_DB.titles)),
+    copies: JSON.parse(JSON.stringify(INITIAL_DB.copies)),
+    activeLoans: JSON.parse(JSON.stringify(INITIAL_DB.activeLoans)),
+    studentHistory: JSON.parse(JSON.stringify(INITIAL_DB.studentHistory)),
+    debts: JSON.parse(JSON.stringify(INITIAL_DB.debts)),
+    inventory: JSON.parse(JSON.stringify(INITIAL_DB.inventory)),
+    parameters: JSON.parse(JSON.stringify(INITIAL_DB.parameters)),
+    reports: JSON.parse(JSON.stringify(INITIAL_DB.reports))
+  };
+
+  // Snapshot 2: 25/10/2026 (trạng thái kho sách nguyên vẹn sơ khai trước khi lưu thông: 0 mượn, 0 nợ)
+  const pristineAccounts = JSON.parse(JSON.stringify(INITIAL_DB.accounts)).map(a => {
+    a.debt = 0;
+    if (a.cardStatus === 'TAM_KHOA_NO' || a.cardStatus === 'Bị khóa') {
+      a.cardStatus = 'HOAT_DONG';
+    }
+    return a;
+  });
+
+  const pristineTitles = JSON.parse(JSON.stringify(INITIAL_DB.titles)).map(t => {
+    t.availableCopies = t.totalCopies || 0;
+    return t;
+  });
+
+  const pristineCopies = JSON.parse(JSON.stringify(INITIAL_DB.copies)).map(c => {
+    c.status = 'SAN_SANG';
+    c.statusLabel = 'Sẵn sàng cho mượn';
+    c.statusBadge = 'badge-green';
+    c.borrowerName = '—';
+    c.borrowerCard = '';
+    c.note = '';
+    return c;
+  });
+
+  const snapshotData25 = {
+    accounts: pristineAccounts,
+    categories: JSON.parse(JSON.stringify(INITIAL_DB.categories)),
+    titles: pristineTitles,
+    copies: pristineCopies,
+    activeLoans: [],
+    studentHistory: [],
+    debts: [],
+    inventory: JSON.parse(JSON.stringify(INITIAL_DB.inventory)),
+    parameters: JSON.parse(JSON.stringify(INITIAL_DB.parameters)),
+    reports: {
+      ...JSON.parse(JSON.stringify(INITIAL_DB.reports)),
+      monthlyLoans: 840,
+      monthlyReturns: 790
+    }
+  };
+
+  if (INITIAL_DB.backups[0]) {
+    INITIAL_DB.backups[0].snapshot = snapshotData28;
+  }
+  if (INITIAL_DB.backups[1]) {
+    INITIAL_DB.backups[1].snapshot = snapshotData25;
+  }
+}
+
 
 
