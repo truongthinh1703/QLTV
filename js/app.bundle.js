@@ -8878,122 +8878,102 @@ function triggerConfetti() {
 
  */
 
-function switchScreen(targetScreenId) {
-
+function switchScreen(targetScreenId, pushToHistory = true) {
   const currentUser = getCurrentUser();
 
-
-
   // 1. Nếu chưa đăng nhập mà vào màn hình quản trị -> Bật về Login
-
   if (!currentUser && targetScreenId !== 'screen-login' && targetScreenId !== 'screen-forgot') {
-
     showToast("Vui lòng đăng nhập để tiếp tục!", "warning");
-
-    switchScreen('screen-login');
-
+    switchScreen('screen-login', pushToHistory);
     return;
-
   }
-
-
 
   // 2. Chặn leo thang đặc quyền Admin
-
   if (ADMIN_SCREENS.includes(targetScreenId) && currentUser?.role !== 'ADMIN') {
-
     showToast("⛔ Lỗi 403 Forbidden: Chức năng này chỉ dành riêng cho Quản trị viên hệ thống!", "error");
-
     return;
-
   }
-
-
 
   // 3. Chặn sinh viên truy cập bàn tác nghiệp của cán bộ
-
   if (LIBRARIAN_SCREENS.includes(targetScreenId) && currentUser?.role === 'DOC_GIA') {
-
     showToast("⛔ Lỗi 403 Forbidden: Độc giả sinh viên không có quyền truy cập bàn tác nghiệp của cán bộ!", "error");
-
-    switchScreen('screen-student-search');
-
+    switchScreen('screen-student-search', pushToHistory);
     return;
-
   }
-
-
 
   // 4. Cán bộ vào cổng sinh viên
-
   if (STUDENT_SCREENS.includes(targetScreenId) && currentUser?.role !== 'DOC_GIA') {
-
     // Cho phép cán bộ xem để kiểm thử hoặc chuyển hướng về dashboard
-
   }
 
+  // 5. Fallback an toàn tuyệt đối nếu targetScreenId rỗng hoặc không tồn tại trong DOM
+  // Ngăn chặn 100% tình trạng tất cả màn hình bị ẩn dẫn đến màn hình đen
+  let target = document.getElementById(targetScreenId);
+  if (!target) {
+    if (currentUser) {
+      targetScreenId = currentUser.role === 'ADMIN' ? 'screen-accounts' : (currentUser.role === 'DOC_GIA' ? 'screen-student-search' : 'screen-dashboard');
+    } else {
+      targetScreenId = 'screen-login';
+    }
+    target = document.getElementById(targetScreenId);
+  }
 
+  // 6. Đảm bảo hiển thị đúng layout container (Auth fullscreen vs Portal layout)
+  // Ngăn chặn 100% tình trạng layout cha bị display: none khiến cả trang bị đen
+  const portalLayout = document.getElementById('portal-main-layout');
+  const authLayout = document.getElementById('auth-fullscreen-layout');
 
-  // Cập nhật DOM
+  if (targetScreenId === 'screen-login' || targetScreenId === 'screen-forgot') {
+    if (portalLayout) portalLayout.style.display = 'none';
+    if (authLayout) authLayout.style.display = 'flex';
+  } else {
+    if (authLayout) authLayout.style.display = 'none';
+    if (portalLayout) portalLayout.style.display = 'flex';
+  }
 
+  // 7. Cập nhật DOM các app-screen
   document.querySelectorAll('.app-screen').forEach(scr => scr.classList.remove('active'));
-
-  const target = document.getElementById(targetScreenId);
-
   if (target) {
-
     target.classList.add('active');
-
     activeScreenId = targetScreenId;
-
   }
 
+  // 8. Đồng bộ với Browser History (SPA Navigation & Chặn triệt để màn hình đen khi bấm Quay lại)
+  if (pushToHistory && typeof window !== 'undefined' && window.history) {
+    try {
+      const currentHash = window.location.hash.replace(/^#/, '');
+      if (currentHash !== targetScreenId) {
+        window.history.pushState({ screenId: targetScreenId }, '', '#' + targetScreenId);
+      }
+    } catch (e) {
+      try {
+        window.location.hash = targetScreenId;
+      } catch (err) {}
+    }
+  }
 
-
-  // Cập nhật active class trên Sidebar menu
-
+  // 9. Cập nhật active class trên Sidebar menu
   document.querySelectorAll('.sidebar-menu-item').forEach(item => {
-
     if (item.getAttribute('data-target') === targetScreenId) {
-
       item.classList.add('active');
-
     } else {
-
       item.classList.remove('active');
-
     }
-
   });
 
-
-
-  // Cập nhật active tab Sinh viên
-
+  // 10. Cập nhật active tab Sinh viên
   document.querySelectorAll('.student-nav-tab').forEach(tab => {
-
     if (tab.getAttribute('data-target') === targetScreenId) {
-
       tab.classList.add('active');
-
     } else {
-
       tab.classList.remove('active');
-
     }
-
   });
 
-
-
-  // Kích hoạt render dữ liệu tương ứng theo màn hình
-
+  // 11. Kích hoạt render dữ liệu tương ứng theo màn hình
   reRenderScreen(targetScreenId);
 
-
-
   window.scrollTo(0, 0);
-
 }
 
 
@@ -9003,6 +8983,65 @@ function switchScreen(targetScreenId) {
  * Làm mới toàn bộ thẻ <select> Dropdown trên hệ thống bằng dữ liệu mới nhất (Quy tắc 4)
 
  */
+
+
+
+/**
+ * Xử lý sự kiện Quay lại (Back/Forward) của Trình duyệt hoặc Nút quay lại trên giao diện
+ * Giải quyết triệt để 100% lỗi màn hình đen khi bấm nút quay lại
+ */
+function handleBrowserBackNavigation(event) {
+  // 1. Nếu đang có bất kỳ modal nào mở (PDF preview, thêm sách, biên lai, restore...)
+  // Ưu tiên đóng modal trước theo đúng thói quen tự nhiên của người dùng
+  const activeModals = document.querySelectorAll('.modal-overlay.active');
+  if (activeModals.length > 0) {
+    activeModals.forEach(m => m.classList.remove('active'));
+    if (activeScreenId && typeof window !== 'undefined' && window.history) {
+      try {
+        window.history.replaceState({ screenId: activeScreenId }, '', '#' + activeScreenId);
+      } catch (e) {}
+    }
+    return;
+  }
+
+  // 2. Lấy screenId từ state hoặc hash
+  let targetScreen = event?.state?.screenId;
+  if (!targetScreen && typeof window !== 'undefined' && window.location.hash) {
+    targetScreen = window.location.hash.replace(/^#/, '');
+  }
+
+  const currentUser = getCurrentUser();
+
+  // 3. Nếu người dùng đang đăng nhập mà browser lùi về login/forgot hoặc rỗng -> Giữ an toàn ở trang chủ vai trò
+  if (currentUser && (!targetScreen || targetScreen === 'screen-login' || targetScreen === 'screen-forgot')) {
+    const homeScreen = currentUser.role === 'ADMIN' ? 'screen-accounts' : (currentUser.role === 'DOC_GIA' ? 'screen-student-search' : 'screen-dashboard');
+    switchScreen(homeScreen, false);
+    try {
+      window.history.replaceState({ screenId: homeScreen }, '', '#' + homeScreen);
+    } catch (e) {}
+    return;
+  }
+
+  // 4. Nếu chưa đăng nhập mà targetScreen không phải login/forgot -> Về login
+  if (!currentUser) {
+    switchScreen('screen-login', false);
+    try {
+      window.history.replaceState({ screenId: 'screen-login' }, '', '#screen-login');
+    } catch (e) {}
+    return;
+  }
+
+  // 5. Chuyển màn hình an toàn với pushToHistory = false (không tạo vòng lặp history)
+  if (targetScreen && document.getElementById(targetScreen)) {
+    switchScreen(targetScreen, false);
+  } else {
+    const homeScreen = currentUser.role === 'ADMIN' ? 'screen-accounts' : (currentUser.role === 'DOC_GIA' ? 'screen-student-search' : 'screen-dashboard');
+    switchScreen(homeScreen, false);
+    try {
+      window.history.replaceState({ screenId: homeScreen }, '', '#' + homeScreen);
+    } catch (e) {}
+  }
+}
 
 function refreshGlobalDropdowns() {
 
@@ -9310,6 +9349,7 @@ function syncUserInterface(user) {
   const portalLayout = document.getElementById('portal-main-layout');
 
   const authLayout = document.getElementById('auth-fullscreen-layout');
+  const hashScreen = (typeof window !== 'undefined' && window.location.hash) ? window.location.hash.replace(/^#/, '') : '';
 
 
 
@@ -9403,7 +9443,9 @@ function syncUserInterface(user) {
 
 
 
-    switchScreen('screen-accounts');
+    const initialScreen = (hashScreen && document.getElementById(hashScreen) && ADMIN_SCREENS.includes(hashScreen)) ? hashScreen : 'screen-accounts';
+    switchScreen(initialScreen, false);
+    try { window.history.replaceState({ screenId: initialScreen }, '', '#' + initialScreen); } catch(e) {}
 
   } else if (user.role === 'THU_THU') {
 
@@ -9431,7 +9473,9 @@ function syncUserInterface(user) {
 
 
 
-    switchScreen('screen-dashboard');
+    const initialScreen = (hashScreen && document.getElementById(hashScreen) && (LIBRARIAN_SCREENS.includes(hashScreen) || hashScreen === 'screen-student-search')) ? hashScreen : 'screen-dashboard';
+    switchScreen(initialScreen, false);
+    try { window.history.replaceState({ screenId: initialScreen }, '', '#' + initialScreen); } catch(e) {}
 
   } else if (user.role === 'DOC_GIA') {
 
@@ -9459,7 +9503,9 @@ function syncUserInterface(user) {
 
 
 
-    switchScreen('screen-student-search');
+    const initialScreen = (hashScreen && document.getElementById(hashScreen) && STUDENT_SCREENS.includes(hashScreen)) ? hashScreen : 'screen-student-search';
+    switchScreen(initialScreen, false);
+    try { window.history.replaceState({ screenId: initialScreen }, '', '#' + initialScreen); } catch(e) {}
 
   }
 
@@ -9474,6 +9520,35 @@ function syncUserInterface(user) {
  */
 
 function registerGlobalEvents() {
+  // Lắng nghe sự kiện Back / Forward của trình duyệt (Fix triệt để lỗi màn hình đen khi bấm Quay lại)
+  window.addEventListener('popstate', handleBrowserBackNavigation);
+  window.addEventListener('hashchange', () => {
+    const newHash = (window.location.hash || '').replace(/^#/, '');
+    if (newHash && newHash !== activeScreenId) {
+      handleBrowserBackNavigation({ state: { screenId: newHash } });
+    }
+  });
+
+  // Hàm toàn cục cho nút quay lại (Back Navigation)
+  window.goBack = function() {
+    const activeModals = document.querySelectorAll('.modal-overlay.active');
+    if (activeModals.length > 0) {
+      activeModals.forEach(m => m.classList.remove('active'));
+      return;
+    }
+    if (window.history && window.history.length > 1) {
+      window.history.back();
+    } else {
+      const currentUser = getCurrentUser();
+      if (currentUser) {
+        const homeScreen = currentUser.role === 'ADMIN' ? 'screen-accounts' : (currentUser.role === 'DOC_GIA' ? 'screen-student-search' : 'screen-dashboard');
+        switchScreen(homeScreen, true);
+      } else {
+        switchScreen('screen-login', true);
+      }
+    }
+  };
+
 
   // Phím tắt Esc đóng modal
 
@@ -9551,6 +9626,7 @@ function registerGlobalEvents() {
 
   // Global functions gán vào window để HTML onclick gọi mượt mà
 
+  window.handleBrowserBackNavigation = handleBrowserBackNavigation;
   window.switchScreen = switchScreen;
 
   window.reRenderScreen = reRenderScreen;
