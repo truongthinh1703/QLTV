@@ -2850,6 +2850,13 @@
   </div>
 
   <!-- Script chạy trực tiếp mượt mà cả trên file:// (nhấp đúp mở ngay) và http:// (Live Server / Dev server) -->
+  <!-- Thư viện Socket.io Real-time (Tự động nạp từ server Node.js hoặc CDN khi chạy static) -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    if (typeof io === 'undefined') {
+      document.write('<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"><\\/script>');
+    }
+  </script>
   <script src="js/app.bundle.js"></script>
 </body>
 

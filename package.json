@@ -1,19 +1,29 @@
 {
   "name": "hcmue-library-management",
   "version": "1.0.0",
-  "description": "Hệ thống Quản lý Thư viện Đại học Sư phạm TP.HCM (HCMUE) chuẩn HTML5, CSS3, ES6+ và PostgreSQL",
-  "main": "index.html",
+  "description": "Hệ thống Quản lý Thư viện Đại học Sư phạm TP.HCM (HCMUE) chuẩn HTML5, CSS3, ES6+, PostgreSQL và WebSocket Real-time",
+  "main": "server.js",
+  "type": "module",
   "scripts": {
-    "start": "npx serve ."
+    "start": "node server.js",
+    "bundle": "python build_bundle.py",
+    "test": "node test_requirements.mjs"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
   },
   "keywords": [
     "hcmue",
     "library",
     "management",
     "spa",
-    "postgresql"
+    "postgresql",
+    "realtime",
+    "socket.io",
+    "express"
   ],
   "author": "HCMUE",
   "license": "MIT"
 }
-

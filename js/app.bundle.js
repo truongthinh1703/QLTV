@@ -3186,6 +3186,7 @@ function resetDB() {
       detail: { action: 'RESET_DATABASE', db: fresh, timestamp: Date.now() }
     }));
   }
+  broadcastDBSync(fresh, 'RESET_DATABASE');
   return fresh;
 }
 
@@ -3221,12 +3222,136 @@ function mutateDB(mutatorFn, actionName = 'DATA_CHANGED') {
 
   
 
+  broadcastDBSync(current, actionName);
   return current;
 
 }
 
 
 
+
+
+// =============================================================================
+// REAL-TIME WEBSOCKET SYNC ENGINE (SOCKET.IO)
+// =============================================================================
+let socket = null;
+let isRemoteSyncInProgress = false;
+const CLIENT_ID = 'client_' + Math.random().toString(36).substring(2, 10);
+
+/**
+ * Khởi tạo bộ thu phát sóng Real-time Socket.io kết nối với máy chủ Express
+ */
+function initRealtimeSync() {
+  if (typeof window === 'undefined') return;
+  if (typeof io === 'undefined') {
+    console.log('[REAL-TIME] Đang chạy ở chế độ Local (Socket.io client chưa sẵn sàng)');
+    return;
+  }
+
+  if (socket) return;
+
+  try {
+    socket = io({
+      reconnectionAttempts: 10,
+      reconnectionDelay: 2000,
+      timeout: 10000
+    });
+
+    socket.on('connect', () => {
+      console.log(`[REAL-TIME] 🟢 Đã kết nối máy chủ WebSocket Real-time (${socket.id})`);
+      socket.emit('hcmue:client-ready', { clientId: CLIENT_ID });
+    });
+
+    // Nhận dữ liệu khởi tạo từ máy chủ khi vừa mở web
+    socket.on('hcmue:init-db', (serverDB) => {
+      if (!serverDB) return;
+      console.log('[REAL-TIME] 📥 Nhận CSDL mới nhất từ máy chủ');
+      applyRemoteDB(serverDB, 'SERVER_INIT');
+    });
+
+    // Nhận dữ liệu đồng bộ khi thiết bị khác thao tác mượn/trả/nhập sách
+    socket.on('hcmue:sync-db', (payload) => {
+      if (!payload || !payload.db) return;
+      if (payload.senderId === CLIENT_ID) return;
+
+      console.log(`[REAL-TIME] ⚡ Nhận đồng bộ nghiệp vụ "${payload.action}" từ thiết bị khác`);
+      applyRemoteDB(payload.db, payload.action);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('[REAL-TIME] 🔴 Mất kết nối tới máy chủ WebSocket');
+    });
+  } catch (err) {
+    console.warn('[REAL-TIME] Lỗi khởi tạo WebSocket:', err);
+  }
+}
+
+/**
+ * Nạp CSDL từ máy chủ vào máy khách và kích hoạt phản ứng giao diện toàn cục
+ */
+function applyRemoteDB(remoteDB, actionName) {
+  isRemoteSyncInProgress = true;
+  try {
+    const clean = sanitizeDB(remoteDB);
+    if (typeof window !== 'undefined') {
+      window.HCMUE_DB = clean;
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(clean));
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('hcmue:data-changed', {
+        detail: { action: actionName || 'REMOTE_SYNC', isRemote: true, timestamp: Date.now() }
+      }));
+
+      // Bật thông báo Toast nếu có
+      if (typeof window.showToast === 'function' && actionName !== 'SERVER_INIT') {
+        const actionLabels = {
+          'CONFIRM_BORROW': 'Lập phiếu mượn mới',
+          'RETURN_BOOK': 'Tiếp nhận trả sách',
+          'SETTLE_DEBT': 'Thu nợ phạt / Mở khóa thẻ',
+          'RENEW_LOAN': 'Gia hạn sách',
+          'ADD_COPY': 'Thêm bản sao mới',
+          'DELETE_COPY': 'Xóa bản sao',
+          'ADD_TITLE': 'Thêm tựa sách mới',
+          'UPDATE_SYSTEM_PARAMS': 'Cập nhật tham số hệ thống',
+          'RESET_DATABASE': 'Khôi phục CSDL chuẩn'
+        };
+        const label = actionLabels[actionName] || actionName || 'Dữ liệu được cập nhật';
+        window.showToast(`⚡ [Real-time] Thiết bị khác vừa thao tác: ${label}`, 'info');
+      }
+    }
+  } catch (e) {
+    console.error('[REAL-TIME] Lỗi áp dụng CSDL từ máy chủ:', e);
+  } finally {
+    isRemoteSyncInProgress = false;
+  }
+}
+
+/**
+ * Phát sóng dữ liệu CSDL vừa cập nhật tới tất cả thiết bị khác qua WebSocket
+ */
+function broadcastDBSync(data, actionName) {
+  if (isRemoteSyncInProgress) return;
+  if (socket && socket.connected) {
+    socket.emit('hcmue:sync-db', {
+      db: data,
+      action: actionName,
+      senderId: CLIENT_ID,
+      timestamp: Date.now()
+    });
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.initRealtimeSync = initRealtimeSync;
+  window.broadcastDBSync = broadcastDBSync;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initRealtimeSync);
+  } else {
+    initRealtimeSync();
+  }
+}
 
 
 // ==========================================
