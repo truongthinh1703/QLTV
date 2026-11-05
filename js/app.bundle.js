@@ -2548,22 +2548,15 @@ function sanitizeDB(dbData) {
 
         }
 
+        const maxAllowedDebt = Number(dbData.parameters?.maxAllowedDebt !== undefined ? dbData.parameters.maxAllowedDebt : 50000);
         if (actualDebt === 0 && acc.cardStatus === 'TAM_KHOA_NO') {
-
           acc.cardStatus = 'HOAT_DONG';
-
           acc.status = 'KICH_HOAT';
-
           modified = true;
-
-        } else if (actualDebt > 0 && acc.cardStatus !== 'TAM_KHOA_NO') {
-
+        } else if (actualDebt > maxAllowedDebt && acc.cardStatus !== 'TAM_KHOA_NO') {
           acc.cardStatus = 'TAM_KHOA_NO';
-
           acc.status = 'KHOA';
-
           modified = true;
-
         }
 
       }
@@ -3890,33 +3883,40 @@ function verifyBorrowReader() {
     return;
   }
 
-  // 1. Kiểm tra trạng thái thẻ & Thời hạn hiệu lực của thẻ (Hạng mục 3.1)
+  // 1. Kiểm tra trạng thái thẻ & Thời hạn hiệu lực của thẻ (Hạng mục 3.1 & BR-04)
   const systemCurrentDate = new Date(); // Thời gian thực tế hệ thống
   systemCurrentDate.setHours(0, 0, 0, 0);
   const cardExpiryParts = String(reader.cardExpiry || '').trim().split('/');
   const cardExpiryDate = cardExpiryParts.length === 3 ? new Date(Number(cardExpiryParts[2]), Number(cardExpiryParts[1]) - 1, Number(cardExpiryParts[0])) : null;
   const isCardNotExpired = cardExpiryDate ? (cardExpiryDate >= systemCurrentDate) : true;
-  const isStatusActive = reader.status === 'KICH_HOAT' && reader.cardStatus === 'HOAT_DONG';
+
+  // 2. Kiểm tra công nợ chưa tất toán theo quy tắc BR-04 (Hạn mức trần maxAllowedDebt)
+  const maxAllowedDebt = Number(db.parameters?.maxAllowedDebt !== undefined ? db.parameters.maxAllowedDebt : 50000);
+  const readerDebts = db.debts.filter(d => d.readerCard === reader.cardId);
+  const totalDebt = reader.debt !== undefined ? Number(reader.debt) : readerDebts.reduce((sum, d) => sum + Number(d.amount), 0);
+  const isDebtAllowed = totalDebt <= maxAllowedDebt;
+
+  // Thẻ hợp lệ nếu còn hạn, không bị khóa hành chính (status !== 'KHOA', cardStatus !== 'KHOA') và nếu bị tạm khóa do nợ thì nợ phải vượt trần mới chặn
+  const isCardNotAdminLocked = reader.status !== 'KHOA';
+  const isCardNotPermanentlyLocked = reader.cardStatus !== 'KHOA' && reader.cardStatus !== 'BI_KHOA';
+  const isStatusActive = isCardNotAdminLocked && isCardNotPermanentlyLocked && (reader.cardStatus === 'HOAT_DONG' || (reader.cardStatus === 'TAM_KHOA_NO' && isDebtAllowed));
   const isCardActive = isStatusActive && isCardNotExpired;
 
   let cardRuleFailReason = '';
   if (!isCardNotExpired) {
     cardRuleFailReason = `KHÔNG ĐẠT - Thẻ đã hết hạn sử dụng từ ngày ${escapeHTML(reader.cardExpiry)}`;
+  } else if (!isCardNotAdminLocked || !isCardNotPermanentlyLocked) {
+    cardRuleFailReason = `KHÔNG ĐẠT - Thẻ đang bị khóa hành chính`;
   } else if (!isStatusActive) {
-    cardRuleFailReason = `KHÔNG ĐẠT - Thẻ đang bị khóa`;
+    cardRuleFailReason = `KHÔNG ĐẠT - Thẻ đang bị khóa (Nợ ${totalDebt.toLocaleString('vi-VN')} đ vượt trần ${maxAllowedDebt.toLocaleString('vi-VN')} đ)`;
   }
 
-  // 2. Kiểm tra sách quá hạn
+  // 3. Kiểm tra sách quá hạn
   const overdueLoans = db.activeLoans.filter(l =>
     (l.readerCard === reader.cardId || l.readerName === reader.name) &&
     (l.overdueDays > 0 || (l.statusBadge && l.statusBadge.includes('red')))
   );
   const hasNoOverdue = overdueLoans.length === 0;
-
-  // 3. Kiểm tra công nợ chưa tất toán
-  const readerDebts = db.debts.filter(d => d.readerCard === reader.cardId);
-  const totalDebt = reader.debt !== undefined ? Number(reader.debt) : readerDebts.reduce((sum, d) => sum + Number(d.amount), 0);
-  const hasNoDebt = totalDebt === 0;
 
   // 4. Số lượng đang mượn và hạn mức
   const readerCurrentLoans = db.activeLoans.filter(l => l.readerCard === reader.cardId || l.readerName === reader.name);
@@ -3925,7 +3925,7 @@ function verifyBorrowReader() {
   const canBorrowMore = Math.max(0, maxBooks - currentLoanCount);
   const hasQuotaAvailable = canBorrowMore > 0;
 
-  const isEligible = isCardActive && hasNoOverdue && hasNoDebt && hasQuotaAvailable;
+  const isEligible = isCardActive && hasNoOverdue && isDebtAllowed && hasQuotaAvailable;
 
   verifiedBorrowReader = {
     ...reader,
@@ -3934,9 +3934,9 @@ function verifyBorrowReader() {
     currentLoanCount,
     maxBooks,
     currentLoans: readerCurrentLoans,
-    ineligibleReason: !isCardActive ? (!isCardNotExpired ? `Thẻ đã hết hạn sử dụng (${reader.cardExpiry})` : "Thẻ đang bị khóa") :
+    ineligibleReason: !isCardActive ? (!isCardNotExpired ? `Thẻ đã hết hạn sử dụng (${reader.cardExpiry})` : (!isCardNotAdminLocked || !isCardNotPermanentlyLocked ? "Thẻ đang bị khóa hành chính" : `Thẻ đang bị khóa (Nợ ${totalDebt.toLocaleString('vi-VN')} đ vượt trần ${maxAllowedDebt.toLocaleString('vi-VN')} đ)`)) :
       !hasNoOverdue ? `Đang có ${overdueLoans.length} cuốn sách quá hạn chưa trả` :
-        !hasNoDebt ? `Còn công nợ chưa tất toán (${totalDebt.toLocaleString('vi-VN')} đ)` :
+        !isDebtAllowed ? `Nợ phạt ${totalDebt.toLocaleString('vi-VN')} đ vượt trần quy định (tối đa ${maxAllowedDebt.toLocaleString('vi-VN')} đ)` :
           !hasQuotaAvailable ? `Đã mượn đủ số lượng tối đa (${currentLoanCount}/${maxBooks} cuốn)` : ""
   };
 
@@ -3969,9 +3969,9 @@ function verifyBorrowReader() {
         <i class="fa-solid ${hasNoOverdue ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
         <span>[2] Độc giả không có sách quá hạn chưa trả (${hasNoOverdue ? 'Đạt' : `KHÔNG ĐẠT - Quá hạn: ${overdueLoans.map(l => l.copyCode).join(', ')}`}).</span>
       </div>
-      <div class="rule-check-item" style="${hasNoDebt ? '' : 'color: var(--hcmue-crimson); font-weight: 600;'}">
-        <i class="fa-solid ${hasNoDebt ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
-        <span>[3] Không có nợ phạt / bồi thường chưa tất toán (${hasNoDebt ? '0 đ - Đạt' : `KHÔNG ĐẠT - Còn nợ ${totalDebt.toLocaleString('vi-VN')} đ`}).</span>
+      <div class="rule-check-item" style="${isDebtAllowed ? '' : 'color: var(--hcmue-crimson); font-weight: 600;'}">
+        <i class="fa-solid ${isDebtAllowed ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
+        <span>[3] ${totalDebt === 0 ? 'Không có nợ phạt / bồi thường chưa tất toán (0 đ - Đạt).' : (isDebtAllowed ? `Nợ phạt trong hạn mức cho phép ≤ ${maxAllowedDebt.toLocaleString('vi-VN')} đ (Đang nợ ${totalDebt.toLocaleString('vi-VN')} đ ≤ ${maxAllowedDebt.toLocaleString('vi-VN')} đ - Đạt).` : `Nợ phạt vượt trần quy định (KHÔNG ĐẠT - Nợ ${totalDebt.toLocaleString('vi-VN')} đ > ${maxAllowedDebt.toLocaleString('vi-VN')} đ).`)}</span>
       </div>
       <div class="rule-check-item" style="${hasQuotaAvailable ? '' : 'color: var(--hcmue-crimson); font-weight: 600;'}">
         <i class="fa-solid ${hasQuotaAvailable ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>

@@ -208,22 +208,15 @@ export function sanitizeDB(dbData) {
 
         }
 
+        const maxAllowedDebt = Number(dbData.parameters?.maxAllowedDebt !== undefined ? dbData.parameters.maxAllowedDebt : 50000);
         if (actualDebt === 0 && acc.cardStatus === 'TAM_KHOA_NO') {
-
           acc.cardStatus = 'HOAT_DONG';
-
           acc.status = 'KICH_HOAT';
-
           modified = true;
-
-        } else if (actualDebt > 0 && acc.cardStatus !== 'TAM_KHOA_NO') {
-
+        } else if (actualDebt > maxAllowedDebt && acc.cardStatus !== 'TAM_KHOA_NO') {
           acc.cardStatus = 'TAM_KHOA_NO';
-
           acc.status = 'KHOA';
-
           modified = true;
-
         }
 
       }
