@@ -452,7 +452,7 @@ export function verifyBorrowReader() {
   if (!isCardNotExpired) {
     cardRuleFailReason = `KHÔNG ĐẠT - Thẻ đã hết hạn sử dụng từ ngày ${escapeHTML(reader.cardExpiry)}`;
   } else if (!isStatusActive) {
-    cardRuleFailReason = `KHÔNG ĐẠT - Thẻ đang bị ${reader.cardStatus === 'TAM_KHOA_NO' ? 'tạm khóa nợ' : 'khóa'}`;
+    cardRuleFailReason = `KHÔNG ĐẠT - Thẻ đang bị khóa`;
   }
 
   // 2. Kiểm tra sách quá hạn
@@ -483,7 +483,7 @@ export function verifyBorrowReader() {
     currentLoanCount,
     maxBooks,
     currentLoans: readerCurrentLoans,
-    ineligibleReason: !isCardActive ? (!isCardNotExpired ? `Thẻ đã hết hạn sử dụng (${reader.cardExpiry})` : "Thẻ đang bị tạm khóa") :
+    ineligibleReason: !isCardActive ? (!isCardNotExpired ? `Thẻ đã hết hạn sử dụng (${reader.cardExpiry})` : "Thẻ đang bị khóa") :
       !hasNoOverdue ? `Đang có ${overdueLoans.length} cuốn sách quá hạn chưa trả` :
         !hasNoDebt ? `Còn công nợ chưa tất toán (${totalDebt.toLocaleString('vi-VN')} đ)` :
           !hasQuotaAvailable ? `Đã mượn đủ số lượng tối đa (${currentLoanCount}/${maxBooks} cuốn)` : ""
@@ -492,7 +492,7 @@ export function verifyBorrowReader() {
   // Hiển thị thông tin độc giả
   if (container) {
     const cardBadgeClass = isCardActive ? 'badge-green' : 'badge-red';
-    const cardBadgeText = isCardActive ? 'Hoạt động' : (reader.cardStatus === 'TAM_KHOA_NO' ? 'Tạm khóa nợ' : 'Bị khóa');
+    const cardBadgeText = isCardActive ? 'Hoạt động' : 'Bị khóa';
     container.innerHTML = `
       <div class="reader-verified-box" style="${!isEligible ? 'border-color: #fca5a5; background: #fff5f5;' : ''}">
         <div class="reader-verified-name">${escapeHTML(reader.name)}</div>
@@ -793,6 +793,17 @@ export function executeConfirmBorrow(onDone) {
         const titleInDB = draft.titles.find(t => t.id === pCopy.titleId);
         if (titleInDB) {
           titleInDB.availableCopies = Math.max(0, (titleInDB.availableCopies || 0) - 1);
+        }
+
+        // 4. Đồng bộ tăng lượt mượn trong tháng & Top sách lưu thông
+        if (draft.reports) {
+          draft.reports.monthlyLoans = (Number(draft.reports.monthlyLoans) || 0) + 1;
+          if (draft.reports.topBooks) {
+            const topB = draft.reports.topBooks.find(b => b.title === pCopy.titleName);
+            if (topB) {
+              topB.count = (Number(topB.count) || 0) + 1;
+            }
+          }
         }
       });
     }, 'CONFIRM_BORROW');
@@ -1663,7 +1674,7 @@ function renderActiveRightColumn() {
         <button class="btn btn-primary" style="background: #102a43; color: #ffffff; border: none; font-weight: 700; padding: 12px 24px; border-radius: 6px; cursor: pointer;" onclick="window.handleCompleteReturn(true)">
           <i class="fa-solid fa-file-pen"></i> Ghi nợ vào tài khoản
         </button>
-        <div class="cell-sub" style="margin-top: 6px; color: #64748b; font-size: 11px;">Ghi nợ có thể tạm khóa thẻ độc giả cho đến khi thanh toán.</div>
+        <div class="cell-sub" style="margin-top: 6px; color: #64748b; font-size: 11px;">Ghi nợ sẽ khóa thẻ độc giả cho đến khi thanh toán.</div>
       </div>
 
       <button class="btn btn-primary btn-lg" style="background: #102a43; color: #ffffff; border: none; font-weight: 700; padding: 12px 28px; border-radius: 6px; cursor: pointer;" onclick="window.handleCompleteReturn(false)">
@@ -1783,7 +1794,7 @@ export function executeReturnBook(asDebt = false, onDone) {
         const oldAmount = Number(existingDebt.amount) || 0;
         existingDebt.amount = totalFee;
         existingDebt.reason = returnReason;
-        existingDebt.cardStatus = "Tạm khóa";
+        existingDebt.cardStatus = "Bị khóa";
         existingDebt.action = "Thu nợ";
 
         if (acc) {
@@ -1800,7 +1811,7 @@ export function executeReturnBook(asDebt = false, onDone) {
           deptKey: acc?.departmentKey || "CNTT",
           reason: returnReason,
           amount: totalFee,
-          cardStatus: "Tạm khóa",
+          cardStatus: "Bị khóa",
           action: "Thu nợ",
           receiptCode: `BL-${Date.now().toString().slice(-4)}`
         });
@@ -1822,6 +1833,14 @@ export function executeReturnBook(asDebt = false, onDone) {
           acc.cardStatus = 'HOAT_DONG';
           acc.status = 'KICH_HOAT';
         }
+      }
+    }
+
+    // Đồng bộ tăng lượt trả trong tháng và tiền bồi thường (nếu có)
+    if (draft.reports) {
+      draft.reports.monthlyReturns = (Number(draft.reports.monthlyReturns) || 0) + 1;
+      if (!asDebt && damageFee > 0) {
+        draft.reports.compensationCollected = (Number(draft.reports.compensationCollected) || 0) + damageFee;
       }
     }
 
@@ -1924,7 +1943,7 @@ export function renderDebtsScreen() {
       (a.name && a.name === item.readerName)
     );
     const isLocked = acc ? (acc.cardStatus === 'TAM_KHOA_NO' || acc.status === 'KHOA' || (acc.debt && acc.debt > 0)) : true;
-    const cardStatusText = isLocked ? 'Tạm khóa' : 'Hoạt động';
+    const cardStatusText = isLocked ? 'Bị khóa' : 'Hoạt động';
     const cardBadgeClass = isLocked ? 'badge-red' : 'badge-green';
 
     return `
@@ -2097,7 +2116,14 @@ export function settleDebt(debtId, options, onDone) {
 
     // Cập nhật Báo cáo tài chính theo Khoa (draft.reports)
     if (draft.reports) {
-      draft.reports.finesCollected = (Number(draft.reports.finesCollected) || 0) + actualPaid;
+      const isComp = targetDebt && (
+        (targetDebt.reason && (targetDebt.reason.includes('Bồi thường') || targetDebt.reason.includes('bồi thường') || targetDebt.reason.includes('mất') || targetDebt.reason.includes('rách')))
+      );
+      if (isComp) {
+        draft.reports.compensationCollected = (Number(draft.reports.compensationCollected) || 0) + actualPaid;
+      } else {
+        draft.reports.finesCollected = (Number(draft.reports.finesCollected) || 0) + actualPaid;
+      }
       if (draft.reports.facultyStats) {
         const fStat = draft.reports.facultyStats.find(f =>
           (deptKey === 'CNTT' && f.faculty.includes('Công nghệ Thông tin')) ||

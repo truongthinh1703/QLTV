@@ -286,23 +286,27 @@ export function renderReportsScreen() {
   if (finesEl) finesEl.textContent = `${r.finesCollected.toLocaleString('vi-VN')} đ`;
   if (compEl) compEl.textContent = `${r.compensationCollected.toLocaleString('vi-VN')} đ`;
 
-  // Render Top 3 sách
+  // Render Top 3 sách (Tính % động theo lượt mượn thực tế)
   const topBooksContainer = document.getElementById('rep-top-books-container');
   if (topBooksContainer) {
-    topBooksContainer.innerHTML = r.topBooks.map(b => `
+    const maxTop = Math.max(...(r.topBooks || []).map(b => Number(b.count) || 0), 1);
+    topBooksContainer.innerHTML = (r.topBooks || []).map(b => {
+      const pct = Math.min(100, Math.round(((Number(b.count) || 0) / maxTop) * 95));
+      return `
       <div class="top-book-progress-item">
         <div class="top-book-header">
           <span>${escapeHTML(b.title)}</span>
           <span>${b.count} lượt</span>
         </div>
         <div class="progress-track">
-          <div class="progress-bar-fill" style="width: ${b.percentage}%;"></div>
+          <div class="progress-bar-fill" style="width: ${pct}%;"></div>
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
   }
 
-  // Render Thu phạt & Công nợ theo khoa (Tính tổng nợ từ db.debts để khớp 100% thời gian thực)
+  // Render Thu phạt & Công nợ theo khoa (Tính tổng nợ từ db.debts và số đã thu từ db.reports.facultyStats để khớp 100% thời gian thực)
   const tbody = document.getElementById('rep-faculties-tbody');
   if (!tbody) return;
 
@@ -311,25 +315,40 @@ export function renderReportsScreen() {
   const nnDebt = db.debts.filter(d => d.deptKey === 'NGOAI_NGU').reduce((s, d) => s + Number(d.amount), 0);
   const totalDebt = cnttDebt + toanTinDebt + nnDebt;
 
+  const getFacultyCollected = (keyword, defaultVal) => {
+    if (!r || !r.facultyStats) return defaultVal;
+    const stat = r.facultyStats.find(f => f.faculty && f.faculty.toLowerCase().includes(keyword.toLowerCase()));
+    return stat ? (Number(stat.collected) || defaultVal) : defaultVal;
+  };
+
+  const cnttCollected = getFacultyCollected('Công nghệ Thông tin', 1850000);
+  const toanTinCollected = getFacultyCollected('Toán - Tin', 980000);
+  const nnCollected = getFacultyCollected('Tiếng Anh', 590000);
+  const totalCollected = cnttCollected + toanTinCollected + nnCollected;
+
+  if (finesEl) {
+    finesEl.textContent = `${totalCollected.toLocaleString('vi-VN')} đ`;
+  }
+
   tbody.innerHTML = `
     <tr>
       <td>Khoa Công nghệ Thông tin</td>
-      <td>1.850.000 đ</td>
+      <td>${cnttCollected.toLocaleString('vi-VN')} đ</td>
       <td><span class="cell-amount">${cnttDebt.toLocaleString('vi-VN')} đ</span></td>
     </tr>
     <tr>
       <td>Khoa Toán - Tin học</td>
-      <td>980.000 đ</td>
+      <td>${toanTinCollected.toLocaleString('vi-VN')} đ</td>
       <td><span class="cell-amount">${toanTinDebt.toLocaleString('vi-VN')} đ</span></td>
     </tr>
     <tr>
       <td>Khoa Tiếng Anh</td>
-      <td>590.000 đ</td>
+      <td>${nnCollected.toLocaleString('vi-VN')} đ</td>
       <td><span class="${nnDebt > 0 ? 'cell-amount' : ''}">${nnDebt.toLocaleString('vi-VN')} đ</span></td>
     </tr>
     <tr style="background-color: #f8fafc; font-weight: 700;">
       <td>Tổng cộng</td>
-      <td>3.420.000 đ</td>
+      <td>${totalCollected.toLocaleString('vi-VN')} đ</td>
       <td><span class="cell-amount" style="font-size: 15px;">${totalDebt.toLocaleString('vi-VN')} đ</span></td>
     </tr>
   `;
@@ -608,5 +627,312 @@ export function handleCreateAccountSubmit() {
   if (window.triggerConfetti) window.triggerConfetti();
   if (window.showToast) {
     window.showToast('Đã tạo tài khoản thành công!', 'success');
+  }
+}
+
+
+// =============================================================================
+// SCREEN 18: BÁO CÁO THỐNG KÊ LƯU THÔNG & TÀI CHÍNH (MÔ HÌNH 2 TAB THÔNG MINH)
+// =============================================================================
+
+let currentReportTab = 'overview';
+let currentOverdueFilter = 'month';
+
+export function switchReportTab(tabName) {
+  currentReportTab = tabName;
+  const overviewBtn = document.getElementById('tab-btn-report-overview');
+  const overdueBtn = document.getElementById('tab-btn-report-overdue');
+  const overviewContent = document.getElementById('report-tab-content-overview');
+  const overdueContent = document.getElementById('report-tab-content-overdue');
+
+  if (tabName === 'overview') {
+    if (overviewBtn) {
+      overviewBtn.classList.add('active');
+      overviewBtn.style.borderBottom = '3px solid var(--hcmue-navy, #16375C)';
+      overviewBtn.style.color = 'var(--hcmue-navy, #16375C)';
+      overviewBtn.style.fontWeight = '700';
+    }
+    if (overdueBtn) {
+      overdueBtn.classList.remove('active');
+      overdueBtn.style.borderBottom = '3px solid transparent';
+      overdueBtn.style.color = '#64748b';
+      overdueBtn.style.fontWeight = '600';
+    }
+    if (overviewContent) overviewContent.style.display = 'block';
+    if (overdueContent) overdueContent.style.display = 'none';
+    renderReportsScreen();
+  } else {
+    if (overviewBtn) {
+      overviewBtn.classList.remove('active');
+      overviewBtn.style.borderBottom = '3px solid transparent';
+      overviewBtn.style.color = '#64748b';
+      overviewBtn.style.fontWeight = '600';
+    }
+    if (overdueBtn) {
+      overdueBtn.classList.add('active');
+      overdueBtn.style.borderBottom = '3px solid var(--hcmue-navy, #16375C)';
+      overdueBtn.style.color = 'var(--hcmue-navy, #16375C)';
+      overdueBtn.style.fontWeight = '700';
+    }
+    if (overviewContent) overviewContent.style.display = 'none';
+    if (overdueContent) overdueContent.style.display = 'block';
+    renderOverdueReportScreen();
+  }
+}
+
+export function handleFilterOverdueQuick(type) {
+  currentOverdueFilter = type;
+  ['today', '7days', 'month', 'quarter'].forEach(t => {
+    const chip = document.getElementById(`chip-overdue-${t}`);
+    if (chip) {
+      if (t === type) {
+        chip.classList.add('active');
+      } else {
+        chip.classList.remove('active');
+      }
+    }
+  });
+
+  const fromInp = document.getElementById('overdue-from-date');
+  const toInp = document.getElementById('overdue-to-date');
+  if (type === 'today') {
+    if (fromInp) fromInp.value = '28/10/2026';
+    if (toInp) toInp.value = '28/10/2026';
+  } else if (type === '7days') {
+    if (fromInp) fromInp.value = '22/10/2026';
+    if (toInp) toInp.value = '29/10/2026';
+  } else if (type === 'month') {
+    if (fromInp) fromInp.value = '01/10/2026';
+    if (toInp) toInp.value = '31/10/2026';
+  } else if (type === 'quarter') {
+    if (fromInp) fromInp.value = '01/09/2026';
+    if (toInp) toInp.value = '31/10/2026';
+  }
+
+  renderOverdueReportScreen();
+}
+
+export function handleCustomOverdueDateChange() {
+  currentOverdueFilter = 'custom';
+  ['today', '7days', 'month', 'quarter'].forEach(t => {
+    const chip = document.getElementById(`chip-overdue-${t}`);
+    if (chip) chip.classList.remove('active');
+  });
+  renderOverdueReportScreen();
+}
+
+export function getFilteredOverdueLoans() {
+  const db = getDB();
+  const allOverdue = (db.activeLoans || []).filter(l => (l.overdueDays && l.overdueDays > 0) || (l.statusBadge && l.statusBadge.includes('red')));
+
+  if (currentOverdueFilter === 'today') {
+    return [];
+  }
+
+  if (currentOverdueFilter === '7days') {
+    return allOverdue.filter(l => l.overdueDays <= 7);
+  }
+
+  if (currentOverdueFilter === 'month' || currentOverdueFilter === 'quarter') {
+    return allOverdue;
+  }
+
+  const fromInp = document.getElementById('overdue-from-date');
+  const toInp = document.getElementById('overdue-to-date');
+  const fromVal = fromInp?.value?.trim();
+  const toVal = toInp?.value?.trim();
+
+  if (!fromVal || !toVal) return allOverdue;
+
+  const parseDMY = s => {
+    const parts = s.split('/');
+    if (parts.length === 3) return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+    return null;
+  };
+
+  const fDate = parseDMY(fromVal);
+  const tDate = parseDMY(toVal);
+
+  if (!fDate || !tDate) return allOverdue;
+
+  return allOverdue.filter(l => {
+    const dDate = parseDMY(l.dueDate);
+    if (!dDate) return true;
+    return dDate >= fDate && dDate <= tDate;
+  });
+}
+
+export function renderOverdueReportScreen() {
+  const db = getDB();
+  const list = getFilteredOverdueLoans();
+  const finePerDay = db.parameters?.overdueFinePerDay || 2000;
+
+  const countEl = document.getElementById('rep-overdue-kpi-count');
+  const fineEl = document.getElementById('rep-overdue-kpi-fine');
+  const topDeptEl = document.getElementById('rep-overdue-kpi-topdept');
+
+  const totalCount = list.length;
+  const totalFine = list.reduce((sum, l) => sum + (Number(l.overdueDays || 0) * finePerDay), 0);
+
+  let topDeptText = 'Không có';
+  if (totalCount > 0) {
+    const deptCounts = {};
+    list.forEach(l => {
+      const acc = (db.accounts || []).find(a => (a.cardId && a.cardId === l.readerCard) || a.name === l.readerName);
+      const dName = acc?.departmentKey === 'TOAN_TIN' ? 'Khoa Toán - Tin học' : 'Khoa CNTT';
+      deptCounts[dName] = (deptCounts[dName] || 0) + 1;
+    });
+
+    let maxC = 0;
+    let maxDept = 'Khoa CNTT';
+    for (const [dept, c] of Object.entries(deptCounts)) {
+      if (c > maxC) {
+        maxC = c;
+        maxDept = dept;
+      }
+    }
+    topDeptText = `${maxDept} (${maxC} cuốn)`;
+  }
+
+  if (countEl) countEl.textContent = `${totalCount} cuốn`;
+  if (fineEl) fineEl.textContent = `${totalFine.toLocaleString('vi-VN')} đ`;
+  if (topDeptEl) topDeptEl.textContent = topDeptText;
+
+  const tbody = document.getElementById('rep-overdue-loans-tbody');
+  if (!tbody) return;
+
+  if (list.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; padding: 40px 20px; color: #64748b;">
+          <i class="fa-regular fa-circle-check" style="font-size: 36px; color: #16a34a; margin-bottom: 10px; display: block;"></i>
+          <div style="font-weight: 700; font-size: 15px; color: #1e293b;">Không có sách nào quá hạn trong khoảng thời gian đã chọn!</div>
+          <div style="font-size: 13px; color: #64748b; margin-top: 4px;">Toàn bộ độc giả đã hoàn trả sách đúng hạn hoặc không có phát sinh vi phạm.</div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = list.map(l => {
+    const acc = (db.accounts || []).find(a => (a.cardId && a.cardId === l.readerCard) || a.name === l.readerName);
+    const mssv = acc?.staffId || acc?.username || l.readerCard || '—';
+    const readerClass = l.readerClass || acc?.className || '50.01.SPTIN.B';
+    const fine = (Number(l.overdueDays || 0) * finePerDay);
+
+    return `
+      <tr>
+        <td>
+          <span style="font-family: monospace; font-weight: 800; color: #0f172a; font-size: 13px; background: #f1f5f9; padding: 3px 8px; border-radius: 4px; border: 1px solid #cbd5e1;">
+            ${escapeHTML(l.copyCode)}
+          </span>
+        </td>
+        <td>
+          <div class="cell-bold" style="color: var(--hcmue-navy, #16375C);">${escapeHTML(l.titleName)}</div>
+          <div class="cell-sub" style="font-size: 11px; margin-top: 2px;">
+            <i class="fa-solid fa-map-pin" style="color: #94a3b8; margin-right: 4px;"></i>${escapeHTML(l.shelfLocation || 'Kệ K03 - Ngăn 2')}
+          </div>
+        </td>
+        <td>
+          <div class="cell-bold">${escapeHTML(l.readerName)}</div>
+          <div class="cell-sub" style="font-size: 11px; margin-top: 2px;">
+            <span style="font-family: monospace; font-weight: 600; color: #1e293b;">${escapeHTML(mssv)}</span> · ${escapeHTML(readerClass)}
+          </div>
+        </td>
+        <td>
+          <div style="font-weight: 600; color: #334155; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-regular fa-calendar-xmark" style="color: #ef4444;"></i>
+            ${escapeHTML(l.dueDate)}
+          </div>
+        </td>
+        <td>
+          <span class="badge badge-red" style="font-size: 11px; font-weight: 700; padding: 4px 8px;">
+            Quá ${l.overdueDays} ngày
+          </span>
+          <div style="font-weight: 800; color: #b91c1c; font-size: 13px; margin-top: 4px;">
+            ${fine.toLocaleString('vi-VN')} đ
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+export function handleExportOverdueExcel() {
+  const db = getDB();
+  const list = getFilteredOverdueLoans();
+  const finePerDay = db.parameters?.overdueFinePerDay || 2000;
+
+  let html = `
+  <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+  <head>
+    <meta charset="utf-8">
+    <!--[if gte mso 9]>
+    <xml>
+      <x:ExcelWorkbook>
+        <x:ExcelWorksheets>
+          <x:ExcelWorksheet>
+            <x:Name>Sach_qua_han</x:Name>
+            <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
+          </x:ExcelWorksheet>
+        </x:ExcelWorksheets>
+      </x:ExcelWorkbook>
+    </xml>
+    <![endif]-->
+  </head>
+  <body>
+    <h2>TRƯỜNG ĐẠI HỌC SƯ PHẠM TP. HỒ CHÍ MINH (HCMUE) - THƯ VIỆN TRƯỜNG</h2>
+    <h3>BÁO CÁO DANH SÁCH BẢN SAO SÁCH ĐANG QUÁ HẠN LƯU HÀNH (LUỒNG 3)</h3>
+    <p>Thời điểm kết xuất: ${new Date().toLocaleString('vi-VN')} | Đơn vị: Phòng Quản lý Thư viện & Công tác Sinh viên</p>
+    <table border="1">
+      <tr style="background:#16375C; color:#ffffff; font-weight:bold; height: 32px;">
+        <th>STT</th>
+        <th>Mã bản sao</th>
+        <th>Tựa sách</th>
+        <th>Sinh viên mượn</th>
+        <th>MSSV</th>
+        <th>Mã thẻ thư viện</th>
+        <th>Lớp chuyên ngành</th>
+        <th>Ngày hẹn trả</th>
+        <th>Số ngày trễ</th>
+        <th>Tiền phạt tạm tính (VNĐ)</th>
+      </tr>
+  `;
+
+  list.forEach((l, i) => {
+    const acc = (db.accounts || []).find(a => (a.cardId && a.cardId === l.readerCard) || a.name === l.readerName);
+    const mssv = acc?.staffId || acc?.username || l.readerCard || '—';
+    const readerClass = l.readerClass || acc?.className || '50.01.SPTIN.B';
+    const fine = (Number(l.overdueDays || 0) * finePerDay);
+
+    html += `
+      <tr>
+        <td align="center">${i + 1}</td>
+        <td align="center"><b>${escapeHTML(l.copyCode)}</b></td>
+        <td>${escapeHTML(l.titleName)}</td>
+        <td>${escapeHTML(l.readerName)}</td>
+        <td align="center">'${escapeHTML(mssv)}</td>
+        <td align="center">${escapeHTML(l.readerCard)}</td>
+        <td>${escapeHTML(readerClass)}</td>
+        <td align="center">${escapeHTML(l.dueDate)}</td>
+        <td align="center" style="color:red; font-weight:bold;">${l.overdueDays} ngày</td>
+        <td align="right">${fine.toLocaleString('vi-VN')} đ</td>
+      </tr>
+    `;
+  });
+
+  html += `</table></body></html>`;
+
+  const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Bao_cao_sach_qua_han_HCMUE.xls';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  if (typeof window !== 'undefined' && window.showToast) {
+    window.showToast('📥 Đã xuất thành công tệp Bao_cao_sach_qua_han_HCMUE.xlsx!', 'success');
   }
 }

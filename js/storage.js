@@ -554,22 +554,21 @@ export function sanitizeDB(dbData) {
 
 
 
-          if (diffDays > 0) {
-
-            if (l.overdueDays !== diffDays || l.statusBadge !== 'badge-red') {
-
+          if (l.overdueDays === undefined || l.overdueDays === null) {
+            if (diffDays > 0) {
               l.overdueDays = diffDays;
-
               l.statusBadge = 'badge-red';
-
               l.statusText = `Quá hạn ${diffDays} ngày`;
-
               l.actionText = 'Tiếp nhận trả sách →';
-
               modified = true;
-
+            } else {
+              l.overdueDays = 0;
+              modified = true;
             }
-
+          } else if (l.overdueDays > 0) {
+            l.statusBadge = 'badge-red';
+            l.statusText = `Quá hạn ${l.overdueDays} ngày`;
+            l.actionText = 'Tiếp nhận trả sách →';
           } else {
 
             const remainingDays = Math.abs(diffDays);
@@ -678,33 +677,60 @@ export function sanitizeDB(dbData) {
 
 
 
-  
-  // Tự động đồng bộ các đầu sách mới, bản sao và thể loại từ INITIAL_DB nếu chưa có trong LocalStorage
-  if (Array.isArray(INITIAL_DB.titles) && Array.isArray(dbData.titles)) {
-    INITIAL_DB.titles.forEach(initT => {
-      if (!dbData.titles.some(t => t.id === initT.id)) {
-        dbData.titles.push(JSON.parse(JSON.stringify(initT)));
-        modified = true;
-      }
-    });
-  }
-  if (Array.isArray(INITIAL_DB.copies) && Array.isArray(dbData.copies)) {
-    INITIAL_DB.copies.forEach(initC => {
-      if (!dbData.copies.some(c => c.code === initC.code)) {
-        dbData.copies.push(JSON.parse(JSON.stringify(initC)));
-        modified = true;
-      }
-    });
-  }
-  if (Array.isArray(INITIAL_DB.categories) && Array.isArray(dbData.categories)) {
-    INITIAL_DB.categories.forEach(initCat => {
-      if (!dbData.categories.some(cat => cat.id === initCat.id)) {
-        dbData.categories.push(JSON.parse(JSON.stringify(initCat)));
-        modified = true;
-      }
-    });
-  }
-
+  
+
+  // Tự động đồng bộ các đầu sách mới, bản sao và thể loại từ INITIAL_DB nếu chưa có trong LocalStorage
+
+  if (Array.isArray(INITIAL_DB.titles) && Array.isArray(dbData.titles)) {
+
+    INITIAL_DB.titles.forEach(initT => {
+
+      if (!dbData.titles.some(t => t.id === initT.id)) {
+
+        dbData.titles.push(JSON.parse(JSON.stringify(initT)));
+
+        modified = true;
+
+      }
+
+    });
+
+  }
+
+  if (Array.isArray(INITIAL_DB.copies) && Array.isArray(dbData.copies)) {
+
+    INITIAL_DB.copies.forEach(initC => {
+
+      if (!dbData.copies.some(c => c.code === initC.code)) {
+
+        dbData.copies.push(JSON.parse(JSON.stringify(initC)));
+
+        modified = true;
+
+      }
+
+    });
+
+  }
+
+  if (Array.isArray(INITIAL_DB.categories) && Array.isArray(dbData.categories)) {
+
+    INITIAL_DB.categories.forEach(initCat => {
+
+      if (!dbData.categories.some(cat => cat.id === initCat.id)) {
+
+        dbData.categories.push(JSON.parse(JSON.stringify(initCat)));
+
+        modified = true;
+
+      }
+
+    });
+
+  }
+
+
+
   return dbData;
 
 }

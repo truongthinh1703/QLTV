@@ -32,7 +32,11 @@ INSERT INTO tai_khoan (ma_tai_khoan, username, mat_khau_hash, ho_ten, email, so_
 
 ('TK-DOCGIA-05', '50.01.103.065', '$2a$10$7EqJtq98hPqEX7fNZaFWoO5J9j1mU2Qp8c8V9z4G7a1Q2W3E4R5T6', 'Nguyễn Đức Anh Tài', 'tai.nda@student.hcmue.edu.vn', '0955443322', 'DOC_GIA', 'Bị khóa', '2023-09-15 09:20:00+07'),
 
-('TK-DOCGIA-06', '50.01.103.077', '$2a$10$7EqJtq98hPqEX7fNZaFWoO5J9j1mU2Qp8c8V9z4G7a1Q2W3E4R5T6', 'Huỳnh Nguyễn Huyền Trân', 'tran.hnh@student.hcmue.edu.vn', '0944332211', 'DOC_GIA', 'Hoạt động', '2023-09-15 09:25:00+07')
+('TK-DOCGIA-06', '50.01.103.077', '$2a$10$7EqJtq98hPqEX7fNZaFWoO5J9j1mU2Qp8c8V9z4G7a1Q2W3E4R5T6', 'Huỳnh Nguyễn Huyền Trân', 'tran.hnh@student.hcmue.edu.vn', '0944332211', 'DOC_GIA', 'Hoạt động', '2023-09-15 09:25:00+07'),
+('TK-DOCGIA-07', '50.01.103.088', '$2a$10$7EqJtq98hPqEX7fNZaFWoO5J9j1mU2Qp8c8V9z4G7a1Q2W3E4R5T6', 'Hoàng Văn Khóa', 'khoa.hv@student.hcmue.edu.vn', '0933112233', 'DOC_GIA', 'Bị khóa', '2023-09-15 09:30:00+07'),
+('TK-DOCGIA-08', '49.01.103.099', '$2a$10$7EqJtq98hPqEX7fNZaFWoO5J9j1mU2Qp8c8V9z4G7a1Q2W3E4R5T6', 'Trần Thị Hết Hạn', 'han.tth@student.hcmue.edu.vn', '0922334455', 'DOC_GIA', 'Hoạt động', '2022-09-15 09:00:00+07'),
+('TK-DOCGIA-09', '50.01.701.012', '$2a$10$7EqJtq98hPqEX7fNZaFWoO5J9j1mU2Qp8c8V9z4G7a1Q2W3E4R5T6', 'Phạm Thùy Linh', 'linh.pt@student.hcmue.edu.vn', '0911445566', 'DOC_GIA', 'Hoạt động', '2023-09-15 09:35:00+07'),
+('TK-DOCGIA-10', '50.01.102.045', '$2a$10$7EqJtq98hPqEX7fNZaFWoO5J9j1mU2Qp8c8V9z4G7a1Q2W3E4R5T6', 'Vũ Minh Tuấn', 'tuan.vm@student.hcmue.edu.vn', '0900556677', 'DOC_GIA', 'Hoạt động', '2023-09-15 09:40:00+07')
 
 ON CONFLICT (username) DO NOTHING;
 
@@ -52,7 +56,11 @@ INSERT INTO the_doc_gia (ma_the, ma_tai_khoan, mssv, ho_ten, don_vi, ngay_cap, n
 
 ('THE-50011065', 'TK-DOCGIA-05', '50.01.103.065', 'Nguyễn Đức Anh Tài', 'Khoa Toán - Tin học - Lớp 50.01.SPTIN.B', '2023-09-15', '2027-06-30', 'Bị khóa', 'Tạm khóa nợ quá hạn & bồi thường rách sách CSDL-002 (180.000 đ)'),
 
-('THE-50011077', 'TK-DOCGIA-06', '50.01.103.077', 'Huỳnh Nguyễn Huyền Trân', 'Khoa Toán - Tin học - Lớp 50.01.SPTIN.B', '2023-09-15', '2027-06-30', 'Hoạt động', NULL)
+('THE-50011077', 'TK-DOCGIA-06', '50.01.103.077', 'Huỳnh Nguyễn Huyền Trân', 'Khoa Toán - Tin học - Lớp 50.01.SPTIN.B', '2023-09-15', '2027-06-30', 'Hoạt động', NULL),
+('THE-50011088', 'TK-DOCGIA-07', '50.01.103.088', 'Hoàng Văn Khóa', 'Khoa CNTT - Lớp 50.01.SPTIN.A', '2023-09-15', '2028-06-30', 'Bị khóa', 'Thẻ bị khóa vi phạm nội quy thư viện'),
+('THE-49011099', 'TK-DOCGIA-08', '49.01.103.099', 'Trần Thị Hết Hạn', 'Khoa CNTT - Cựu sinh viên', '2019-09-15', '2023-09-15', 'Hoạt động', NULL),
+('THE-50017012', 'TK-DOCGIA-09', '50.01.701.012', 'Phạm Thùy Linh', 'Khoa Ngoại ngữ - Lớp 50.01.AV.A', '2023-09-15', '2028-06-30', 'Hoạt động', NULL),
+('THE-50011024', 'TK-DOCGIA-10', '50.01.102.045', 'Vũ Minh Tuấn', 'Khoa Vật lý - Lớp 50.01.SPVL.A', '2023-09-15', '2028-06-30', 'Hoạt động', NULL)
 
 ON CONFLICT (ma_the) DO NOTHING;
 
@@ -91,7 +99,17 @@ INSERT INTO tac_gia (ma_tac_gia, ten_tac_gia, ghi_chu) VALUES
 ('TG-07', 'Trần Thị Hương', 'Chủ biên giáo trình Giáo dục học Đại cương - ĐH Sư phạm'),
 ('TG-08', 'Lê Văn Hồng', 'Đồng tác giả giáo trình Tâm lý học lứa tuổi và Sư phạm'),
 ('TG-09', 'P. Charles Brown', 'Tác giả bộ sách English for Computer Science - Oxford'),
-('TG-10', 'Bộ Giáo dục và Đào tạo', 'Cơ quan biên soạn giáo trình Triết học Mác - Lênin')
+('TG-10', 'Bộ Giáo dục và Đào tạo', 'Cơ quan biên soạn giáo trình Triết học Mác - Lênin'),
+('TG-11', 'PGS.TS. Huỳnh Văn Sơn', 'Tác giả giáo trình Tâm lý học Đại cương'),
+('TG-12', 'GS.TS. Nguyễn Thị Mỹ Lộc', 'Tác giả Giáo dục học Việt Nam hiện đại'),
+('TG-13', 'TS. Lê Đức Long', 'Tác giả Phương pháp Dạy học môn Tin học'),
+('TG-14', 'Maja Olejniczak', 'Tác giả English for Information Technology'),
+('TG-15', 'PGS.TS. Đặng Văn Vinh', 'Tác giả Xác suất Thống kê ứng dụng trong AI'),
+('TG-16', 'GS. Vũ Dương Ninh', 'Tác giả Lịch sử Văn minh Thế giới'),
+('TG-17', 'GS.TS. Lương Duyên Bình', 'Tác giả Vật lý Đại cương: Cơ - Nhiệt'),
+('TG-18', 'TS. Nguyễn Nam Hải', 'Tác giả An toàn & Bảo mật Thông tin'),
+('TG-19', 'Bộ Giáo dục và Đào tạo', 'Cơ quan biên soạn Triết học Mác - Lênin tập 2'),
+('TG-20', 'TS. Nguyễn Thanh Bình', 'Tác giả Kỹ năng Giao tiếp Sư phạm')
 
 ON CONFLICT (ma_tac_gia) DO NOTHING;
 
@@ -113,7 +131,17 @@ INSERT INTO dau_sach (ma_dau_sach, isbn, ten_sach, ma_the_loai, nha_xuat_ban, na
 ('DS-07', '978-604-0-77889-3', 'Giáo trình Giáo dục học Đại cương', 'TL-SPGD', 'NXB Đại học Sư phạm', 2024, 'Giáo trình cung cấp các nguyên lý cơ bản của giáo dục học, lý luận dạy học hiện đại, nguyên tắc giáo dục nhân cách học sinh và tổ chức hoạt động sư phạm.', 'Kệ K04 - Ngăn 1', 'assets/sample.pdf', 4, 3),
 ('DS-08', '978-604-0-88990-4', 'Tâm lý học Lứa tuổi và Sư phạm', 'TL-SPGD', 'NXB Đại học Sư phạm', 2023, 'Nghiên cứu các quy luật phát triển tâm lý học sinh THCS và THPT, cơ sở tâm lý học của hoạt động lĩnh hội tri thức và hình thành phẩm chất nhà giáo mẫu mực.', 'Kệ K04 - Ngăn 2', 'assets/sample.pdf', 3, 3),
 ('DS-09', '978-0-19-457380-1', 'English for Computer Science', 'TL-NN', 'NXB Oxford University Press', 2024, 'Tài liệu tiếng Anh chuyên ngành CNTT chuẩn quốc tế, rèn luyện kỹ năng đọc hiểu tài liệu phần mềm, kiến trúc máy tính, mạng và thuật ngữ kỹ thuật số.', 'Kệ K05 - Ngăn 1', 'assets/sample.pdf', 3, 3),
-('DS-10', '978-604-57-5522-3', 'Triết học Mác - Lênin', 'TL-KHXH', 'NXB Chính trị Quốc gia Sự thật', 2023, 'Giáo trình chuẩn quốc gia dành cho bậc đại học, gồm thế giới quan và phương pháp luận triết học duy vật biện chứng và duy vật lịch sử.', 'Kệ K02 - Ngăn 4', 'assets/sample.pdf', 4, 3)
+('DS-10', '978-604-57-5522-3', 'Triết học Mác - Lênin', 'TL-KHXH', 'NXB Chính trị Quốc gia Sự thật', 2023, 'Giáo trình chuẩn quốc gia dành cho bậc đại học, gồm thế giới quan và phương pháp luận triết học duy vật biện chứng và duy vật lịch sử.', 'Kệ K02 - Ngăn 4', 'assets/sample.pdf', 4, 3),
+('DS-11', '978-604-9-11001-1', 'Giáo trình Tâm lý học Đại cương', 'TL-SPGD', 'NXB ĐH Sư Phạm', 2024, 'Giáo trình nền tảng về tâm lý học đại cương, các hiện tượng tâm lý, nhân cách và ứng dụng trong sư phạm.', 'Kệ K01 - Ngăn 1', 'assets/sample.pdf', 4, 4),
+('DS-12', '978-604-0-12002-2', 'Giáo dục học Việt Nam hiện đại', 'TL-SPGD', 'NXB Giáo Dục', 2023, 'Phân tích các xu hướng giáo dục hiện đại, đổi mới phương pháp giảng dạy và đánh giá năng lực người học.', 'Kệ K01 - Ngăn 2', 'assets/sample.pdf', 3, 3),
+('DS-13', '978-604-9-13003-3', 'Phương pháp Dạy học môn Tin học', 'TL-SPGD', 'NXB ĐH Sư Phạm', 2024, 'Lý luận và phương pháp dạy học Tin học phổ thông theo chương trình GDPT 2018, thiết kế kế hoạch bài dạy STEM.', 'Kệ K01 - Ngăn 3', 'assets/sample.pdf', 4, 4),
+('DS-14', '978-0-19-14004-4', 'English for Information Technology', 'TL-NN', 'Oxford University Press', 2023, 'Tài liệu tiếng Anh chuyên ngành CNTT, thuật ngữ phần cứng, mạng máy tính, an toàn thông tin và phát triển phần mềm.', 'Kệ K05 - Ngăn 1', 'assets/sample.pdf', 3, 3),
+('DS-15', '978-604-6-15005-5', 'Xác suất Thống kê ứng dụng trong AI', 'TL-TOAN', 'NXB Khoa học & Kỹ thuật', 2024, 'Kiến thức xác suất thống kê nâng cao ứng dụng trong học máy (Machine Learning), khoa học dữ liệu và mô hình AI.', 'Kệ K04 - Ngăn 2', 'assets/sample.pdf', 4, 4),
+('DS-16', '978-604-7-16006-6', 'Lịch sử Văn minh Thế giới', 'TL-KHXH', 'NXB ĐHQG', 2023, 'Khái quát tiến trình các nền văn minh phương Đông và phương Tây từ cổ đại đến hiện đại.', 'Kệ K02 - Ngăn 3', 'assets/sample.pdf', 3, 3),
+('DS-17', '978-604-0-17007-7', 'Vật lý Đại cương: Cơ - Nhiệt', 'TL-TOAN', 'NXB Giáo Dục', 2024, 'Giáo trình vật lý đại cương phần cơ học chất điểm, chất lưu và nhiệt học cho sinh viên đại học kỹ thuật và sư phạm.', 'Kệ K04 - Ngăn 3', 'assets/sample.pdf', 3, 3),
+('DS-18', '978-604-8-18008-8', 'An toàn & Bảo mật Thông tin', 'TL-CNTT', 'NXB Thông tin & Truyền thông', 2024, 'Các nguyên lý mật mã học, chữ ký số, bảo mật giao thức mạng và phòng chống tấn công an ninh mạng.', 'Kệ K03 - Ngăn 1', 'assets/sample.pdf', 4, 4),
+('DS-19', '978-604-5-19009-9', 'Triết học Mác - Lênin', 'TL-KHXH', 'NXB Chính trị Quốc gia', 2023, 'Giáo trình chuẩn quốc gia về chủ nghĩa duy vật biện chứng và chủ nghĩa duy vật lịch sử dành cho bậc đại học.', 'Kệ K02 - Ngăn 2', 'assets/sample.pdf', 5, 5),
+('DS-20', '978-604-9-20010-0', 'Kỹ năng Giao tiếp Sư phạm', 'TL-SPGD', 'NXB ĐH Sư Phạm', 2024, 'Rèn luyện kỹ năng ứng xử, nghệ thuật thuyết trình, lắng nghe và giải quyết tình huống sư phạm trong môi trường học đường.', 'Kệ K01 - Ngăn 4', 'assets/sample.pdf', 3, 3)
 
 ON CONFLICT (ma_dau_sach) DO NOTHING;
 
@@ -135,7 +163,17 @@ INSERT INTO dau_sach_tac_gia (ma_dau_sach, ma_tac_gia, vai_tro_tac_gia) VALUES
 ('DS-07', 'TG-07', 'Tác giả chính'),
 ('DS-08', 'TG-08', 'Tác giả chính'),
 ('DS-09', 'TG-09', 'Tác giả chính'),
-('DS-10', 'TG-10', 'Tác giả chính')
+('DS-10', 'TG-10', 'Tác giả chính'),
+('DS-11', 'TG-11', 'Tác giả chính'),
+('DS-12', 'TG-12', 'Tác giả chính'),
+('DS-13', 'TG-13', 'Tác giả chính'),
+('DS-14', 'TG-14', 'Tác giả chính'),
+('DS-15', 'TG-15', 'Tác giả chính'),
+('DS-16', 'TG-16', 'Tác giả chính'),
+('DS-17', 'TG-17', 'Tác giả chính'),
+('DS-18', 'TG-18', 'Tác giả chính'),
+('DS-19', 'TG-19', 'Tác giả chính'),
+('DS-20', 'TG-20', 'Tác giả chính')
 
 ON CONFLICT (ma_dau_sach, ma_tac_gia) DO NOTHING;
 
@@ -211,7 +249,44 @@ INSERT INTO ban_sao_sach (ma_ban_sao, ma_dau_sach, vi_tri_ke, don_gia_sach, tran
 ('THML-001', 'DS-10', 'Kệ K02 - Ngăn 4', 65000, 'Sẵn sàng', '2023-10-12'),
 ('THML-002', 'DS-10', 'Kệ K02 - Ngăn 4', 65000, 'Sẵn sàng', '2023-10-12'),
 ('THML-003', 'DS-10', 'Kệ K02 - Ngăn 4', 65000, 'Sẵn sàng', '2023-10-12'),
-('THML-004', 'DS-10', 'Kệ K02 - Ngăn 4', 65000, 'Đang mượn', '2023-10-12')
+('THML-004', 'DS-10', 'Kệ K02 - Ngăn 4', 65000, 'Đang mượn', '2023-10-12'),
+-- Bản sao DS-11 đến DS-20 (36 bản sao mới, nâng tổng số lên 73)
+('TLDC-001', 'DS-11', 'Kệ K01 - Ngăn 1', 75000, 'Sẵn sàng', '2024-01-15'),
+('TLDC-002', 'DS-11', 'Kệ K01 - Ngăn 1', 75000, 'Sẵn sàng', '2024-01-15'),
+('TLDC-003', 'DS-11', 'Kệ K01 - Ngăn 1', 75000, 'Sẵn sàng', '2024-01-15'),
+('TLDC-004', 'DS-11', 'Kệ K01 - Ngăn 1', 75000, 'Sẵn sàng', '2024-01-15'),
+('GDVN-001', 'DS-12', 'Kệ K01 - Ngăn 2', 80000, 'Sẵn sàng', '2024-01-15'),
+('GDVN-002', 'DS-12', 'Kệ K01 - Ngăn 2', 80000, 'Sẵn sàng', '2024-01-15'),
+('GDVN-003', 'DS-12', 'Kệ K01 - Ngăn 2', 80000, 'Sẵn sàng', '2024-01-15'),
+('PPDH-001', 'DS-13', 'Kệ K01 - Ngăn 3', 95000, 'Sẵn sàng', '2024-01-15'),
+('PPDH-002', 'DS-13', 'Kệ K01 - Ngăn 3', 95000, 'Sẵn sàng', '2024-01-15'),
+('PPDH-003', 'DS-13', 'Kệ K01 - Ngăn 3', 95000, 'Sẵn sàng', '2024-01-15'),
+('PPDH-004', 'DS-13', 'Kệ K01 - Ngăn 3', 95000, 'Sẵn sàng', '2024-01-15'),
+('EIT-001', 'DS-14', 'Kệ K05 - Ngăn 1', 120000, 'Sẵn sàng', '2024-01-15'),
+('EIT-002', 'DS-14', 'Kệ K05 - Ngăn 1', 120000, 'Sẵn sàng', '2024-01-15'),
+('EIT-003', 'DS-14', 'Kệ K05 - Ngăn 1', 120000, 'Sẵn sàng', '2024-01-15'),
+('XSTK-001', 'DS-15', 'Kệ K04 - Ngăn 2', 110000, 'Sẵn sàng', '2024-01-15'),
+('XSTK-002', 'DS-15', 'Kệ K04 - Ngăn 2', 110000, 'Sẵn sàng', '2024-01-15'),
+('XSTK-003', 'DS-15', 'Kệ K04 - Ngăn 2', 110000, 'Sẵn sàng', '2024-01-15'),
+('XSTK-004', 'DS-15', 'Kệ K04 - Ngăn 2', 110000, 'Sẵn sàng', '2024-01-15'),
+('LS-001', 'DS-16', 'Kệ K02 - Ngăn 3', 90000, 'Sẵn sàng', '2024-01-15'),
+('LS-002', 'DS-16', 'Kệ K02 - Ngăn 3', 90000, 'Sẵn sàng', '2024-01-15'),
+('LS-003', 'DS-16', 'Kệ K02 - Ngăn 3', 90000, 'Sẵn sàng', '2024-01-15'),
+('VL-001', 'DS-17', 'Kệ K04 - Ngăn 3', 85000, 'Sẵn sàng', '2024-01-15'),
+('VL-002', 'DS-17', 'Kệ K04 - Ngăn 3', 85000, 'Sẵn sàng', '2024-01-15'),
+('VL-003', 'DS-17', 'Kệ K04 - Ngăn 3', 85000, 'Sẵn sàng', '2024-01-15'),
+('ATTT-001', 'DS-18', 'Kệ K03 - Ngăn 1', 135000, 'Sẵn sàng', '2024-01-15'),
+('ATTT-002', 'DS-18', 'Kệ K03 - Ngăn 1', 135000, 'Sẵn sàng', '2024-01-15'),
+('ATTT-003', 'DS-18', 'Kệ K03 - Ngăn 1', 135000, 'Sẵn sàng', '2024-01-15'),
+('ATTT-004', 'DS-18', 'Kệ K03 - Ngăn 1', 135000, 'Sẵn sàng', '2024-01-15'),
+('MLN-001', 'DS-19', 'Kệ K02 - Ngăn 2', 65000, 'Sẵn sàng', '2024-01-15'),
+('MLN-002', 'DS-19', 'Kệ K02 - Ngăn 2', 65000, 'Sẵn sàng', '2024-01-15'),
+('MLN-003', 'DS-19', 'Kệ K02 - Ngăn 2', 65000, 'Sẵn sàng', '2024-01-15'),
+('MLN-004', 'DS-19', 'Kệ K02 - Ngăn 2', 65000, 'Sẵn sàng', '2024-01-15'),
+('MLN-005', 'DS-19', 'Kệ K02 - Ngăn 2', 65000, 'Sẵn sàng', '2024-01-15'),
+('KNGT-001', 'DS-20', 'Kệ K01 - Ngăn 4', 70000, 'Sẵn sàng', '2024-01-15'),
+('KNGT-002', 'DS-20', 'Kệ K01 - Ngăn 4', 70000, 'Sẵn sàng', '2024-01-15'),
+('KNGT-003', 'DS-20', 'Kệ K01 - Ngăn 4', 70000, 'Sẵn sàng', '2024-01-15')
 
 ON CONFLICT (ma_ban_sao) DO NOTHING;
 

@@ -191,7 +191,8 @@ psql -U postgres -d library_hcmue -f sql/01_schema_postgresql.sql
 psql -U postgres -d library_hcmue -f sql/02_seed_data_postgresql.sql
 ```
 
-### 3. Bộ Tài khoản Thử nghiệm 1-Click (Quick Login Chips)
+### 3. Bộ Tài khoản Thử nghiệm 1-Click (Quick Login Chips) & Dữ liệu Seed Chuẩn hóa
+- **Quy mô CSDL Seed:** 20 Đầu sách mẹ (`DS-01` đến `DS-20`), 73 Bản sao sách vật lý, 12 Tài khoản (1 Quản trị viên, 1 Thủ thư, 10 Sinh viên / Thẻ độc giả).
 Ngay tại giao diện Đăng nhập, hệ thống trang bị sẵn **5 phím tắt 1-Click** để Thầy Cô kiểm tra nhanh mọi kịch bản:
 
 ```
@@ -205,6 +206,10 @@ Ngay tại giao diện Đăng nhập, hệ thống trang bị sẵn **5 phím t�
 | **`50.01.103.002`**| `123456` | **Nguyễn Ngọc Hồng An** | Sinh viên (Chuẩn) | Kiểm tra Cổng sinh viên, đọc thử PDF mẫu, tự gia hạn trực tuyến +7 ngày thành công (Ảnh 20b). |
 | **`50.01.103.065`**| `123456` | **Nguyễn Đức Anh Tài** | Sinh viên (Nợ phạt) | Kiểm tra cơ chế cảnh báo nợ 180.000 đ, sách quá hạn 1 ngày (`CSDL-002`) và nút gia hạn bị khóa đúng luật. |
 | **`50.01.103.077`**| `123456` | **Huỳnh Nguyễn Huyền Trân** | Sinh viên (Còn hạn) | Kiểm tra sách mượn `AI-004` (còn 1 ngày), kiểm thử gia hạn tại quầy và online. |
+| **`50.01.103.088`**| `123456` | **Hoàng Văn Khóa** | Sinh viên (Thẻ bị khóa) | **TC05 (BR-02):** Kiểm thử quy tắc nghiệp vụ chặn mượn sách khi thẻ thư viện bị khóa. |
+| **`49.01.103.099`**| `123456` | **Trần Thị Hết Hạn** | Sinh viên (Thẻ hết hạn) | **TC06 (BR-02):** Kiểm thử quy tắc nghiệp vụ chặn mượn sách khi thẻ thư viện hết hạn (hạn 15/09/2023). |
+| **`50.01.701.012`**| `123456` | **Phạm Thùy Linh** | Sinh viên (Ngoại ngữ) | Kiểm thử liên khoa, tra cứu & mượn sách giáo trình ngoại ngữ chuyên ngành. |
+| **`50.01.102.045`**| `123456` | **Vũ Minh Tuấn** | Sinh viên (Vật lý) | Kiểm thử liên khoa, tra cứu & mượn sách giáo trình khoa Vật lý. |
 
 ---
 
@@ -239,6 +244,16 @@ Ngay tại giao diện Đăng nhập, hệ thống trang bị sẵn **5 phím t�
    - Hệ thống hiển thị 4 tích xanh đạt chuẩn (Thẻ hoạt động, Chưa quá 3 cuốn, Không có nợ tồn, Sách sẵn sàng) $\rightarrow$ Mở nút Xác nhận tạo phiếu mượn.
 
 ---
+
+
+---
+
+### 5. Bộ Kiểm thử Tự động 20/20 Test Cases (Automated Requirements Suite)
+Hệ thống tích hợp bộ kiểm thử tự động toàn diện kiểm chứng 100% 11 Yêu cầu Chức năng (G2-FR01 đến G2-FR11) và 4 Quy tắc Nghiệp vụ (BR-01 đến BR-04):
+```bash
+node test_requirements.mjs
+```
+Kết quả kiểm thử hiển thị chi tiết trạng thái từng Test Case (TC01 đến TC20) đạt 100% PASS.
 
 ## VII. ĐÓNG GÓI VÀ BẢO TRÌ MÃ NGUỒN
 

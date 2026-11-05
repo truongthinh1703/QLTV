@@ -80,7 +80,9 @@ import {
 
   handleInventoryScan, exportInventoryExcel, commitInventorySync,
 
-  openCreateReaderCardModal, handleReaderCardMssvInput, handleCreateReaderCardSubmit
+  openCreateReaderCardModal, handleReaderCardMssvInput, handleCreateReaderCardSubmit,
+  setPendingPdfFile, getPendingPdfFile,
+  renderCopiesTitleDropdownItems
 
 } from './modules/catalog.js';
 
@@ -90,7 +92,8 @@ import {
 
   createNewBackup, deleteBackup, getBackupForRestore, renderReportsScreen,
 
-  handleSelectAccountRole, handleCreateAccountUsernameInput, handleToggleCreateCardOption, handleCreateAccountSubmit
+  handleSelectAccountRole, handleCreateAccountUsernameInput, handleToggleCreateCardOption, handleCreateAccountSubmit,
+  switchReportTab, handleFilterOverdueQuick, handleCustomOverdueDateChange, renderOverdueReportScreen, handleExportOverdueExcel
 
 } from './modules/admin.js';
 
@@ -635,11 +638,12 @@ export function openModal(modalId) {
 
 
 export function closeModal(modalId) {
-
+  if (modalId === 'modal-add-title') {
+    if (typeof setPendingPdfFile === 'function') setPendingPdfFile(null);
+    if (typeof resetPdfDropzoneUI === 'function') resetPdfDropzoneUI();
+  }
   const modal = document.getElementById(modalId);
-
   if (modal) modal.classList.remove('active');
-
 }
 
 
@@ -915,6 +919,8 @@ function registerGlobalEvents() {
   window.mutateDB = mutateDB;
 
   window.addMasterTitle = addMasterTitle;
+  window.setPendingPdfFile = setPendingPdfFile;
+  window.getPendingPdfFile = getPendingPdfFile;
 
   window.settleDebt = settleDebt;
 
@@ -1993,46 +1999,148 @@ function registerGlobalEvents() {
 
 
 
-  window.handleSaveNewMasterTitle = function(e) {
+  // Reset và cập nhật giao diện Dropzone chọn file PDF ở Modal 10b
+  function resetPdfDropzoneUI() {
+    const fileInput = document.getElementById('add-title-pdf-file');
+    if (fileInput) fileInput.value = '';
 
+    const dropzone = document.getElementById('add-title-pdf-dropzone');
+    const defaultIcon = document.getElementById('dropzone-default-icon');
+    const fileNameEl = document.getElementById('dropzone-file-name');
+    const fileSizeEl = document.getElementById('dropzone-file-size');
+    const selectBtn = document.getElementById('btn-select-pdf-trigger');
+    const removeBtn = document.getElementById('btn-remove-pdf');
+
+    if (dropzone) {
+      dropzone.style.borderColor = 'var(--border-color)';
+      dropzone.style.background = '#fafbfc';
+    }
+    if (defaultIcon) {
+      defaultIcon.className = 'fa-solid fa-file-arrow-up dropzone-icon';
+      defaultIcon.style.color = 'var(--hcmue-navy)';
+    }
+    if (fileNameEl) {
+      fileNameEl.textContent = 'Đính kèm tệp PDF đọc thử mẫu';
+      fileNameEl.style.color = 'var(--text-main)';
+    }
+    if (fileSizeEl) {
+      fileSizeEl.textContent = 'Kéo thả hoặc nhấp để chọn tệp PDF mẫu từ máy tính';
+    }
+    if (selectBtn) {
+      selectBtn.textContent = 'Chọn tệp PDF';
+    }
+    if (removeBtn) {
+      removeBtn.style.display = 'none';
+    }
+  }
+  window.resetPdfDropzoneUI = resetPdfDropzoneUI;
+
+  window.handlePdfFileSelected = function(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      showToast('Vui lòng chỉ chọn tệp định dạng PDF!', 'warning');
+      resetPdfDropzoneUI();
+      if (typeof setPendingPdfFile === 'function') setPendingPdfFile(null);
+      return;
+    }
+
+    if (typeof setPendingPdfFile === 'function') {
+      setPendingPdfFile(file);
+    }
+
+    // Định dạng kích thước file
+    let sizeStr = '';
+    if (file.size < 1024 * 1024) {
+      sizeStr = (file.size / 1024).toFixed(1) + ' KB';
+    } else {
+      sizeStr = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    const dropzone = document.getElementById('add-title-pdf-dropzone');
+    const defaultIcon = document.getElementById('dropzone-default-icon');
+    const fileNameEl = document.getElementById('dropzone-file-name');
+    const fileSizeEl = document.getElementById('dropzone-file-size');
+    const selectBtn = document.getElementById('btn-select-pdf-trigger');
+    const removeBtn = document.getElementById('btn-remove-pdf');
+
+    if (dropzone) {
+      dropzone.style.borderColor = '#22c55e';
+      dropzone.style.background = '#f0fdf4';
+    }
+    if (defaultIcon) {
+      defaultIcon.className = 'fa-solid fa-file-pdf dropzone-icon';
+      defaultIcon.style.color = '#dc2626';
+    }
+    if (fileNameEl) {
+      fileNameEl.textContent = file.name;
+      fileNameEl.style.color = '#15803d';
+    }
+    if (fileSizeEl) {
+      fileSizeEl.textContent = `Dung lượng: ${sizeStr} · Đã đính kèm thành công`;
+    }
+    if (selectBtn) {
+      selectBtn.textContent = 'Chọn tệp khác';
+    }
+    if (removeBtn) {
+      removeBtn.style.display = 'inline-flex';
+    }
+
+    showToast(`Đã đính kèm tệp PDF: ${file.name} (${sizeStr})`, 'info');
+  };
+
+  window.handleRemoveSelectedPdf = function(event) {
+    if (event) event.stopPropagation();
+    if (typeof setPendingPdfFile === 'function') setPendingPdfFile(null);
+    resetPdfDropzoneUI();
+    showToast('Đã hủy đính kèm tệp PDF', 'info');
+  };
+
+  window.handleSaveNewMasterTitle = function(e) {
     e.preventDefault();
 
     const isbn = document.getElementById('add-title-isbn')?.value;
-
     const title = document.getElementById('add-title-name')?.value;
-
     const author = document.getElementById('add-title-author')?.value;
-
     const category = document.getElementById('add-title-category')?.value;
-
     const publisher = document.getElementById('add-title-publisher')?.value;
-
     const year = document.getElementById('add-title-year')?.value;
-
     const summary = document.getElementById('add-title-summary')?.value;
 
-
-
     if (!isbn || !title || !author) {
-
       showToast("Vui lòng điền các trường bắt buộc (*)", "warning");
-
       return;
-
     }
 
+    const pendingPdf = (typeof getPendingPdfFile === 'function') ? getPendingPdfFile() : null;
 
+    addMasterTitle({
+      isbn,
+      title,
+      author,
+      category,
+      publisher,
+      year,
+      summary,
+      pdfUrl: pendingPdf ? pendingPdf.url : null,
+      pdfFileName: pendingPdf ? pendingPdf.fileName : null
+    });
 
-    addMasterTitle({ isbn, title, author, category, publisher, year, summary });
+    // Reset dropzone sau khi lưu thành công
+    if (typeof setPendingPdfFile === 'function') setPendingPdfFile(null);
+    resetPdfDropzoneUI();
+
+    // Reset form fields
+    const form = e.target;
+    if (form && typeof form.reset === 'function') {
+      form.reset();
+    }
 
     triggerConfetti();
-
     closeModal('modal-add-title');
-
-    showToast("✅ Đã thêm đầu sách mẹ mới thành công!", "success");
-
+    showToast("✅ Đã thêm đầu sách mới thành công!", "success");
     renderMasterTitlesScreen();
-
   };
 
 
@@ -2085,8 +2193,114 @@ function registerGlobalEvents() {
 
 
 
-  // Screen 11 Window Handlers (Untitled 2)
+  // Screen 11: Combobox tìm kiếm & cuộn chọn đầu sách mẹ (Untitled 2)
+  window.handleOpenCopiesTitleDropdown = function() {
+    const menu = document.getElementById('copies-title-dropdown-menu');
+    const chevron = document.getElementById('copies-title-chevron');
+    if (menu) {
+      menu.classList.remove('hidden');
+      if (typeof renderCopiesTitleDropdownItems === 'function') {
+        const inp = document.getElementById('copies-title-search-input');
+        renderCopiesTitleDropdownItems(inp ? inp.value : '');
+      }
+    }
+    if (chevron) {
+      chevron.className = 'fa-solid fa-chevron-up select-chevron';
+    }
+  };
 
+  window.handleCloseCopiesTitleDropdown = function() {
+    const menu = document.getElementById('copies-title-dropdown-menu');
+    const chevron = document.getElementById('copies-title-chevron');
+    if (menu) menu.classList.add('hidden');
+    if (chevron) chevron.className = 'fa-solid fa-chevron-down select-chevron';
+
+    // Nếu ô input đang trống, khôi phục lại tựa sách đang chọn
+    const inp = document.getElementById('copies-title-search-input');
+    const db = getDB();
+    const selectEl = document.getElementById('copies-title-select');
+    const curId = selectEl?.value;
+    const cur = (db.titles || []).find(t => t.id === curId);
+    if (inp && cur) {
+      inp.value = `${cur.id} - ${cur.title}`;
+    }
+  };
+
+  window.handleToggleCopiesTitleDropdown = function(event) {
+    if (event) event.stopPropagation();
+    const menu = document.getElementById('copies-title-dropdown-menu');
+    if (menu && !menu.classList.contains('hidden')) {
+      window.handleCloseCopiesTitleDropdown();
+    } else {
+      window.handleOpenCopiesTitleDropdown();
+    }
+  };
+
+  window.handleFilterCopiesTitles = function(query) {
+    const menu = document.getElementById('copies-title-dropdown-menu');
+    if (menu && menu.classList.contains('hidden')) {
+      menu.classList.remove('hidden');
+      const chevron = document.getElementById('copies-title-chevron');
+      if (chevron) chevron.className = 'fa-solid fa-chevron-up select-chevron';
+    }
+    if (typeof renderCopiesTitleDropdownItems === 'function') {
+      renderCopiesTitleDropdownItems(query);
+    }
+  };
+
+  window.handlePickCopiesTitle = function(titleId) {
+    window.handleCloseCopiesTitleDropdown();
+    const selectEl = document.getElementById('copies-title-select');
+    if (selectEl) selectEl.value = titleId;
+    window.handleSelectCopiesTitle(titleId);
+  };
+
+  // Click outside listener để đóng Combobox đầu sách
+  document.addEventListener('click', function(e) {
+    const wrap = document.getElementById('copies-title-combobox-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+      window.handleCloseCopiesTitleDropdown();
+    }
+  });
+
+  // Xóa bản sao vật lý nếu thêm nhầm
+  window.handleDeleteCopy = function(copyCode) {
+    const db = getDB();
+    const copy = (db.copies || []).find(c => c.code === copyCode);
+    if (!copy) {
+      showToast(`Không tìm thấy bản sao ${copyCode}!`, 'error');
+      return;
+    }
+
+    // Chặn nếu bản sao đang được mượn
+    if (copy.status === 'DANG_MUON') {
+      showToast(`⛔ Không thể xóa: Bản sao ${copyCode} đang được độc giả mượn! Vui lòng tiếp nhận trả sách trước.`, 'error');
+      return;
+    }
+
+    if (confirm(`Bạn có chắc chắn muốn xóa bản sao "${copyCode}" khỏi tựa sách này?`)) {
+      const titleId = copy.titleId;
+      mutateDB(draft => {
+        draft.copies = draft.copies.filter(c => c.code !== copyCode);
+        const targetTitle = draft.titles.find(t => t.id === titleId);
+        if (targetTitle) {
+          const remaining = draft.copies.filter(c => c.titleId === titleId);
+          targetTitle.totalCopies = remaining.length;
+          targetTitle.availableCopies = remaining.filter(c => c.status === 'SAN_SANG').length;
+        }
+      }, 'DELETE_PHYSICAL_COPY');
+
+      showToast(`✅ Đã xóa thành công bản sao ${copyCode}!`, 'success');
+      if (typeof renderCopiesScreen === 'function') {
+        renderCopiesScreen(titleId);
+      }
+      if (typeof renderMasterTitlesScreen === 'function') {
+        renderMasterTitlesScreen();
+      }
+    }
+  };
+
+  // Screen 11 Window Handlers (Untitled 2)
   window.handleSelectCopiesTitle = function(titleId) {
 
     renderCopiesScreen(titleId);
@@ -2277,6 +2491,22 @@ function registerGlobalEvents() {
 
     showToast(`Bắt đầu tải về tệp sao lưu CSDL: ${filename}`, "info");
 
+    try {
+      const db = getDB();
+      const content = JSON.stringify(db, null, 2);
+      const blob = new Blob([content], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename.endsWith('.json') ? filename : `${filename}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.warn('Lỗi tải file sao lưu:', e);
+    }
+
   };
 
 
@@ -2444,6 +2674,12 @@ function registerGlobalEvents() {
   window.handleToggleCreateCardOption = handleToggleCreateCardOption;
 
   window.handleCreateAccountSubmit = handleCreateAccountSubmit;
+  window.renderReportsScreen = renderReportsScreen;
+  window.switchReportTab = switchReportTab;
+  window.handleFilterOverdueQuick = handleFilterOverdueQuick;
+  window.handleCustomOverdueDateChange = handleCustomOverdueDateChange;
+  window.renderOverdueReportScreen = renderOverdueReportScreen;
+  window.handleExportOverdueExcel = handleExportOverdueExcel;
 
 
 
@@ -2748,61 +2984,48 @@ function registerGlobalEvents() {
 
 
   window.handleDeleteTitle = function(titleId) {
-
     const db = getDB();
-
     const targetTitle = db.titles.find(t => t.id === titleId);
-
     const titleName = targetTitle ? targetTitle.title : titleId;
 
-
-
-    // QUY TẮC 4: Chặn không cho xóa đầu sách mẹ nếu vẫn đang có bản sao vật lý trong kho
+    // QUY TẮC: Chặn không cho xóa nếu đang có bản sao được độc giả mượn
+    const isBeingLoaned = db.activeLoans.some(l => {
+      const copy = db.copies.find(c => c.code.toUpperCase() === l.copyCode.toUpperCase());
+      return copy && copy.titleId === titleId;
+    });
+    if (isBeingLoaned) {
+      (window.showToast || showToast)(`⛔ Không thể xóa: Đầu sách "${titleName}" đang có bản sao được độc giả mượn! Vui lòng tiếp nhận trả sách trước.`, 'error');
+      return;
+    }
 
     const existingCopies = db.copies.filter(c => c.titleId === titleId);
-
     if (existingCopies.length > 0) {
-
-      (window.showToast || showToast)(`⛔ Không thể xóa: Đầu sách "${titleName}" hiện đang có ${existingCopies.length} bản sao vật lý trong kho thư viện! Vui lòng thanh lý hoặc xóa hết bản sao trước khi xóa đầu sách mẹ.`, 'error');
-
+      if (confirm(`Đầu sách "${titleName}" (${titleId}) hiện đang có ${existingCopies.length} bản sao vật lý trong kho (chưa có ai mượn).\nBạn có chắc chắn muốn xóa đầu sách này cùng toàn bộ ${existingCopies.length} bản sao vật lý liên quan không?`)) {
+        mutateDB(draft => {
+          draft.copies = draft.copies.filter(c => c.titleId !== titleId);
+          draft.titles = draft.titles.filter(x => x.id !== titleId);
+        }, 'DELETE_MASTER_TITLE_AND_COPIES');
+        (window.showToast || showToast)(`✅ Đã xóa thành công đầu sách "${titleName}" và các bản sao liên quan!`, 'success');
+        renderMasterTitlesScreen();
+        if (typeof renderCopiesScreen === 'function') {
+          const remainingTitles = getDB().titles;
+          if (remainingTitles.length > 0) renderCopiesScreen(remainingTitles[0].id);
+        }
+      }
       return;
-
     }
-
-
-
-    // QUY TẮC 4: Chặn không cho xóa nếu đang có người mượn
-
-    const isBeingLoaned = db.activeLoans.some(l => {
-
-      const copy = db.copies.find(c => c.code.toUpperCase() === l.copyCode.toUpperCase());
-
-      return copy && copy.titleId === titleId;
-
-    });
-
-    if (isBeingLoaned) {
-
-      (window.showToast || showToast)(`⛔ Không thể xóa: Đầu sách "${titleName}" đang có bản sao được độc giả mượn!`, 'error');
-
-      return;
-
-    }
-
-
 
     if (confirm(`Bạn có chắc chắn muốn xóa đầu sách "${titleName}" (${titleId}) khỏi hệ thống?`)) {
-
       mutateDB(draft => {
-
         draft.titles = draft.titles.filter(x => x.id !== titleId);
-
       }, 'DELETE_MASTER_TITLE');
-
-      (window.showToast || showToast)(`Đã xóa thành công đầu sách "${titleName}"!`, 'info');
-
+      (window.showToast || showToast)(`✅ Đã xóa thành công đầu sách "${titleName}"!`, 'success');
+      renderMasterTitlesScreen();
+      if (typeof renderCopiesScreen === 'function') {
+        const remainingTitles = getDB().titles;
+        if (remainingTitles.length > 0) renderCopiesScreen(remainingTitles[0].id);
+      }
     }
-
   };
 
 

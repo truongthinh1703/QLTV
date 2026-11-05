@@ -3,7 +3,7 @@
 // =============================================================================
 
 import { getDB, mutateDB } from '../storage.js';
-import { escapeHTML } from './circulation.js';
+import { escapeHTML, removeVietnameseTones } from './circulation.js';
 
 let selectedTitleForCopies = 'DS-01';
 
@@ -77,6 +77,28 @@ export function renderMasterTitlesScreen() {
   }).join('');
 }
 
+// Quản lý file PDF tạm thời tải lên ở Screen 10b
+let pendingUploadedPdf = {
+  file: null,
+  url: null,
+  fileName: ''
+};
+
+export function setPendingPdfFile(file) {
+  if (!file) {
+    pendingUploadedPdf = { file: null, url: null, fileName: '' };
+    return;
+  }
+  pendingUploadedPdf.file = file;
+  pendingUploadedPdf.fileName = file.name;
+  // Tạo Blob URL tạm thời để trình duyệt có thể render PDF trực tiếp
+  pendingUploadedPdf.url = URL.createObjectURL(file);
+}
+
+export function getPendingPdfFile() {
+  return pendingUploadedPdf;
+}
+
 /**
  * Screen 10b: Thêm đầu sách mẹ
  */
@@ -98,7 +120,9 @@ export function addMasterTitle(newTitleData) {
       coverTag: "GIÁO TRÌNH ĐẠI HỌC",
       coverTitle: newTitleData.title.toUpperCase(),
       coverSub: `${newTitleData.year || 2026}`,
-      pdfFile: "assets/sample.pdf",
+      pdfFile: newTitleData.pdfUrl || "assets/sample.pdf",
+      pdfUrl: newTitleData.pdfUrl || null,
+      pdfFileName: newTitleData.pdfFileName || null,
       summary: newTitleData.summary || "Đang cập nhật nội dung trích yếu của sách."
     });
   }, 'ADD_MASTER_TITLE');
@@ -107,13 +131,58 @@ export function addMasterTitle(newTitleData) {
 /**
  * Screen 11: Bản sao sách vật lý UC08 (Untitled 2 Cải tiến 100%)
  */
+
+/**
+ * Render danh sách dropdown đầu sách hỗ trợ vừa cuộn vừa lọc gõ chữ (Screen 11)
+ */
+export function renderCopiesTitleDropdownItems(query = '') {
+  const menu = document.getElementById('copies-title-dropdown-menu');
+  if (!menu) return;
+
+  const db = getDB();
+  const qClean = (typeof removeVietnameseTones === 'function' ? removeVietnameseTones(query) : query).toLowerCase().trim();
+
+  const filtered = (db.titles || []).filter(t => {
+    if (!qClean) return true;
+    const idClean = t.id.toLowerCase();
+    const titleClean = (typeof removeVietnameseTones === 'function' ? removeVietnameseTones(t.title) : t.title).toLowerCase();
+    const authorClean = (typeof removeVietnameseTones === 'function' ? removeVietnameseTones(t.author || '') : (t.author || '')).toLowerCase();
+    return idClean.includes(qClean) || titleClean.includes(qClean) || authorClean.includes(qClean);
+  });
+
+  if (filtered.length === 0) {
+    menu.innerHTML = `<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px;">Không tìm thấy tựa sách nào khớp với "${escapeHTML(query)}"</div>`;
+    return;
+  }
+
+  menu.innerHTML = filtered.map(t => {
+    const isSelected = t.id === selectedTitleForCopies;
+    const copiesCount = (db.copies || []).filter(c => c.titleId === t.id).length;
+    return `
+      <div class="hero-dropdown-item ${isSelected ? 'active' : ''}" 
+           onclick="window.handlePickCopiesTitle('${t.id}')">
+        <div style="flex: 1; padding-right: 10px;">
+          <div style="font-weight: 700; font-size: 13px; color: ${isSelected ? 'var(--hcmue-navy)' : 'var(--text-main)'};">
+            <span style="color: var(--hcmue-crimson); font-family: monospace; font-size: 12px; margin-right: 6px;">[${escapeHTML(t.id)}]</span>
+            ${escapeHTML(t.title)}
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+            ${escapeHTML(t.author || 'Tác giả')} · Năm ${t.year || 2026} · (${copiesCount} bản sao)
+          </div>
+        </div>
+        ${isSelected ? '<i class="fa-solid fa-check" style="color: #16a34a; font-size: 13px;"></i>' : ''}
+      </div>
+    `;
+  }).join('');
+}
+
 export function renderCopiesScreen(titleId = selectedTitleForCopies) {
   selectedTitleForCopies = titleId;
   const db = getDB();
 
   const currentTitle = db.titles.find(t => t.id === selectedTitleForCopies) || db.titles[0];
 
-  // 1. Populate Dropdown đầu sách mẹ
+  // 1. Cập nhật Dropdown đầu sách mẹ (Screen 11)
   const selectEl = document.getElementById('copies-title-select');
   if (selectEl) {
     selectEl.innerHTML = db.titles.map(t => `
@@ -121,6 +190,7 @@ export function renderCopiesScreen(titleId = selectedTitleForCopies) {
         ${escapeHTML(t.id)} · ${escapeHTML(t.title)}
       </option>
     `).join('');
+    selectEl.value = selectedTitleForCopies;
   }
 
   // 2. Cập nhật bìa sách thu nhỏ (Master Book Miniature Cover)
@@ -185,26 +255,32 @@ export function renderCopiesScreen(titleId = selectedTitleForCopies) {
           </div>
         `;
       } else if (c.status === 'HU_HONG') {
-        // [ Phục hồi về Sẵn sàng ] (1-click nút xanh lá) & [ Sửa ghi chú ]
+        // [ Phục hồi về Sẵn sàng ] & [ Sửa ghi chú ] & [ Xóa bản sao ]
         actionsHtml = `
-          <div style="display: flex; gap: 8px;">
+          <div style="display: flex; gap: 6px; align-items: center;">
             <button class="btn-solid-green" onclick="window.handleRestoreCopyReady('${c.code}')">
               Phục hồi về Sẵn sàng
             </button>
             <button class="btn-outline-gray" onclick="window.handleEditCopyNote('${c.code}')">
               Sửa ghi chú
             </button>
+            <button class="btn-outline-gray danger" style="color: #dc2626; border-color: #fca5a5;" onclick="window.handleDeleteCopy('${c.code}')" title="Xóa bản sao nếu thêm nhầm">
+              Xóa
+            </button>
           </div>
         `;
       } else if (c.status === 'SAN_SANG') {
-        // [ Xem mã bản sao ] & [ Đổi kệ / Sửa ] (Untitled 5)
+        // [ Xem mã bản sao ] & [ Đổi kệ / Sửa ] & [ Xóa bản sao ]
         actionsHtml = `
-          <div style="display: flex; gap: 8px;">
+          <div style="display: flex; gap: 6px; align-items: center;">
             <button class="btn-outline-gray" onclick="window.handleViewCopyCode('${c.code}')">
               Xem mã bản sao
             </button>
             <button class="btn-outline-gray" onclick="window.handleEditCopy('${c.code}')">
               Đổi kệ / Sửa
+            </button>
+            <button class="btn-outline-gray danger" style="color: #dc2626; border-color: #fca5a5;" onclick="window.handleDeleteCopy('${c.code}')" title="Xóa bản sao nếu thêm nhầm">
+              Xóa
             </button>
           </div>
         `;
@@ -353,22 +429,113 @@ export function renderInventoryScreen() {
     statusEl.className = `badge ${inv.statusBadge || 'badge-blue'}`;
   }
 
+  // 1. KPI Cards
   const sysEl = document.getElementById('inv-kpi-system');
   const scanEl = document.getElementById('inv-kpi-scanned');
   const matchEl = document.getElementById('inv-kpi-matched');
   const diffEl = document.getElementById('inv-kpi-diff');
+  const percentEl = document.getElementById('inv-kpi-matched-percent');
 
-  if (sysEl) sysEl.textContent = inv.systemCopies.toLocaleString();
-  if (scanEl) scanEl.textContent = inv.scannedCopies.toLocaleString();
-  if (matchEl) matchEl.textContent = inv.matchedCopies.toLocaleString();
-  if (diffEl) diffEl.textContent = `${inv.diffCopies} cuốn`;
+  const totalSystem = inv.systemCopies || (db.copies ? db.copies.length : 3892);
+  const totalScanned = inv.scannedCopies || 0;
+  const totalMatched = inv.matchedCopies || 0;
+  const percent = totalScanned > 0 ? ((totalMatched / totalScanned) * 100).toFixed(2) : '100.00';
 
+  if (sysEl) sysEl.textContent = totalSystem.toLocaleString();
+  if (scanEl) scanEl.textContent = totalScanned.toLocaleString();
+  if (matchEl) matchEl.textContent = totalMatched.toLocaleString();
+  if (percentEl) percentEl.textContent = `${percent}%`;
+
+  // 2. Cập nhật động Card Chênh lệch (inv-kpi-diff)
+  const pendingAnomalies = (inv.anomalies || []).filter(a => a.status === 'PENDING');
+  const pendingCount = pendingAnomalies.length;
+  inv.diffCopies = pendingCount;
+  if (diffEl) diffEl.textContent = `${pendingCount} cuốn`;
+
+  const diffCard = diffEl ? diffEl.closest('.kpi-card') : null;
+  if (diffCard) {
+    const cardTitle = diffCard.querySelector('.kpi-title');
+    const cardSub = diffCard.querySelector('.kpi-subtext');
+    if (pendingCount === 0) {
+      diffCard.style.setProperty('background', '#f0fdf4', 'important');
+      diffCard.style.setProperty('border', '1.5px solid #86efac', 'important');
+      if (cardTitle) {
+        cardTitle.style.color = '#16a34a';
+        cardTitle.textContent = 'Chênh lệch đã xử lý';
+      }
+      diffEl.style.color = '#16a34a';
+      if (cardSub) {
+        cardSub.style.color = '#15803d';
+        cardSub.textContent = 'Đã xử lý xong toàn bộ bất thường';
+      }
+    } else {
+      diffCard.style.setProperty('background', '#fef2f2', 'important');
+      diffCard.style.setProperty('border', '1.5px solid #fca5a5', 'important');
+      if (cardTitle) {
+        cardTitle.style.color = '#dc2626';
+        cardTitle.textContent = 'Chênh lệch cần xử lý';
+      }
+      diffEl.style.color = '#dc2626';
+      if (cardSub) {
+        cardSub.style.color = '#b91c1c';
+        cardSub.textContent = `${pendingCount} bất thường cần xử lý`;
+      }
+    }
+  }
+
+  // 3. Render Khung Nhật ký quét kiểm đếm thời gian thực (inventory-recent-scans-tbody)
+  const scansTbody = document.getElementById('inventory-recent-scans-tbody');
+  if (scansTbody) {
+    const recents = inv.recentScans || [];
+    if (recents.length === 0) {
+      scansTbody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 14px; color: #94a3b8; font-style: italic;">
+            Chưa có lượt quét nào trong phiên này. Hãy nhập mã bản sao phía trên để kiểm đếm đối soát.
+          </td>
+        </tr>
+      `;
+    } else {
+      scansTbody.innerHTML = recents.map(s => `
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 8px 12px; color: #64748b; font-family: monospace;">${escapeHTML(s.time || '--:--:--')}</td>
+          <td style="padding: 8px 12px;"><strong style="color: var(--hcmue-navy); font-family: monospace;">${escapeHTML(s.code)}</strong></td>
+          <td style="padding: 8px 12px; color: #334155; font-weight: 500;">${escapeHTML(s.title || 'Tài liệu thư viện')}</td>
+          <td style="padding: 8px 12px; color: #64748b;">${escapeHTML(s.shelf || '—')}</td>
+          <td style="padding: 8px 12px;">
+            <span class="badge ${s.badge || 'badge-blue'}" style="font-size: 11px; padding: 3px 8px;">
+              ${escapeHTML(s.status)}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  // 4. Khóa thao tác nếu đợt kiểm kê đã hoàn tất
+  const isCompleted = inv.status === 'Đã hoàn tất kiểm kê';
+  const barcodeInp = document.getElementById('inventory-barcode-input');
+  const shelfInp = document.getElementById('inventory-shelf-input');
+  const scanBtn = document.querySelector('button[onclick="window.handleInventoryScan()"]');
+  if (barcodeInp) barcodeInp.disabled = isCompleted;
+  if (shelfInp) shelfInp.disabled = isCompleted;
+  if (scanBtn) {
+    scanBtn.disabled = isCompleted;
+    scanBtn.style.opacity = isCompleted ? '0.6' : '1';
+    scanBtn.style.cursor = isCompleted ? 'not-allowed' : 'pointer';
+    scanBtn.textContent = isCompleted ? 'Đã chốt kiểm kê' : 'Ghi nhận kiểm đếm';
+  }
+
+  // 5. Render Bảng Danh sách bản sao bất thường cần xử lý
   const tbody = document.getElementById('inventory-anomalies-tbody');
   if (!tbody) return;
 
   tbody.innerHTML = inv.anomalies.map(ano => {
     let badgeHtml = '';
     let actionsHtml = '';
+
+    const theoryShort = (ano.theoryShelf || 'K02').replace(/Kệ\s*/i, '').trim();
+    const actualShort = (ano.actualShelf || 'K05').replace(/Kệ\s*/i, '').trim();
 
     if (ano.conclusionType === 'LOSS') {
       badgeHtml = `<span class="badge-loss">${escapeHTML(ano.conclusion)}</span>`;
@@ -388,14 +555,14 @@ export function renderInventoryScreen() {
       // MISPLACED
       badgeHtml = `<span class="badge-misplaced">${escapeHTML(ano.conclusion)}</span>`;
       if (ano.status === 'FIXED_SHELF') {
-        actionsHtml = `<span class="badge badge-green" style="padding: 6px 12px; font-weight: 600; font-size: 12px;"><i class="fa-solid fa-check"></i> Đã xếp lại đúng K02</span>`;
+        actionsHtml = `<span class="badge badge-green" style="padding: 6px 12px; font-weight: 600; font-size: 12px;"><i class="fa-solid fa-check"></i> Đã xếp lại đúng ${escapeHTML(theoryShort)}</span>`;
       } else if (ano.status === 'UPDATED_SHELF') {
-        actionsHtml = `<span class="badge badge-blue" style="padding: 6px 12px; font-weight: 600; font-size: 12px;"><i class="fa-solid fa-check"></i> Đã cập nhật vị trí K05</span>`;
+        actionsHtml = `<span class="badge badge-blue" style="padding: 6px 12px; font-weight: 600; font-size: 12px;"><i class="fa-solid fa-check"></i> Đã cập nhật vị trí ${escapeHTML(actualShort)}</span>`;
       } else {
         actionsHtml = `
           <div style="display: flex; align-items: center; gap: 8px;">
-            <button type="button" class="btn-solid-darkgreen" onclick="window.handleFixInventoryShelf('${ano.code}')">Đã xếp lại đúng K02</button>
-            <button type="button" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 5px; color: #475569; background: #ffffff;" onclick="window.handleUpdateInventoryShelf('${ano.code}')">Cập nhật vị trí mới: K05</button>
+            <button type="button" class="btn-solid-darkgreen" onclick="window.handleFixInventoryShelf('${ano.code}')">Đã xếp lại đúng ${escapeHTML(theoryShort)}</button>
+            <button type="button" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 5px; color: #475569; background: #ffffff;" onclick="window.handleUpdateInventoryShelf('${ano.code}')">Cập nhật vị trí mới: ${escapeHTML(actualShort)}</button>
           </div>
         `;
       }
@@ -418,23 +585,32 @@ export function renderInventoryScreen() {
 
 export function confirmInventoryLost(code) {
   mutateDB(draft => {
-    const ano = draft.inventory.anomalies.find(a => a.code === code);
+    const ano = (draft.inventory.anomalies || []).find(a => a.code === code);
     if (ano) ano.status = 'CONFIRMED_LOST';
-    const copiesList = draft.copies || draft.physicalCopies || [];
+    const copiesList = draft.copies || [];
     const copy = copiesList.find(c => c.code === code);
     if (copy) {
       copy.status = 'DA_MAT';
       copy.statusLabel = 'Đã mất';
       copy.statusBadge = 'badge-red';
+
+      // ĐỒNG BỘ VÀO BẢNG ĐẦU SÁCH MẸ (titles)
+      const targetTitle = (draft.titles || []).find(t => t.id === copy.titleId);
+      if (targetTitle) {
+        targetTitle.totalCopies = Math.max(0, (targetTitle.totalCopies || 1) - 1);
+        targetTitle.availableCopies = Math.max(0, (targetTitle.availableCopies || 1) - 1);
+      }
     }
   });
   renderInventoryScreen();
-  if (window.showToast) window.showToast(`✅ Đã xác nhận cuốn [${code}] chuyển trạng thái "Đã mất" và đưa vào biên bản xử lý bồi thường!`, 'success');
+  if (typeof renderMasterTitlesScreen === 'function') renderMasterTitlesScreen();
+  if (typeof renderCopiesScreen === 'function') renderCopiesScreen();
+  if (window.showToast) window.showToast(`✅ Đã xác nhận cuốn [${code}] ĐÃ MẤT, cập nhật giảm số lượng tồn kho CSDL và đưa vào biên bản xử lý tài sản!`, 'success');
 }
 
 export function markInventorySuspect(code) {
   mutateDB(draft => {
-    const ano = draft.inventory.anomalies.find(a => a.code === code);
+    const ano = (draft.inventory.anomalies || []).find(a => a.code === code);
     if (ano) ano.status = 'SUSPECT';
   });
   renderInventoryScreen();
@@ -443,33 +619,35 @@ export function markInventorySuspect(code) {
 
 export function fixInventoryShelf(code) {
   mutateDB(draft => {
-    const ano = draft.inventory.anomalies.find(a => a.code === code);
+    const ano = (draft.inventory.anomalies || []).find(a => a.code === code);
     if (ano) ano.status = 'FIXED_SHELF';
-    const copiesList = draft.copies || draft.physicalCopies || [];
+    const copiesList = draft.copies || [];
     const copy = copiesList.find(c => c.code === code);
-    if (copy) {
-      copy.shelf = 'Kệ K02 - Ngăn 1';
+    if (copy && ano) {
+      copy.shelf = ano.theoryShelf;
       copy.status = 'SAN_SANG';
       copy.statusLabel = 'Sẵn sàng cho mượn';
       copy.statusBadge = 'badge-green';
     }
   });
   renderInventoryScreen();
-  if (window.showToast) window.showToast(`✅ Đã xác nhận xếp lại sách [${code}] về đúng vị trí Kệ K02 - Ngăn 1!`, 'success');
+  if (typeof renderCopiesScreen === 'function') renderCopiesScreen();
+  if (window.showToast) window.showToast(`✅ Đã xác nhận xếp lại sách [${code}] về đúng vị trí lý thuyết!`, 'success');
 }
 
 export function updateInventoryShelf(code) {
   mutateDB(draft => {
-    const ano = draft.inventory.anomalies.find(a => a.code === code);
+    const ano = (draft.inventory.anomalies || []).find(a => a.code === code);
     if (ano) ano.status = 'UPDATED_SHELF';
-    const copiesList = draft.copies || draft.physicalCopies || [];
+    const copiesList = draft.copies || [];
     const copy = copiesList.find(c => c.code === code);
-    if (copy) {
-      copy.shelf = 'Kệ K05 - Ngăn 3';
+    if (copy && ano) {
+      copy.shelf = ano.actualShelf;
     }
   });
   renderInventoryScreen();
-  if (window.showToast) window.showToast(`✅ Đã cập nhật vị trí lưu trữ mới của bản sao [${code}] thành Kệ K05 - Ngăn 3!`, 'success');
+  if (typeof renderCopiesScreen === 'function') renderCopiesScreen();
+  if (window.showToast) window.showToast(`✅ Đã cập nhật vị trí lưu trữ mới của bản sao [${code}] theo vị trí thực tế!`, 'success');
 }
 
 export function handleInventoryScan() {
@@ -482,18 +660,104 @@ export function handleInventoryScan() {
     if (window.showToast) window.showToast('Vui lòng nhập mã bản sao cần kiểm đếm!', 'error');
     return;
   }
+
+  const db = getDB();
+
+  // Kiểm tra trạng thái đợt kiểm kê
+  if (db.inventory.status === 'Đã hoàn tất kiểm kê') {
+    if (window.showToast) window.showToast('⚠️ Đợt kiểm kê này đã được chốt và lập biên bản hoàn tất, không thể quét thêm!', 'warning');
+    return;
+  }
+
+  const nowTime = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const copy = (db.copies || []).find(c => c.code.toUpperCase() === code);
+
+  // 1. Kiểm tra tồn tại trong kho CSDL
+  if (!copy) {
+    mutateDB(draft => {
+      if (!Array.isArray(draft.inventory.recentScans)) draft.inventory.recentScans = [];
+      draft.inventory.recentScans.unshift({
+        time: nowTime,
+        code: code,
+        title: "Không tìm thấy trong CSDL",
+        shelf: actualShelf || "Không rõ kệ",
+        status: "Mã lạ / Không có trong CSDL",
+        badge: "badge-red"
+      });
+      if (draft.inventory.recentScans.length > 5) draft.inventory.recentScans.pop();
+    });
+
+    if (input) input.value = '';
+    if (shelfInput) shelfInput.value = '';
+    renderInventoryScreen();
+    if (window.showToast) window.showToast(`⛔ Mã bản sao [${code}] không tồn tại trong danh mục CSDL thư viện!`, 'error');
+    return;
+  }
+
+  // 2. Kiểm tra trùng lặp lượt quét trong đợt này
+  if (Array.isArray(db.inventory.scannedCodes) && db.inventory.scannedCodes.includes(code)) {
+    if (window.showToast) window.showToast(`⚠️ Bản sao [${code}] đã được kiểm đếm trước đó trong đợt này rồi!`, 'warning');
+    return;
+  }
+
+  // 3. Thực hiện đối soát vị trí kệ
+  const titleObj = (db.titles || []).find(t => t.id === copy.titleId);
+  const titleName = copy.titleName || copy.title || (titleObj ? titleObj.title : 'Tài liệu thư viện');
+
+  const isMatch = !actualShelf || (actualShelf.toLowerCase() === copy.shelf.toLowerCase());
+
   mutateDB(draft => {
-    draft.inventory.scannedCopies = (draft.inventory.scannedCopies || 3889) + 1;
-    draft.inventory.matchedCopies = (draft.inventory.matchedCopies || 3887) + 1;
-    const ano = draft.inventory.anomalies.find(a => a.code.toUpperCase() === code);
-    if (ano && actualShelf) {
-      ano.actualShelf = actualShelf;
+    if (!Array.isArray(draft.inventory.scannedCodes)) draft.inventory.scannedCodes = [];
+    if (!Array.isArray(draft.inventory.recentScans)) draft.inventory.recentScans = [];
+    if (!Array.isArray(draft.inventory.anomalies)) draft.inventory.anomalies = [];
+
+    draft.inventory.scannedCodes.push(code);
+    draft.inventory.scannedCopies = (draft.inventory.scannedCopies || 0) + 1;
+
+    if (isMatch) {
+      draft.inventory.matchedCopies = (draft.inventory.matchedCopies || 0) + 1;
+      draft.inventory.recentScans.unshift({
+        time: nowTime,
+        code: code,
+        title: titleName,
+        shelf: copy.shelf,
+        status: "Trùng khớp đúng kệ",
+        badge: "badge-green"
+      });
+    } else {
+      // Sai vị trí kệ (MISPLACED)
+      draft.inventory.diffCopies = (draft.inventory.diffCopies || 0) + 1;
+      draft.inventory.anomalies.unshift({
+        code: copy.code,
+        title: titleName,
+        theoryShelf: copy.shelf,
+        actualShelf: actualShelf,
+        conclusion: 'Sai vị trí kệ',
+        conclusionType: 'MISPLACED',
+        status: 'PENDING'
+      });
+      draft.inventory.recentScans.unshift({
+        time: nowTime,
+        code: code,
+        title: titleName,
+        shelf: actualShelf,
+        status: `Sai vị trí kệ (Lý thuyết: ${copy.shelf} - Thực tế: ${actualShelf})`,
+        badge: "badge-yellow"
+      });
     }
+
+    if (draft.inventory.recentScans.length > 5) draft.inventory.recentScans.pop();
   });
+
   if (input) input.value = '';
   if (shelfInput) shelfInput.value = '';
   renderInventoryScreen();
-  if (window.showToast) window.showToast(`✅ Đã ghi nhận và đối soát bản sao [${code}] thành công!`, 'success');
+
+  if (isMatch) {
+    if (window.showToast) window.showToast(`✅ Đã đối soát trùng khớp bản sao [${code}] tại [${copy.shelf}]!`, 'success');
+  } else {
+    if (window.showToast) window.showToast(`⚠️ Bản sao [${code}] bị xếp sai vị trí kệ! Đã ghi nhận vào danh sách bất thường.`, 'warning');
+  }
 }
 
 export function exportInventoryExcel() {
@@ -525,6 +789,15 @@ export function exportInventoryExcel() {
 }
 
 export function commitInventorySync() {
+  const db = getDB();
+  const hasPending = (db.inventory.anomalies || []).some(a => a.status === 'PENDING');
+  if (hasPending) {
+    if (window.showToast) {
+      window.showToast('⚠️ Vẫn còn cuốn sách bất thường chưa được xử lý! Vui lòng bấm xác nhận xử lý hết các cuốn trước khi chốt biên bản.', 'warning');
+    }
+    return;
+  }
+
   mutateDB(draft => {
     draft.inventory.status = 'Đã hoàn tất kiểm kê';
     draft.inventory.statusBadge = 'badge-green';
@@ -559,7 +832,7 @@ export function renderReadersScreen() {
     if (statusFilter === 'HOAT_DONG') {
       readers = readers.filter(r => r.cardStatus === 'HOAT_DONG');
     } else if (statusFilter === 'KHOA') {
-      readers = readers.filter(r => r.cardStatus === 'TAM_KHOA_NO' || r.status === 'KHOA');
+      readers = readers.filter(r => r.cardStatus === 'TAM_KHOA_NO' || r.cardStatus === 'KHOA' || r.cardStatus === 'BI_KHOA' || r.status === 'KHOA');
     }
   }
 
@@ -588,7 +861,7 @@ export function renderReadersScreen() {
       </td>
       <td>
         <span class="badge ${r.cardStatus === 'HOAT_DONG' ? 'badge-green' : 'badge-red'}">
-          ${r.cardStatus === 'HOAT_DONG' ? 'Hoạt động' : 'Tạm khóa nợ'}
+          ${r.cardStatus === 'HOAT_DONG' ? 'Hoạt động' : 'Bị khóa'}
         </span>
       </td>
       <td>

@@ -995,6 +995,35 @@
               </div>
             </div>
 
+            <!-- Live Scan Log: Nhật ký quét kiểm đếm thời gian thực -->
+            <div id="inventory-recent-scans-box"
+              style="margin-bottom: 20px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div
+                  style="font-size: 13px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                  <i class="fa-solid fa-clock-rotate-left" style="color: var(--hcmue-navy);"></i>
+                  NHẬT KÝ QUÉT ĐỐI SOÁT THỜI GIAN THỰC (GẦN NHẤT)
+                </div>
+                <span style="font-size: 11px; color: #64748b;">Tự động ghi nhận đối soát theo thời gian thực</span>
+              </div>
+              <div class="table-responsive">
+                <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                  <thead>
+                    <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; color: #475569;">
+                      <th style="padding: 8px 12px; text-align: left; width: 90px;">Thời gian</th>
+                      <th style="padding: 8px 12px; text-align: left; width: 110px;">Mã bản sao</th>
+                      <th style="padding: 8px 12px; text-align: left;">Tựa sách</th>
+                      <th style="padding: 8px 12px; text-align: left; width: 150px;">Vị trí thực tế</th>
+                      <th style="padding: 8px 12px; text-align: left; width: 190px;">Kết quả đối soát</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inventory-recent-scans-tbody">
+                    <!-- Sẽ được render động -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             <!-- 4 Stat Cards -->
             <div class="kpi-grid-4"
               style="margin-bottom: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
@@ -1022,7 +1051,8 @@
                 </div>
                 <div class="kpi-value" id="inv-kpi-matched"
                   style="font-size: 32px; font-weight: 800; color: #0f172a; margin: 8px 0 4px 0;">3,887</div>
-                <div class="kpi-subtext" style="font-size: 12px; color: #94a3b8;">99.87%</div>
+                <div class="kpi-subtext" id="inv-kpi-matched-percent" style="font-size: 12px; color: #94a3b8;">99.87%
+                </div>
               </div>
 
               <div class="kpi-card anomaly-card"
@@ -1107,7 +1137,7 @@
                 <select id="readers-filter-status" class="form-select" onchange="window.renderReadersScreen()">
                   <option value="ALL">Hoạt động / Bị khóa</option>
                   <option value="HOAT_DONG">Hoạt động</option>
-                  <option value="KHOA">Tạm khóa do nợ</option>
+                  <option value="KHOA">Bị khóa</option>
                 </select>
               </div>
 
@@ -1151,7 +1181,7 @@
 
             <div class="alert-banner alert-banner-info">
               <i class="fa-solid fa-circle-info"></i>
-              <span>Thẻ bị tạm khóa do công nợ chỉ được khôi phục quyền mượn sau khi hoàn tất thu nợ. Xem Thu công nợ
+              <span>Thẻ bị khóa do công nợ chỉ được khôi phục quyền mượn sau khi hoàn tất thu nợ. Xem Thu công nợ
                 tồn đọng.</span>
             </div>
           </div>
@@ -1467,108 +1497,240 @@
             <div class="content-breadcrumb">Thư viện HCMUE / Báo cáo thống kê</div>
             <div class="page-title-ribbon">BÁO CÁO THỐNG KÊ LƯU THÔNG & QUẢN LÝ TÀI CHÍNH</div>
 
-            <!-- Date Filters & Export -->
-            <div class="report-date-filters" style="margin-top: 14px;">
-              <div class="date-pickers-group">
-                <div class="floating-input-wrap" style="width: 200px;">
-                  <span class="floating-label">Từ ngày</span>
-                  <input type="text" class="floating-input" value="01/10/2026">
-                  <i class="fa-regular fa-calendar-days input-icon-right"></i>
+            <!-- Thanh chuyển đổi 2 Tab Thông minh -->
+            <div class="report-tabs-bar">
+              <button type="button" class="report-tab-btn active" id="tab-btn-report-overview"
+                onclick="window.switchReportTab('overview')">
+                <i class="fa-solid fa-chart-pie"></i> Tổng quan Lưu thông & Doanh thu
+              </button>
+              <button type="button" class="report-tab-btn" id="tab-btn-report-overdue"
+                onclick="window.switchReportTab('overdue')">
+                <i class="fa-solid fa-clock-rotate-left"></i> Báo cáo Sách quá hạn theo ngày (Luồng 3)
+              </button>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- TAB 1: TỔNG QUAN LƯU THÔNG & DOANH THU (BẢO TOÀN 100% GỐC)     -->
+            <!-- ============================================================== -->
+            <div id="report-tab-content-overview">
+              <!-- Date Filters & Export -->
+              <div class="report-date-filters">
+                <div class="date-pickers-group">
+                  <div class="floating-input-wrap" style="width: 200px;">
+                    <span class="floating-label">Từ ngày</span>
+                    <input type="text" class="floating-input" value="01/10/2026">
+                    <i class="fa-regular fa-calendar-days input-icon-right"></i>
+                  </div>
+                  <div class="floating-input-wrap" style="width: 200px;">
+                    <span class="floating-label">Đến ngày</span>
+                    <input type="text" class="floating-input" value="31/10/2026">
+                    <i class="fa-regular fa-calendar-days input-icon-right"></i>
+                  </div>
                 </div>
-                <div class="floating-input-wrap" style="width: 200px;">
-                  <span class="floating-label">Đến ngày</span>
-                  <input type="text" class="floating-input" value="31/10/2026">
-                  <i class="fa-regular fa-calendar-days input-icon-right"></i>
+
+                <div style="display: flex; gap: 10px;">
+                  <button class="btn btn-outline"
+                    onclick="window.showToast('Đang xuất tệp Excel Báo cáo tháng 10/2026...', 'success')">
+                    <i class="fa-regular fa-file-excel"></i> Xuất Excel
+                  </button>
+                  <button class="btn btn-outline"
+                    onclick="window.showToast('Đang tạo bản in PDF Báo cáo tài chính...', 'success')">
+                    <i class="fa-regular fa-file-pdf"></i> Xuất PDF
+                  </button>
                 </div>
               </div>
 
-              <div style="display: flex; gap: 10px;">
-                <button class="btn btn-outline"
-                  onclick="window.showToast('Đang xuất tệp Excel Báo cáo tháng 10/2026...', 'success')">
-                  <i class="fa-regular fa-file-excel"></i> Xuất Excel
-                </button>
-                <button class="btn btn-outline"
-                  onclick="window.showToast('Đang tạo bản in PDF Báo cáo tài chính...', 'success')">
-                  <i class="fa-regular fa-file-pdf"></i> Xuất PDF
-                </button>
+              <!-- 4 KPI Cards -->
+              <div class="kpi-grid-4">
+                <div class="kpi-card">
+                  <div class="kpi-card-header">
+                    <span class="kpi-title">Lượt mượn trong tháng</span>
+                    <i class="fa-solid fa-file-circle-plus kpi-icon"></i>
+                  </div>
+                  <div class="kpi-value" id="rep-kpi-loans">845</div>
+                </div>
+
+                <div class="kpi-card">
+                  <div class="kpi-card-header">
+                    <span class="kpi-title">Lượt trả trong tháng</span>
+                    <i class="fa-solid fa-file-circle-check kpi-icon"></i>
+                  </div>
+                  <div class="kpi-value" id="rep-kpi-returns">790</div>
+                </div>
+
+                <div class="kpi-card">
+                  <div class="kpi-card-header">
+                    <span class="kpi-title">Tiền phạt đã thu</span>
+                    <i class="fa-solid fa-wallet kpi-icon"></i>
+                  </div>
+                  <div class="kpi-value" id="rep-kpi-fines">3.420.000 đ</div>
+                </div>
+
+                <div class="kpi-card">
+                  <div class="kpi-card-header">
+                    <span class="kpi-title">Bồi thường đã thu</span>
+                    <i class="fa-solid fa-money-bill-wave kpi-icon"></i>
+                  </div>
+                  <div class="kpi-value" id="rep-kpi-compensation">850.000 đ</div>
+                </div>
+              </div>
+
+              <!-- Two Panels: Top Books & Fines by Department -->
+              <div class="report-split-grid">
+                <!-- Left: Top 3 Books -->
+                <div class="hcmue-card">
+                  <div class="hcmue-card-header">
+                    <div class="hcmue-card-title">Top 3 Đầu Sách Lưu Thông Cao Nhất</div>
+                    <div class="hcmue-card-desc">Lượt mượn theo đầu sách</div>
+                  </div>
+                  <div id="rep-top-books-container"></div>
+                </div>
+
+                <!-- Right: Thu Phạt & Công Nợ Theo Khoa -->
+                <div class="hcmue-card">
+                  <div class="hcmue-card-header">
+                    <div class="hcmue-card-title">Thu Phạt & Công Nợ Theo Khoa</div>
+                    <div class="hcmue-card-desc">Số tiền đã thu và nợ tồn đọng</div>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="hcmue-table">
+                      <thead>
+                        <tr>
+                          <th>Khoa</th>
+                          <th>Đã thu</th>
+                          <th>Nợ tồn đọng</th>
+                        </tr>
+                      </thead>
+                      <tbody id="rep-faculties-tbody"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div class="alert-banner alert-banner-success">
+                <i class="fa-solid fa-circle-check"></i>
+                <span id="rep-banner-debt-val">TỔNG CÔNG NỢ TỒN ĐỌNG: 600,000 đ · Khớp chính xác với Dashboard và Quản
+                  lý nợ phạt.</span>
               </div>
             </div>
 
-            <!-- 4 KPI Cards -->
-            <div class="kpi-grid-4">
-              <div class="kpi-card">
-                <div class="kpi-card-header">
-                  <span class="kpi-title">Lượt mượn trong tháng</span>
-                  <i class="fa-solid fa-file-circle-plus kpi-icon"></i>
+            <!-- ============================================================== -->
+            <!-- TAB 2: BÁO CÁO SÁCH QUÁ HẠN THEO NGÀY (LUỒNG 3 TÁC NGHIỆP)       -->
+            <!-- ============================================================== -->
+            <div id="report-tab-content-overdue" style="display: none;">
+              <!-- Bộ lọc thời gian nhanh -->
+              <div class="report-filter-bar"
+                style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <span
+                    style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-right: 4px;">
+                    <i class="fa-solid fa-filter"></i> Lọc nhanh:
+                  </span>
+                  <button type="button" class="btn-filter-chip" id="chip-overdue-today"
+                    onclick="window.handleFilterOverdueQuick('today')">Hôm nay</button>
+                  <button type="button" class="btn-filter-chip" id="chip-overdue-7days"
+                    onclick="window.handleFilterOverdueQuick('7days')">7 ngày qua</button>
+                  <button type="button" class="btn-filter-chip active" id="chip-overdue-month"
+                    onclick="window.handleFilterOverdueQuick('month')">Tháng này</button>
+                  <button type="button" class="btn-filter-chip" id="chip-overdue-quarter"
+                    onclick="window.handleFilterOverdueQuick('quarter')">Quý này</button>
                 </div>
-                <div class="kpi-value" id="rep-kpi-loans">845</div>
+
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div class="floating-input-wrap" style="width: 150px; margin: 0;">
+                    <span class="floating-label">Từ ngày</span>
+                    <input type="text" id="overdue-from-date" class="floating-input" value="01/09/2026"
+                      onchange="window.handleCustomOverdueDateChange()">
+                    <i class="fa-regular fa-calendar-days input-icon-right"></i>
+                  </div>
+                  <span style="color: #94a3b8; font-weight: 700;">—</span>
+                  <div class="floating-input-wrap" style="width: 150px; margin: 0;">
+                    <span class="floating-label">Đến ngày</span>
+                    <input type="text" id="overdue-to-date" class="floating-input" value="31/10/2026"
+                      onchange="window.handleCustomOverdueDateChange()">
+                    <i class="fa-regular fa-calendar-days input-icon-right"></i>
+                  </div>
+                  <button type="button" class="btn btn-outline btn-sm" onclick="window.handleCustomOverdueDateChange()"
+                    style="height: 40px; padding: 0 14px; font-weight: 600;">
+                    <i class="fa-solid fa-magnifying-glass"></i> Lọc
+                  </button>
+                </div>
               </div>
 
-              <div class="kpi-card">
-                <div class="kpi-card-header">
-                  <span class="kpi-title">Lượt trả trong tháng</span>
-                  <i class="fa-solid fa-file-circle-check kpi-icon"></i>
+              <!-- 3 Thẻ chỉ số nhanh (KPI Grid 3) -->
+              <div class="kpi-grid-3">
+                <div class="kpi-card"
+                  style="border-left: 4px solid #ef4444; background: #ffffff; padding: 18px 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-size: 13px; font-weight: 700; color: #64748b;">Tổng sách quá hạn</span>
+                    <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444; font-size: 18px;"></i>
+                  </div>
+                  <div id="rep-overdue-kpi-count"
+                    style="font-size: 32px; font-weight: 800; color: #ef4444; margin-bottom: 4px;">3 cuốn</div>
+                  <div style="font-size: 12px; color: #94a3b8;">Đang lưu hành quá hạn quy định</div>
                 </div>
-                <div class="kpi-value" id="rep-kpi-returns">790</div>
+
+                <div class="kpi-card"
+                  style="border-left: 4px solid #f59e0b; background: #ffffff; padding: 18px 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-size: 13px; font-weight: 700; color: #64748b;">Tiền phạt ước tính</span>
+                    <i class="fa-solid fa-coins" style="color: #f59e0b; font-size: 18px;"></i>
+                  </div>
+                  <div id="rep-overdue-kpi-fine"
+                    style="font-size: 32px; font-weight: 800; color: #b45309; margin-bottom: 4px;">38.000 đ</div>
+                  <div style="font-size: 12px; color: #94a3b8;">Tạm tính 2.000 đ / ngày trễ</div>
+                </div>
+
+                <div class="kpi-card"
+                  style="border-left: 4px solid #3b82f6; background: #ffffff; padding: 18px 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-size: 13px; font-weight: 700; color: #64748b;">Khoa có nhiều sách trễ nhất</span>
+                    <i class="fa-solid fa-building-columns" style="color: #3b82f6; font-size: 18px;"></i>
+                  </div>
+                  <div id="rep-overdue-kpi-topdept"
+                    style="font-size: 20px; font-weight: 800; color: #1e3a8a; margin-bottom: 4px; line-height: 1.4;">
+                    Khoa CNTT (2 cuốn)</div>
+                  <div style="font-size: 12px; color: #94a3b8;">Cần gửi thông báo nhắc nhở</div>
+                </div>
               </div>
 
-              <div class="kpi-card">
-                <div class="kpi-card-header">
-                  <span class="kpi-title">Tiền phạt đã thu</span>
-                  <i class="fa-solid fa-wallet kpi-icon"></i>
-                </div>
-                <div class="kpi-value" id="rep-kpi-fines">3.420.000 đ</div>
-              </div>
-
-              <div class="kpi-card">
-                <div class="kpi-card-header">
-                  <span class="kpi-title">Bồi thường đã thu</span>
-                  <i class="fa-solid fa-money-bill-wave kpi-icon"></i>
-                </div>
-                <div class="kpi-value" id="rep-kpi-compensation">850.000 đ</div>
-              </div>
-            </div>
-
-            <!-- Two Panels: Top Books & Fines by Department -->
-            <div class="report-split-grid">
-
-              <!-- Left: Top 3 Books -->
+              <!-- Bảng Danh sách bản sao đang quá hạn lưu hành -->
               <div class="hcmue-card">
-                <div class="hcmue-card-header">
-                  <div class="hcmue-card-title">Top 3 Đầu Sách Lưu Thông Cao Nhất</div>
-                  <div class="hcmue-card-desc">Lượt mượn theo đầu sách</div>
-                </div>
-
-                <div id="rep-top-books-container"></div>
-              </div>
-
-              <!-- Right: Thu Phạt & Công Nợ Theo Khoa -->
-              <div class="hcmue-card">
-                <div class="hcmue-card-header">
-                  <div class="hcmue-card-title">Thu Phạt & Công Nợ Theo Khoa</div>
-                  <div class="hcmue-card-desc">Số tiền đã thu và nợ tồn đọng</div>
+                <div class="hcmue-card-header"
+                  style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #e2e8f0;">
+                  <div>
+                    <div class="hcmue-card-title"
+                      style="font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+                      <i class="fa-solid fa-clock" style="color: #ef4444;"></i>
+                      DANH SÁCH BẢN SAO ĐANG QUÁ HẠN LƯU HÀNH
+                    </div>
+                    <div class="hcmue-card-desc" style="font-size: 12px; color: #64748b; margin-top: 2px;">
+                      Theo dõi chi tiết số ngày trễ hạn và số tiền phạt tương ứng của từng độc giả
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-outline btn-sm" onclick="window.handleExportOverdueExcel()"
+                    style="display: flex; align-items: center; gap: 6px; font-weight: 600; padding: 8px 14px;">
+                    <i class="fa-solid fa-file-excel" style="color: #16a34a;"></i> Xuất Excel danh sách
+                  </button>
                 </div>
 
                 <div class="table-responsive">
                   <table class="hcmue-table">
                     <thead>
                       <tr>
-                        <th>Khoa</th>
-                        <th>Đã thu</th>
-                        <th>Nợ tồn đọng</th>
+                        <th style="width: 120px;">Mã sách</th>
+                        <th>Tựa sách</th>
+                        <th>Sinh viên mượn (MSSV)</th>
+                        <th style="width: 140px;">Hạn trả</th>
+                        <th style="width: 170px;">Trễ / Phạt</th>
                       </tr>
                     </thead>
-                    <tbody id="rep-faculties-tbody"></tbody>
+                    <tbody id="rep-overdue-loans-tbody">
+                      <!-- Rendered dynamically -->
+                    </tbody>
                   </table>
                 </div>
               </div>
-
-            </div>
-
-            <div class="alert-banner alert-banner-success">
-              <i class="fa-solid fa-circle-check"></i>
-              <span id="rep-banner-debt-val">TỔNG CÔNG NỢ TỒN ĐỌNG: 600,000 đ · Khớp chính xác với Dashboard và Quản lý
-                nợ phạt.</span>
             </div>
           </div>
 
@@ -1589,7 +1751,9 @@
                   oninput="window.handleStudentSearchInput(event)" autocomplete="off">
                 <i class="fa-solid fa-magnifying-glass input-icon-right"></i>
                 <!-- Dropdown Gợi ý tìm kiếm tự động -->
-                <div id="student-search-dropdown" class="student-search-dropdown hidden" style="position: absolute; top: 100%; left: 0; right: 0; background: #ffffff; border: 1px solid var(--border-color); border-radius: 0 0 var(--radius-md) var(--radius-md); box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 1000; max-height: 280px; overflow-y: auto; margin-top: 4px; display: none;"></div>
+                <div id="student-search-dropdown" class="student-search-dropdown hidden"
+                  style="position: absolute; top: 100%; left: 0; right: 0; background: #ffffff; border: 1px solid var(--border-color); border-radius: 0 0 var(--radius-md) var(--radius-md); box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 1000; max-height: 280px; overflow-y: auto; margin-top: 4px; display: none;">
+                </div>
               </div>
               <div class="cell-sub" style="margin-top: 8px;">Tra cứu tài liệu học tập · Giáo trình · Sách tham khảo
               </div>
@@ -1962,11 +2126,27 @@
               </div>
             </div>
 
-            <div class="file-upload-dropzone">
-              <i class="fa-solid fa-file-arrow-up dropzone-icon"></i>
-              <div class="dropzone-title">Đính kèm tệp PDF đọc thử mẫu</div>
-              <div class="dropzone-subtitle">Kéo thả hoặc chọn tệp PDF mẫu</div>
-              <button type="button" class="btn btn-outline btn-sm">Chọn tệp PDF</button>
+            <div class="file-upload-dropzone" id="add-title-pdf-dropzone"
+              onclick="document.getElementById('add-title-pdf-file').click()"
+              style="cursor: pointer; border: 2px dashed var(--border-color); border-radius: 8px; padding: 20px; text-align: center; transition: all 0.2s; background: #fafbfc;">
+              <input type="file" id="add-title-pdf-file" accept="application/pdf,.pdf" style="display: none;"
+                onchange="window.handlePdfFileSelected(event)">
+              <i class="fa-solid fa-file-arrow-up dropzone-icon" id="dropzone-default-icon"
+                style="font-size: 28px; color: var(--hcmue-navy); margin-bottom: 8px;"></i>
+              <div class="dropzone-title" id="dropzone-file-name"
+                style="font-weight: 700; font-size: 13px; color: var(--text-main);">Đính kèm tệp PDF đọc thử mẫu</div>
+              <div class="dropzone-subtitle" id="dropzone-file-size"
+                style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Kéo thả hoặc nhấp để chọn tệp PDF
+                mẫu từ máy tính</div>
+              <div style="display: flex; justify-content: center; align-items: center; gap: 8px;">
+                <button type="button" class="btn btn-outline btn-sm" id="btn-select-pdf-trigger"
+                  onclick="event.stopPropagation(); document.getElementById('add-title-pdf-file').click()">Chọn tệp
+                  PDF</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btn-remove-pdf" style="display: none;"
+                  onclick="event.stopPropagation(); window.handleRemoveSelectedPdf(event)">
+                  <i class="fa-solid fa-trash-can" style="margin-right: 4px;"></i> Xóa file
+                </button>
+              </div>
             </div>
           </div>
 
