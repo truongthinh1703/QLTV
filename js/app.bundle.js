@@ -74,6 +74,54 @@ const INITIAL_DB = {
 
     {
 
+      id: "GV.CNTT.01",
+      username: "GV.CNTT.01",
+      password: "123456",
+      name: "TS. Lê Hoàng Nam",
+      staffId: "GV.CNTT.01",
+      mssv: null,
+      cardId: "THE-GVCNTT01",
+      role: "DOC_GIA",
+      readerType: "GIANG_VIEN",
+      email: "namlh@hcmue.edu.vn",
+      phone: "0912345678",
+      className: null,
+      departmentSub: "Bộ môn Công nghệ phần mềm",
+      department: "Khoa Công nghệ Thông tin",
+      departmentKey: "CNTT",
+      status: "KICH_HOAT",
+      cardStatus: "HOAT_DONG",
+      issueDate: "15/09/2023",
+      cardExpiry: "30/06/2031",
+      debt: 0,
+      borrowedCount: 0,
+      avatarText: "LN"
+    },
+    {
+      id: "GV.TOAN.02",
+      username: "GV.TOAN.02",
+      password: "123456",
+      name: "ThS. Nguyễn Thị Bích Loan",
+      staffId: "GV.TOAN.02",
+      mssv: null,
+      cardId: "THE-GVTOAN02",
+      role: "DOC_GIA",
+      readerType: "GIANG_VIEN",
+      email: "loanntb@hcmue.edu.vn",
+      phone: "0987654321",
+      className: null,
+      departmentSub: "Bộ môn Giải tích",
+      department: "Khoa Toán - Tin",
+      departmentKey: "TOAN",
+      status: "KICH_HOAT",
+      cardStatus: "HOAT_DONG",
+      issueDate: "10/10/2023",
+      cardExpiry: "30/06/2031",
+      debt: 0,
+      borrowedCount: 0,
+      avatarText: "BL"
+    },
+    {
       id: "50.01.103.002",
 
       username: "50.01.103.002",
@@ -3096,6 +3144,25 @@ function sanitizeDB(dbData) {
 
   }
 
+  if (Array.isArray(INITIAL_DB.accounts) && Array.isArray(dbData.accounts)) {
+    INITIAL_DB.accounts.forEach(initAcc => {
+      const existing = dbData.accounts.find(a => a.username === initAcc.username);
+      if (!existing) {
+        dbData.accounts.push(JSON.parse(JSON.stringify(initAcc)));
+        modified = true;
+      } else {
+        if (!existing.readerType && initAcc.readerType) {
+          existing.readerType = initAcc.readerType;
+          modified = true;
+        }
+        if (!existing.departmentSub && initAcc.departmentSub) {
+          existing.departmentSub = initAcc.departmentSub;
+          modified = true;
+        }
+      }
+    });
+  }
+
   if (Array.isArray(INITIAL_DB.categories) && Array.isArray(dbData.categories)) {
 
     INITIAL_DB.categories.forEach(initCat => {
@@ -3346,10 +3413,12 @@ function broadcastDBSync(data, actionName) {
 if (typeof window !== 'undefined') {
   window.initRealtimeSync = initRealtimeSync;
   window.broadcastDBSync = broadcastDBSync;
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initRealtimeSync);
-  } else {
-    initRealtimeSync();
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initRealtimeSync);
+    } else {
+      initRealtimeSync();
+    }
   }
 }
 
@@ -6572,39 +6641,49 @@ function renderReadersScreen() {
   const tbody = document.getElementById('readers-list-tbody');
   if (!tbody) return;
 
-  tbody.innerHTML = readers.map(r => `
-    <tr>
-      <td><span class="cell-bold">${escapeHTML(r.cardId || r.username)}</span></td>
-      <td>
-        <div class="cell-bold">${escapeHTML(r.name)}</div>
-        <div class="cell-sub">${escapeHTML(r.staffId || r.username)}</div>
-      </td>
-      <td>${escapeHTML(r.department || r.className || 'Khoa CNTT')}</td>
-      <td>${escapeHTML(r.issueDate || '15/09/2023')}</td>
-      <td>${escapeHTML(r.cardExpiry || '30/06/2027')}</td>
-      <td>
-        <span class="${r.debt > 0 ? 'cell-amount' : ''}">${Number(r.debt || 0).toLocaleString()} đ</span>
-      </td>
-      <td>
-        <span class="badge ${r.cardStatus === 'HOAT_DONG' ? 'badge-green' : 'badge-red'}">
-          ${r.cardStatus === 'HOAT_DONG' ? 'Hoạt động' : 'Bị khóa'}
-        </span>
-      </td>
-      <td>
-        <div class="cell-actions">
-          ${r.cardStatus === 'HOAT_DONG' ? `
-            <button class="btn-link" onclick="window.handleExtendReaderCard('${r.username}')">Gia hạn thẻ</button>
-            <span>·</span>
-            <button class="btn-link danger" onclick="window.handleToggleLockReader('${r.username}')">Khóa</button>
-          ` : `
-            <button class="btn-link" onclick="window.handleToggleLockReader('${r.username}')">Mở khóa</button>
-            <span>·</span>
-            <button class="btn-link danger" onclick="window.switchScreen('screen-debts')">Thu nợ</button>
-          `}
-        </div>
-      </td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = readers.map(r => {
+    const isGv = r.readerType === 'GIANG_VIEN' || (r.staffId && !r.mssv && !String(r.staffId).startsWith('50.') && !String(r.staffId).startsWith('49.'));
+    const badgeHtml = isGv 
+      ? `<span class="badge badge-blue" style="font-size: 10px; margin-left: 6px; vertical-align: middle;">GIẢNG VIÊN</span>`
+      : `<span class="badge badge-green" style="font-size: 10px; margin-left: 6px; vertical-align: middle;">SINH VIÊN</span>`;
+    const subText = isGv
+      ? `Mã CB: ${escapeHTML(r.staffId || r.username)} · ${escapeHTML(r.departmentSub || 'Giảng viên')}`
+      : `MSSV: ${escapeHTML(r.mssv || r.staffId || r.username)} · ${escapeHTML(r.className || '50.01.SPTIN.B')}`;
+
+    return `
+      <tr>
+        <td><span class="cell-bold">${escapeHTML(r.cardId || r.username)}</span></td>
+        <td>
+          <div class="cell-bold">${escapeHTML(r.name)} ${badgeHtml}</div>
+          <div class="cell-sub">${subText}</div>
+        </td>
+        <td>${escapeHTML(r.department || 'Khoa CNTT')}</td>
+        <td>${escapeHTML(r.issueDate || '15/09/2023')}</td>
+        <td>${escapeHTML(r.cardExpiry || '30/06/2027')}</td>
+        <td>
+          <span class="${r.debt > 0 ? 'cell-amount' : ''}">${Number(r.debt || 0).toLocaleString()} đ</span>
+        </td>
+        <td>
+          <span class="badge ${r.cardStatus === 'HOAT_DONG' ? 'badge-green' : 'badge-red'}">
+            ${r.cardStatus === 'HOAT_DONG' ? 'Hoạt động' : 'Bị khóa'}
+          </span>
+        </td>
+        <td>
+          <div class="cell-actions">
+            ${r.cardStatus === 'HOAT_DONG' ? `
+              <button class="btn-link" onclick="window.handleExtendReaderCard('${r.username}')">Gia hạn thẻ</button>
+              <span>·</span>
+              <button class="btn-link danger" onclick="window.handleToggleLockReader('${r.username}')">Khóa</button>
+            ` : `
+              <button class="btn-link" onclick="window.handleToggleLockReader('${r.username}')">Mở khóa</button>
+              <span>·</span>
+              <button class="btn-link danger" onclick="window.switchScreen('screen-debts')">Thu nợ</button>
+            `}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');;
 }
 
 /**
@@ -6632,7 +6711,8 @@ function openCreateReaderCardModal() {
   }
 
   if (window.openModal) {
-    window.openModal('modal-create-reader-card');
+    window.handleSelectReaderCardType('SINH_VIEN');
+  openModal('modal-create-reader-card');
   } else {
     const modal = document.getElementById('modal-create-reader-card');
     if (modal) modal.classList.add('active');
@@ -6667,6 +6747,69 @@ function generateCardIdFromMssv(mssv) {
 /**
  * Xử lý khi người dùng nhập MSSV: tự động cập nhật Email và Khung xem trước tài khoản
  */
+let currentReaderCardType = 'SINH_VIEN';
+
+function handleSelectReaderCardType(type) {
+  currentReaderCardType = type;
+
+  const radioSv = document.getElementById('nc-radio-sv');
+  const radioGv = document.getElementById('nc-radio-gv');
+  if (radioSv) radioSv.checked = (type === 'SINH_VIEN');
+  if (radioGv) radioGv.checked = (type === 'GIANG_VIEN');
+
+  const mssvLabel = document.getElementById('nc-label-mssv');
+  const mssvInput = document.getElementById('nc-mssv');
+  const nameLabel = document.getElementById('nc-label-name');
+  const nameInput = document.getElementById('nc-name');
+  const classLabel = document.getElementById('nc-label-class');
+  const classInput = document.getElementById('nc-class');
+  const emailLabel = document.getElementById('nc-label-email');
+  const emailInput = document.getElementById('nc-email');
+  const expiryLabel = document.getElementById('nc-label-expiry');
+  const expiryInput = document.getElementById('nc-expiry-date');
+
+  if (type === 'SINH_VIEN') {
+    if (mssvLabel) mssvLabel.innerHTML = 'Mã số sinh viên (MSSV) <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (mssvInput) mssvInput.placeholder = 'Ví dụ: 50.01.103.088';
+    if (nameLabel) nameLabel.innerHTML = 'Họ và tên sinh viên <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (nameInput) nameInput.placeholder = 'Ví dụ: Trần Thị Mai Lan';
+    if (classLabel) classLabel.innerHTML = 'Lớp sinh hoạt <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (classInput) {
+      classInput.placeholder = 'Ví dụ: 50.01.SPTIN.A';
+      if (!classInput.dataset.manualEdited || classInput.value.includes('Bộ môn')) classInput.value = '50.01.SPTIN.A';
+    }
+    if (emailLabel) emailLabel.textContent = 'Email sinh viên';
+    if (emailInput && !emailInput.dataset.manualEdited) {
+      const u = (mssvInput?.value || '').trim();
+      emailInput.placeholder = '50.01.103.088@student.hcmue.edu.vn';
+      if (u) emailInput.value = `${u}@student.hcmue.edu.vn`;
+    }
+    if (expiryLabel) expiryLabel.textContent = 'Hạn thẻ (+4 năm niên khóa)';
+    if (expiryInput) expiryInput.value = '30/06/2030';
+  } else {
+    // GIANG_VIEN
+    if (mssvLabel) mssvLabel.innerHTML = 'Mã số Cán bộ / Giảng viên <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (mssvInput) mssvInput.placeholder = 'Ví dụ: GV.CNTT.01';
+    if (nameLabel) nameLabel.innerHTML = 'Họ và tên Giảng viên / Cán bộ <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (nameInput) nameInput.placeholder = 'Ví dụ: TS. Trần Văn Minh';
+    if (classLabel) classLabel.innerHTML = 'Bộ môn / Đơn vị công tác <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (classInput) {
+      classInput.placeholder = 'Ví dụ: Bộ môn Công nghệ phần mềm';
+      if (!classInput.dataset.manualEdited || classInput.value.includes('.SPTIN.')) classInput.value = 'Bộ môn Công nghệ phần mềm';
+    }
+    if (emailLabel) emailLabel.textContent = 'Email công vụ';
+    if (emailInput && !emailInput.dataset.manualEdited) {
+      const u = (mssvInput?.value || '').trim();
+      emailInput.placeholder = 'gv.minhtv@hcmue.edu.vn';
+      if (u) emailInput.value = `${u}@hcmue.edu.vn`;
+    }
+    if (expiryLabel) expiryLabel.textContent = 'Hạn thẻ (+5 năm công tác)';
+    if (expiryInput) expiryInput.value = '30/06/2031';
+  }
+
+  handleReaderCardMssvInput(mssvInput ? mssvInput.value : '');
+}
+
 function handleReaderCardMssvInput(val) {
   const raw = String(val || '').trim();
   const emailInput = document.getElementById('nc-email');
@@ -6762,17 +6905,21 @@ function handleCreateReaderCardSubmit() {
   else if (department.includes('Ngoại ngữ') || department.includes('Anh')) deptKey = 'NGOAI_NGU';
   else if (department.includes('Vật lý')) deptKey = 'VAT_LY';
 
+  const readerType = currentReaderCardType;
   const newAccount = {
     id: mssv,
     username: mssv,
     password: "123456",
     name: name,
     staffId: mssv,
+    mssv: readerType === 'SINH_VIEN' ? mssv : null,
     cardId: generatedCardId,
     role: "DOC_GIA",
+    readerType: readerType,
     email: email,
     phone: phone,
-    className: className,
+    className: readerType === 'SINH_VIEN' ? className : null,
+    departmentSub: readerType === 'GIANG_VIEN' ? className : null,
     department: department,
     departmentKey: deptKey,
     status: "KICH_HOAT",
@@ -6787,10 +6934,14 @@ function handleCreateReaderCardSubmit() {
   const newReader = {
     id: generatedCardId,
     cardId: generatedCardId,
-    mssv: mssv,
+    username: mssv,
+    mssv: readerType === 'SINH_VIEN' ? mssv : null,
+    staffId: readerType === 'GIANG_VIEN' ? mssv : null,
     name: name,
+    readerType: readerType,
     department: department,
-    className: className,
+    className: readerType === 'SINH_VIEN' ? className : null,
+    departmentSub: readerType === 'GIANG_VIEN' ? className : null,
     email: email,
     phone: phone,
     status: "HOAT_DONG",
@@ -6927,21 +7078,34 @@ function renderAccountsScreen() {
   tbody.innerHTML = filteredAccounts.map(acc => {
     let roleBadge = 'badge-green';
     let roleLabel = 'ĐỘC GIẢ / SINH VIÊN';
+    const isGiangVien = acc.readerType === 'GIANG_VIEN' || (acc.role === 'DOC_GIA' && acc.staffId && !acc.mssv && !String(acc.staffId).startsWith('50.') && !String(acc.staffId).startsWith('49.'));
+    
     if (acc.role === 'ADMIN') {
       roleBadge = 'badge-purple';
       roleLabel = 'ADMIN';
     } else if (acc.role === 'THU_THU') {
       roleBadge = 'badge-blue';
       roleLabel = 'THỦ THƯ';
+    } else if (acc.role === 'DOC_GIA') {
+      if (isGiangVien) {
+        roleBadge = 'badge-blue';
+        roleLabel = 'ĐỘC GIẢ / GIẢNG VIÊN';
+      } else {
+        roleBadge = 'badge-green';
+        roleLabel = 'ĐỘC GIẢ / SINH VIÊN';
+      }
     }
 
     const isLocked = acc.status === 'KHOA';
+    const subText = acc.role !== 'DOC_GIA' 
+      ? (acc.staffId ? `Mã CB: ${acc.staffId}` : '') 
+      : (isGiangVien ? `${acc.name} · Mã CB: ${acc.staffId || acc.username} · ${acc.departmentSub || 'Giảng viên'}` : `${acc.name} · MSSV: ${acc.mssv || acc.username} · ${acc.className || 'Sinh viên'}`);
 
     return `
       <tr>
         <td>
           <div class="cell-bold">${escapeHTML(acc.username)} ${acc.role !== 'DOC_GIA' ? `· ${escapeHTML(acc.name)}` : ''}</div>
-          <div class="cell-sub">${escapeHTML(acc.role === 'DOC_GIA' ? acc.name : (acc.staffId ? `Mã CB: ${acc.staffId}` : ''))}</div>
+          <div class="cell-sub">${escapeHTML(subText)}</div>
         </td>
         <td>${escapeHTML(acc.email)}</td>
         <td><span class="badge ${roleBadge}">${roleLabel}</span></td>
@@ -7213,6 +7377,95 @@ function renderReportsScreen() {
 // QUẢN LÝ TẠO TÀI KHOẢN NGƯỜI DÙNG & PHÂN QUYỀN (UC04)
 // =============================================================================
 let currentCreateAccountRole = 'DOC_GIA';
+let currentCreateAccountReaderType = 'SINH_VIEN';
+
+function handleSelectAccountReaderType(type) {
+  currentCreateAccountReaderType = type;
+
+  const btnSv = document.getElementById('ca-type-btn-sv');
+  const btnGv = document.getElementById('ca-type-btn-gv');
+
+  if (type === 'SINH_VIEN') {
+    if (btnSv) {
+      btnSv.classList.add('active');
+      btnSv.style.borderColor = '#16a34a';
+      btnSv.style.background = '#f0fdf4';
+      btnSv.style.color = '#166534';
+      btnSv.style.fontWeight = '700';
+    }
+    if (btnGv) {
+      btnGv.classList.remove('active');
+      btnGv.style.borderColor = '#cbd5e1';
+      btnGv.style.background = '#ffffff';
+      btnGv.style.color = '#475569';
+      btnGv.style.fontWeight = '600';
+    }
+  } else {
+    if (btnGv) {
+      btnGv.classList.add('active');
+      btnGv.style.borderColor = '#1d4ed8';
+      btnGv.style.background = '#eff6ff';
+      btnGv.style.color = '#1e40af';
+      btnGv.style.fontWeight = '700';
+    }
+    if (btnSv) {
+      btnSv.classList.remove('active');
+      btnSv.style.borderColor = '#cbd5e1';
+      btnSv.style.background = '#ffffff';
+      btnSv.style.color = '#475569';
+      btnSv.style.fontWeight = '600';
+    }
+  }
+
+  // Cập nhật các trường thông tin thích ứng động
+  const usernameInput = document.getElementById('ca-username');
+  const usernameLabel = document.getElementById('ca-label-username');
+  const nameLabel = document.getElementById('ca-label-name');
+  const nameInput = document.getElementById('ca-name');
+  const emailInput = document.getElementById('ca-email');
+  const classLabel = document.getElementById('ca-label-class');
+  const classInput = document.getElementById('ca-class');
+  const expiryPreview = document.getElementById('ca-card-expiry-preview');
+
+  if (type === 'SINH_VIEN') {
+    if (usernameLabel) usernameLabel.innerHTML = 'Tên đăng nhập / MSSV <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (usernameInput) usernameInput.placeholder = 'Ví dụ: 50.01.104.088';
+    if (nameLabel) nameLabel.innerHTML = 'Họ và tên sinh viên <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (nameInput) nameInput.placeholder = 'Ví dụ: Nguyễn Văn An';
+    if (classLabel) classLabel.innerHTML = 'Lớp chuyên ngành / Niên khóa <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (classInput) {
+      classInput.placeholder = 'Ví dụ: 50.01.CNTT.A';
+      if (!classInput.dataset.manualEdited || classInput.value.includes('Bộ môn')) classInput.value = '50.01.CNTT.A';
+    }
+    if (emailInput && !emailInput.dataset.manualEdited) {
+      const u = (usernameInput?.value || '').trim();
+      emailInput.placeholder = u ? `${u}@student.hcmue.edu.vn` : 'Ví dụ: 50.01.104.088@student.hcmue.edu.vn';
+      if (u) emailInput.value = `${u}@student.hcmue.edu.vn`;
+    }
+    if (expiryPreview) {
+      expiryPreview.innerHTML = '<strong style="color: #0f172a; margin-left: 6px;">4 năm</strong> <span style="color: #64748b; font-size: 11px;">(30/06/2030)</span>';
+    }
+  } else {
+    // GIANG_VIEN
+    if (usernameLabel) usernameLabel.innerHTML = 'Tên đăng nhập / Mã Cán bộ <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (usernameInput) usernameInput.placeholder = 'Ví dụ: GV202601 hoặc CB.CNTT.01';
+    if (nameLabel) nameLabel.innerHTML = 'Họ và tên Giảng viên / Cán bộ <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (nameInput) nameInput.placeholder = 'Ví dụ: TS. Trần Văn Minh';
+    if (classLabel) classLabel.innerHTML = 'Bộ môn / Học vị - Chức vụ <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (classInput) {
+      classInput.placeholder = 'Ví dụ: Bộ môn CNPM / ThS. Giảng viên';
+      if (!classInput.dataset.manualEdited || classInput.value.includes('.CNTT.')) classInput.value = 'Bộ môn Công nghệ phần mềm';
+    }
+    if (emailInput && !emailInput.dataset.manualEdited) {
+      const u = (usernameInput?.value || '').trim();
+      emailInput.placeholder = u ? `${u}@hcmue.edu.vn` : 'Ví dụ: gv.minhtv@hcmue.edu.vn';
+      if (u) emailInput.value = `${u}@hcmue.edu.vn`;
+    }
+    if (expiryPreview) {
+      expiryPreview.innerHTML = '<strong style="color: #0f172a; margin-left: 6px;">5 năm</strong> <span style="color: #64748b; font-size: 11px;">(30/06/2031)</span>';
+    }
+  }
+}
 
 function handleSelectAccountRole(role) {
   currentCreateAccountRole = role;
@@ -7243,23 +7496,22 @@ function handleSelectAccountRole(role) {
 
   const usernameInput = document.getElementById('ca-username');
   const usernameLabel = document.getElementById('ca-label-username');
+  const nameLabel = document.getElementById('ca-label-name');
   const emailInput = document.getElementById('ca-email');
   const readerCardBox = document.getElementById('ca-reader-card-box');
   const classWrap = document.getElementById('ca-wrap-class');
+  const readerTypeSegment = document.getElementById('ca-reader-type-segment');
 
   if (role === 'DOC_GIA') {
-    if (usernameLabel) usernameLabel.innerHTML = 'Tên đăng nhập / MSSV <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
-    if (usernameInput) usernameInput.placeholder = 'Ví dụ: 49.01.104.088';
-    if (emailInput && (!emailInput.dataset.manualEdited)) {
-      const u = (usernameInput?.value || '').trim();
-      emailInput.placeholder = u ? `${u}@student.hcmue.edu.vn` : 'Ví dụ: 49.01.104.088@student.hcmue.edu.vn';
-      if (u) emailInput.value = `${u}@student.hcmue.edu.vn`;
-    }
+    if (readerTypeSegment) readerTypeSegment.style.display = 'flex';
+    handleSelectAccountReaderType(currentCreateAccountReaderType);
     if (readerCardBox) readerCardBox.style.display = 'block';
     if (classWrap) classWrap.style.display = 'block';
   } else {
+    if (readerTypeSegment) readerTypeSegment.style.display = 'none';
     if (usernameLabel) usernameLabel.innerHTML = 'Tên đăng nhập / Mã cán bộ <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
     if (usernameInput) usernameInput.placeholder = role === 'ADMIN' ? 'Ví dụ: admin02 hoặc CB202601' : 'Ví dụ: thuthu02 hoặc CB202602';
+    if (nameLabel) nameLabel.innerHTML = 'Họ và tên đầy đủ <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
     if (emailInput && (!emailInput.dataset.manualEdited)) {
       const u = (usernameInput?.value || '').trim();
       emailInput.placeholder = 'Ví dụ: canbo@hcmue.edu.vn';
@@ -7399,23 +7651,31 @@ function handleCreateAccountSubmit() {
   else if (department.includes('Ngoại ngữ') || department.includes('Anh')) deptKey = 'NGOAI_NGU';
   else if (department.includes('Vật lý')) deptKey = 'VAT_LY';
 
+  const isDocGia = currentCreateAccountRole === 'DOC_GIA';
+  const readerType = isDocGia ? currentCreateAccountReaderType : null;
+  const expiryDate = isDocGia ? (readerType === 'GIANG_VIEN' ? '30/06/2031' : '30/06/2030') : '—';
+  const issueDateStr = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
   const newAccount = {
     id: username,
     username: username,
     password: "123456",
     name: name,
     staffId: username,
-    cardId: (currentCreateAccountRole === 'DOC_GIA' && createCard) ? generatedCardId : '',
+    mssv: (isDocGia && readerType === 'SINH_VIEN') ? username : null,
+    cardId: (isDocGia && createCard) ? generatedCardId : '',
     role: currentCreateAccountRole,
+    readerType: readerType,
     email: email,
     phone: phone,
-    className: className,
+    className: (isDocGia && readerType === 'SINH_VIEN') ? className : null,
+    departmentSub: (isDocGia && readerType === 'GIANG_VIEN') ? className : null,
     department: department,
     departmentKey: deptKey,
     status: "KICH_HOAT",
-    cardStatus: (currentCreateAccountRole === 'DOC_GIA' && createCard) ? "HOAT_DONG" : "—",
-    cardExpiry: (currentCreateAccountRole === 'DOC_GIA' && createCard) ? "30/06/2030" : "—",
-    issueDate: new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+    cardStatus: (isDocGia && createCard) ? "HOAT_DONG" : "—",
+    cardExpiry: (isDocGia && createCard) ? expiryDate : "—",
+    issueDate: issueDateStr,
     debt: 0,
     borrowedCount: 0,
     avatarText: avatarText,
@@ -7428,21 +7688,25 @@ function handleCreateAccountSubmit() {
     draft.accounts.unshift(newAccount);
 
     // Nếu vai trò là DOC_GIA và có chọn cấp thẻ: thêm vào readers
-    if (currentCreateAccountRole === 'DOC_GIA' && createCard) {
+    if (isDocGia && createCard) {
       if (!Array.isArray(draft.readers)) draft.readers = [];
       draft.readers.unshift({
         id: generatedCardId,
         cardId: generatedCardId,
-        mssv: username,
+        username: username,
+        mssv: readerType === 'SINH_VIEN' ? username : null,
+        staffId: readerType === 'GIANG_VIEN' ? username : null,
         name: name,
+        readerType: readerType,
         department: department,
-        className: className,
+        className: readerType === 'SINH_VIEN' ? className : null,
+        departmentSub: readerType === 'GIANG_VIEN' ? className : null,
         email: email,
         phone: phone,
         status: "HOAT_DONG",
         cardStatus: "HOAT_DONG",
-        issueDate: newAccount.issueDate,
-        cardExpiry: "30/06/2030",
+        issueDate: issueDateStr,
+        cardExpiry: expiryDate,
         debt: 0,
         borrowedCount: 0
       });
@@ -8893,7 +9157,7 @@ const ADMIN_SCREENS = ['screen-accounts', 'screen-config', 'screen-backup', 'scr
 
 const LIBRARIAN_SCREENS = [
 
-  'screen-dashboard', 'screen-borrow', 'screen-return', 'screen-debts', 
+  'screen-dashboard', 'screen-borrow', 'screen-return', 'screen-debts',
 
   'screen-titles', 'screen-copies', 'screen-categories', 'screen-inventory', 'screen-readers'
 
@@ -9073,7 +9337,7 @@ function switchScreen(targetScreenId, pushToHistory = true) {
     } catch (e) {
       try {
         window.location.hash = targetScreenId;
-      } catch (err) {}
+      } catch (err) { }
     }
   }
 
@@ -9124,7 +9388,7 @@ function handleBrowserBackNavigation(event) {
     if (activeScreenId && typeof window !== 'undefined' && window.history) {
       try {
         window.history.replaceState({ screenId: activeScreenId }, '', '#' + activeScreenId);
-      } catch (e) {}
+      } catch (e) { }
     }
     return;
   }
@@ -9143,7 +9407,7 @@ function handleBrowserBackNavigation(event) {
     switchScreen(homeScreen, false);
     try {
       window.history.replaceState({ screenId: homeScreen }, '', '#' + homeScreen);
-    } catch (e) {}
+    } catch (e) { }
     return;
   }
 
@@ -9152,7 +9416,7 @@ function handleBrowserBackNavigation(event) {
     switchScreen('screen-login', false);
     try {
       window.history.replaceState({ screenId: 'screen-login' }, '', '#screen-login');
-    } catch (e) {}
+    } catch (e) { }
     return;
   }
 
@@ -9164,7 +9428,7 @@ function handleBrowserBackNavigation(event) {
     switchScreen(homeScreen, false);
     try {
       window.history.replaceState({ screenId: homeScreen }, '', '#' + homeScreen);
-    } catch (e) {}
+    } catch (e) { }
   }
 }
 
@@ -9286,7 +9550,7 @@ function reRenderScreen(targetScreenId = activeScreenId) {
 
   }
 
-  
+
 
   refreshGlobalDropdowns();
 
@@ -9395,6 +9659,12 @@ function reRenderScreen(targetScreenId = activeScreenId) {
  * Quản lý Modal Popup (Mở / Đóng)
 
  */
+
+function openCreateAccountModal() {
+  if (typeof handleSelectAccountRole === 'function') handleSelectAccountRole('DOC_GIA');
+  if (typeof handleSelectAccountReaderType === 'function') handleSelectAccountReaderType('SINH_VIEN');
+  openModal('modal-create-account');
+}
 
 function openModal(modalId) {
 
@@ -9570,7 +9840,7 @@ function syncUserInterface(user) {
 
     const initialScreen = (hashScreen && document.getElementById(hashScreen) && ADMIN_SCREENS.includes(hashScreen)) ? hashScreen : 'screen-accounts';
     switchScreen(initialScreen, false);
-    try { window.history.replaceState({ screenId: initialScreen }, '', '#' + initialScreen); } catch(e) {}
+    try { window.history.replaceState({ screenId: initialScreen }, '', '#' + initialScreen); } catch (e) { }
 
   } else if (user.role === 'THU_THU') {
 
@@ -9600,7 +9870,7 @@ function syncUserInterface(user) {
 
     const initialScreen = (hashScreen && document.getElementById(hashScreen) && (LIBRARIAN_SCREENS.includes(hashScreen) || hashScreen === 'screen-student-search')) ? hashScreen : 'screen-dashboard';
     switchScreen(initialScreen, false);
-    try { window.history.replaceState({ screenId: initialScreen }, '', '#' + initialScreen); } catch(e) {}
+    try { window.history.replaceState({ screenId: initialScreen }, '', '#' + initialScreen); } catch (e) { }
 
   } else if (user.role === 'DOC_GIA') {
 
@@ -9616,7 +9886,9 @@ function syncUserInterface(user) {
 
     if (topbarTitle) topbarTitle.textContent = 'HỆ THỐNG QUẢN LÝ THƯ VIỆN';
 
-    if (topbarUserRole) topbarUserRole.textContent = `${user.staffId} - Sinh viên`;
+    const isGiangVien = user.readerType === 'GIANG_VIEN' || (user.staffId && !user.mssv && !String(user.staffId).startsWith('50.') && !String(user.staffId).startsWith('49.'));
+    const roleTitle = isGiangVien ? 'Giảng viên' : 'Sinh viên';
+    if (topbarUserRole) topbarUserRole.textContent = `${user.staffId || user.username} - ${roleTitle}`;
 
     if (topbarAvatar) {
 
@@ -9630,7 +9902,7 @@ function syncUserInterface(user) {
 
     const initialScreen = (hashScreen && document.getElementById(hashScreen) && STUDENT_SCREENS.includes(hashScreen)) ? hashScreen : 'screen-student-search';
     switchScreen(initialScreen, false);
-    try { window.history.replaceState({ screenId: initialScreen }, '', '#' + initialScreen); } catch(e) {}
+    try { window.history.replaceState({ screenId: initialScreen }, '', '#' + initialScreen); } catch (e) { }
 
   }
 
@@ -9655,7 +9927,7 @@ function registerGlobalEvents() {
   });
 
   // Hàm toàn cục cho nút quay lại (Back Navigation)
-  window.goBack = function() {
+  window.goBack = function () {
     const activeModals = document.querySelectorAll('.modal-overlay.active');
     if (activeModals.length > 0) {
       activeModals.forEach(m => m.classList.remove('active'));
@@ -9813,6 +10085,9 @@ function registerGlobalEvents() {
 
   window.getCurrentReturnLoan = getCurrentReturnLoan;
 
+  window.openCreateAccountModal = openCreateAccountModal;
+  window.handleSelectAccountReaderType = handleSelectAccountReaderType;
+  window.handleSelectReaderCardType = handleSelectReaderCardType;
   window.openCreateReaderCardModal = openCreateReaderCardModal;
 
   window.handleReaderCardMssvInput = handleReaderCardMssvInput;
@@ -9833,7 +10108,7 @@ function registerGlobalEvents() {
 
   // Xử lý Quick Login Chip 1-click
 
-  window.quickLogin = function(username, pass) {
+  window.quickLogin = function (username, pass) {
 
     const uInput = document.getElementById('login-username-input');
 
@@ -10053,7 +10328,7 @@ function registerGlobalEvents() {
 
   // Nút Xác nhận đăng xuất
 
-  window.confirmLogoutAction = function() {
+  window.confirmLogoutAction = function () {
 
     handleLogout();
 
@@ -10069,7 +10344,7 @@ function registerGlobalEvents() {
 
   // Nút Reset Seed Data trên Topbar
 
-  window.handleResetSeedData = function() {
+  window.handleResetSeedData = function () {
 
     const confirmed = window.confirm("Cảnh báo: Bạn có chắc chắn muốn thực hiện thao tác này không? Toàn bộ dữ liệu CSDL hiện tại sẽ được thiết lập lại về trạng thái gốc ban đầu.");
 
@@ -10095,7 +10370,7 @@ function registerGlobalEvents() {
 
   // Window handlers cho Circulation
 
-  window.handleDashboardAction = function(copyCode) {
+  window.handleDashboardAction = function (copyCode) {
 
     switchScreen('screen-return');
 
@@ -10107,7 +10382,7 @@ function registerGlobalEvents() {
 
   // Nút Gia hạn (+7 ngày) trên Bảng điều khiển (Mở Modal 06b - Untitled 3)
 
-  window.handleDashboardRenew = function(copyCode) {
+  window.handleDashboardRenew = function (copyCode) {
 
     openRenewCounterModal(copyCode);
 
@@ -10117,7 +10392,7 @@ function registerGlobalEvents() {
 
   // Nút Gia hạn tại quầy trên Màn hình 08 (Mở Modal 06b - Untitled 3)
 
-  window.handleLibrarianRenewCurrentLoan = function() {
+  window.handleLibrarianRenewCurrentLoan = function () {
 
     renewCurrentReturnLoan();
 
@@ -10133,43 +10408,43 @@ function registerGlobalEvents() {
 
   // Window handlers cho Kiểm kê kho (Màn hình 13 - Untitled 3)
 
-  window.handleConfirmInventoryLost = function(code) {
+  window.handleConfirmInventoryLost = function (code) {
 
     confirmInventoryLost(code);
 
   };
 
-  window.handleMarkInventorySuspect = function(code) {
+  window.handleMarkInventorySuspect = function (code) {
 
     markInventorySuspect(code);
 
   };
 
-  window.handleFixInventoryShelf = function(code) {
+  window.handleFixInventoryShelf = function (code) {
 
     fixInventoryShelf(code);
 
   };
 
-  window.handleUpdateInventoryShelf = function(code) {
+  window.handleUpdateInventoryShelf = function (code) {
 
     updateInventoryShelf(code);
 
   };
 
-  window.handleInventoryScan = function() {
+  window.handleInventoryScan = function () {
 
     handleInventoryScan();
 
   };
 
-  window.handleExportInventoryExcel = function() {
+  window.handleExportInventoryExcel = function () {
 
     exportInventoryExcel();
 
   };
 
-  window.handleCommitInventorySync = function() {
+  window.handleCommitInventorySync = function () {
 
     commitInventorySync();
 
@@ -10179,7 +10454,7 @@ function registerGlobalEvents() {
 
   // Tra cứu mã bản sao nhập tay trên Màn hình 08 (Untitled 5)
 
-  window.handleScanBarcodeClick = function() {
+  window.handleScanBarcodeClick = function () {
 
     // Không tích hợp phần cứng quét mã vạch Barcode / RFID thực tế
 
@@ -10187,7 +10462,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleCheckBorrowReader = function() {
+  window.handleCheckBorrowReader = function () {
 
     verifyBorrowReader();
 
@@ -10195,7 +10470,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleAddBorrowCopyCode = function() {
+  window.handleAddBorrowCopyCode = function () {
 
     const input = document.getElementById('borrow-copy-input');
 
@@ -10298,7 +10573,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleRemoveBorrowCopy = function(code) {
+  window.handleRemoveBorrowCopy = function (code) {
 
     removeCopyFromBorrow(code);
 
@@ -10308,7 +10583,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleConfirmBorrowSubmit = function() {
+  window.handleConfirmBorrowSubmit = function () {
 
     executeConfirmBorrow(() => {
 
@@ -10332,7 +10607,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleReturnSearchInput = function(val) {
+  window.handleReturnSearchInput = function (val) {
 
     handleReturnSearchInput(val);
 
@@ -10340,7 +10615,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleSelectReturnLoanFromDropdown = function(copyCode, preferredCard) {
+  window.handleSelectReturnLoanFromDropdown = function (copyCode, preferredCard) {
 
     handleSelectReturnLoanFromDropdown(copyCode, preferredCard);
 
@@ -10348,7 +10623,7 @@ function registerGlobalEvents() {
 
 
 
-  window.hideReturnDropdown = function() {
+  window.hideReturnDropdown = function () {
 
     hideReturnDropdown();
 
@@ -10356,7 +10631,7 @@ function registerGlobalEvents() {
 
 
 
-  window.getAllActiveReturnLoans = function(db) {
+  window.getAllActiveReturnLoans = function (db) {
 
     return getAllActiveReturnLoans(db);
 
@@ -10364,7 +10639,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleLookupReturnCopy = function() {
+  window.handleLookupReturnCopy = function () {
 
     const input = document.getElementById('return-copy-input');
 
@@ -10374,7 +10649,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleSelectCondition = function(idx) {
+  window.handleSelectCondition = function (idx) {
 
     selectConditionOption(idx);
 
@@ -10382,7 +10657,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleCompleteReturn = function(asDebt) {
+  window.handleCompleteReturn = function (asDebt) {
 
     const curReturn = (typeof getCurrentReturnLoan === 'function') ? getCurrentReturnLoan() : null;
 
@@ -10408,7 +10683,7 @@ function registerGlobalEvents() {
 
       const db = getDB();
 
-      const remainingLoans = (db.activeLoans || []).filter(l => 
+      const remainingLoans = (db.activeLoans || []).filter(l =>
 
         (currentReaderCard && l.readerCard && l.readerCard.toUpperCase() === currentReaderCard.toUpperCase()) ||
 
@@ -10501,7 +10776,7 @@ function registerGlobalEvents() {
           if (multiNotice) multiNotice.style.display = 'none';
           if (confirmBtn) {
             confirmBtn.textContent = 'Đóng biên lai';
-            confirmBtn.onclick = function() {
+            confirmBtn.onclick = function () {
               closeModal('modal-receipt');
             };
           }
@@ -10585,7 +10860,7 @@ function registerGlobalEvents() {
 
       if (amtDisplay) amtDisplay.textContent = `${settleAmount.toLocaleString('vi-VN')} đ`;
 
-      
+
 
       if (alertBox) alertBox.className = 'alert-banner alert-banner-success';
 
@@ -10593,7 +10868,7 @@ function registerGlobalEvents() {
 
       if (alertText) alertText.textContent = `Tất toán toàn bộ tất cả ${d.readerDebtsCount} khoản nợ. Thẻ độc giả sẽ được TỰ ĐỘNG MỞ KHÓA sau khi xác nhận.`;
 
-      
+
 
       if (confirmBtn) {
 
@@ -10685,7 +10960,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleReceiptPaymentModeChange = function() {
+  window.handleReceiptPaymentModeChange = function () {
 
     updateReceiptModalState();
 
@@ -10693,7 +10968,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleReceiptPartialInputChange = function() {
+  window.handleReceiptPartialInputChange = function () {
 
     updateReceiptModalState();
 
@@ -10701,7 +10976,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleOpenReceiptModal = function(debtId) {
+  window.handleOpenReceiptModal = function (debtId) {
 
     const d = getDebtReceiptDetails(debtId);
 
@@ -10839,7 +11114,7 @@ function registerGlobalEvents() {
 
     if (confirmBtn) {
 
-      confirmBtn.onclick = function() {
+      confirmBtn.onclick = function () {
 
         const optPartial = document.getElementById('receipt-opt-partial');
 
@@ -10895,7 +11170,7 @@ function registerGlobalEvents() {
 
   // Window handlers cho Catalog
 
-  window.handleSearchMasterTitles = function() {
+  window.handleSearchMasterTitles = function () {
 
     renderMasterTitlesScreen();
 
@@ -10903,7 +11178,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleViewCopiesOfTitle = function(titleId) {
+  window.handleViewCopiesOfTitle = function (titleId) {
 
     switchScreen('screen-copies');
 
@@ -10949,7 +11224,7 @@ function registerGlobalEvents() {
   }
   window.resetPdfDropzoneUI = resetPdfDropzoneUI;
 
-  window.handlePdfFileSelected = function(event) {
+  window.handlePdfFileSelected = function (event) {
     const file = event.target.files && event.target.files[0];
     if (!file) return;
 
@@ -11004,14 +11279,14 @@ function registerGlobalEvents() {
     showToast(`Đã đính kèm tệp PDF: ${file.name} (${sizeStr})`, 'info');
   };
 
-  window.handleRemoveSelectedPdf = function(event) {
+  window.handleRemoveSelectedPdf = function (event) {
     if (event) event.stopPropagation();
     if (typeof setPendingPdfFile === 'function') setPendingPdfFile(null);
     resetPdfDropzoneUI();
     showToast('Đã hủy đính kèm tệp PDF', 'info');
   };
 
-  window.handleSaveNewMasterTitle = function(e) {
+  window.handleSaveNewMasterTitle = function (e) {
     e.preventDefault();
 
     const isbn = document.getElementById('add-title-isbn')?.value;
@@ -11059,7 +11334,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleSaveNewPhysicalCopy = function(e) {
+  window.handleSaveNewPhysicalCopy = function (e) {
 
     e.preventDefault();
 
@@ -11108,7 +11383,7 @@ function registerGlobalEvents() {
 
 
   // Screen 11: Combobox tìm kiếm & cuộn chọn đầu sách mẹ (Untitled 2)
-  window.handleOpenCopiesTitleDropdown = function() {
+  window.handleOpenCopiesTitleDropdown = function () {
     const menu = document.getElementById('copies-title-dropdown-menu');
     const chevron = document.getElementById('copies-title-chevron');
     if (menu) {
@@ -11123,7 +11398,7 @@ function registerGlobalEvents() {
     }
   };
 
-  window.handleCloseCopiesTitleDropdown = function() {
+  window.handleCloseCopiesTitleDropdown = function () {
     const menu = document.getElementById('copies-title-dropdown-menu');
     const chevron = document.getElementById('copies-title-chevron');
     if (menu) menu.classList.add('hidden');
@@ -11140,7 +11415,7 @@ function registerGlobalEvents() {
     }
   };
 
-  window.handleToggleCopiesTitleDropdown = function(event) {
+  window.handleToggleCopiesTitleDropdown = function (event) {
     if (event) event.stopPropagation();
     const menu = document.getElementById('copies-title-dropdown-menu');
     if (menu && !menu.classList.contains('hidden')) {
@@ -11150,7 +11425,7 @@ function registerGlobalEvents() {
     }
   };
 
-  window.handleFilterCopiesTitles = function(query) {
+  window.handleFilterCopiesTitles = function (query) {
     const menu = document.getElementById('copies-title-dropdown-menu');
     if (menu && menu.classList.contains('hidden')) {
       menu.classList.remove('hidden');
@@ -11162,7 +11437,7 @@ function registerGlobalEvents() {
     }
   };
 
-  window.handlePickCopiesTitle = function(titleId) {
+  window.handlePickCopiesTitle = function (titleId) {
     window.handleCloseCopiesTitleDropdown();
     const selectEl = document.getElementById('copies-title-select');
     if (selectEl) selectEl.value = titleId;
@@ -11170,7 +11445,7 @@ function registerGlobalEvents() {
   };
 
   // Click outside listener để đóng Combobox đầu sách
-  document.addEventListener('click', function(e) {
+  document.addEventListener('click', function (e) {
     const wrap = document.getElementById('copies-title-combobox-wrap');
     if (wrap && !wrap.contains(e.target)) {
       window.handleCloseCopiesTitleDropdown();
@@ -11178,7 +11453,7 @@ function registerGlobalEvents() {
   });
 
   // Xóa bản sao vật lý nếu thêm nhầm
-  window.handleDeleteCopy = function(copyCode) {
+  window.handleDeleteCopy = function (copyCode) {
     const db = getDB();
     const copy = (db.copies || []).find(c => c.code === copyCode);
     if (!copy) {
@@ -11215,7 +11490,7 @@ function registerGlobalEvents() {
   };
 
   // Screen 11 Window Handlers (Untitled 2)
-  window.handleSelectCopiesTitle = function(titleId) {
+  window.handleSelectCopiesTitle = function (titleId) {
 
     renderCopiesScreen(titleId);
 
@@ -11223,7 +11498,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleRestoreCopyReady = function(copyCode) {
+  window.handleRestoreCopyReady = function (copyCode) {
 
     const success = restoreCopyReady(copyCode);
 
@@ -11245,7 +11520,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleViewCopyCode = function(copyCode) {
+  window.handleViewCopyCode = function (copyCode) {
 
     showToast(`Mã định danh bản sao: ${copyCode}`, "info");
 
@@ -11253,7 +11528,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handlePrintBarcode = function(copyCode) {
+  window.handlePrintBarcode = function (copyCode) {
 
     showToast(`Mã định danh bản sao: ${copyCode}`, "info");
 
@@ -11261,7 +11536,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleSwitchToReturnScreen = function(copyCode) {
+  window.handleSwitchToReturnScreen = function (copyCode) {
 
     switchScreen('screen-return');
 
@@ -11273,7 +11548,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleViewCopyHistory = function(copyCode) {
+  window.handleViewCopyHistory = function (copyCode) {
 
     showToast(`Lịch sử lưu thông của mã ${copyCode}: Đang được lưu hành theo đúng quy chế thư viện HCMUE`, "info");
 
@@ -11281,7 +11556,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleEditCopyNote = function(copyCode) {
+  window.handleEditCopyNote = function (copyCode) {
 
     const db = getDB();
 
@@ -11325,7 +11600,7 @@ function registerGlobalEvents() {
 
   // Window handlers cho Admin
 
-  window.handleSaveParamsForm = function() {
+  window.handleSaveParamsForm = function () {
 
     const loanDays = document.getElementById('param-loan-days')?.value;
 
@@ -11351,7 +11626,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleResetParamsDefault = function() {
+  window.handleResetParamsDefault = function () {
 
     resetSystemParamsToDefault();
 
@@ -11361,7 +11636,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleCreateNewBackup = function() {
+  window.handleCreateNewBackup = function () {
 
     const btn = document.getElementById('btn-create-backup');
 
@@ -11401,7 +11676,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleDownloadBackup = function(filename) {
+  window.handleDownloadBackup = function (filename) {
     const db = getDB();
     const bk = db.backups?.find(b => b.filename === filename);
     const exportPayload = bk?.snapshot || db;
@@ -11418,7 +11693,7 @@ function registerGlobalEvents() {
     showToast(`✅ Đã tải về tệp sao lưu: ${filename} thành công!`, "success");
   };
 
-  window.handleOpenRestoreAlertModal = function(backupId) {
+  window.handleOpenRestoreAlertModal = function (backupId) {
     const bk = getBackupForRestore(backupId);
     if (!bk) return;
 
@@ -11430,7 +11705,7 @@ function registerGlobalEvents() {
     if (metaEl) metaEl.textContent = `${bk.size} · ${bk.createdAt} · ${bk.author}`;
 
     if (confirmBtn) {
-      confirmBtn.onclick = function() {
+      confirmBtn.onclick = function () {
         closeModal('modal-restore-alert');
         showToast("Đang phục hồi CSDL từ bản sao lưu...", "warning");
 
@@ -11472,15 +11747,15 @@ function registerGlobalEvents() {
     openModal('modal-restore-alert');
   };
 
-  window.handleUploadBackupFile = function(event) {
+  window.handleUploadBackupFile = function (event) {
     const file = event.target?.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
       try {
         const uploadedData = JSON.parse(e.target.result);
-        
+
         // Kiểm tra sơ bộ tính toàn vẹn của file sao lưu HCMUE
         if (!uploadedData.accounts && !uploadedData.titles && !uploadedData.copies) {
           showToast("⛔ Tệp không đúng định dạng sao lưu CSDL HCMUE!", "error");
@@ -11490,7 +11765,7 @@ function registerGlobalEvents() {
         const cur = getCurrentUser();
         const now = new Date();
         const pad = n => n.toString().padStart(2, '0');
-        const timeStr = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        const timeStr = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
         const newUploadedBackup = {
           id: `BK-UPLOAD-${Date.now()}`,
@@ -11520,7 +11795,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleDeleteBackup = function(backupId) {
+  window.handleDeleteBackup = function (backupId) {
 
     const confirmed = window.confirm("Bạn có chắc muốn xóa bản sao lưu này để giải phóng dung lượng không?");
 
@@ -11562,7 +11837,7 @@ function registerGlobalEvents() {
 
   // Các handler bổ trợ quản lý tài khoản & độc giả
 
-  window.handleResetPasswordAccount = function(username) {
+  window.handleResetPasswordAccount = function (username) {
 
     mutateDB(draft => {
 
@@ -11580,7 +11855,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handlePromoteRole = function(username) {
+  window.handlePromoteRole = function (username) {
 
     const roles = ['ADMIN', 'THU_THU', 'DOC_GIA'];
 
@@ -11606,7 +11881,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleToggleLockAccount = function(username) {
+  window.handleToggleLockAccount = function (username) {
 
     const db = getDB();
 
@@ -11650,7 +11925,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleToggleLockReader = function(username) {
+  window.handleToggleLockReader = function (username) {
 
     const db = getDB();
 
@@ -11670,11 +11945,11 @@ function registerGlobalEvents() {
 
       const currentDebt = Number(acc.debt) || 0;
 
-      const hasActiveDebts = db.debts && db.debts.some(d => 
+      const hasActiveDebts = db.debts && db.debts.some(d =>
 
-        ((d.readerCard && d.readerCard.toUpperCase() === (acc.cardId || '').toUpperCase()) || 
+        ((d.readerCard && d.readerCard.toUpperCase() === (acc.cardId || '').toUpperCase()) ||
 
-         (d.readerName && d.readerName === acc.name)) && Number(d.amount) > 0
+          (d.readerName && d.readerName === acc.name)) && Number(d.amount) > 0
 
       );
 
@@ -11796,7 +12071,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleExtendReaderCard = function(username) {
+  window.handleExtendReaderCard = function (username) {
 
     let nextYear = 2028;
 
@@ -11830,7 +12105,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleEditTitle = function(titleId) {
+  window.handleEditTitle = function (titleId) {
 
     const db = getDB();
 
@@ -11860,7 +12135,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleDeleteTitle = function(titleId) {
+  window.handleDeleteTitle = function (titleId) {
     const db = getDB();
     const targetTitle = db.titles.find(t => t.id === titleId);
     const titleName = targetTitle ? targetTitle.title : titleId;
@@ -11907,7 +12182,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleEditCopy = function(copyCode) {
+  window.handleEditCopy = function (copyCode) {
 
     mutateDB(draft => {
 
@@ -11977,7 +12252,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleAddCategoryPrompt = function() {
+  window.handleAddCategoryPrompt = function () {
 
     const name = prompt("Nhập tên thể loại sách mới (ví dụ: Khoa học Dữ liệu):");
 
@@ -12013,7 +12288,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleEditCategory = function(catId) {
+  window.handleEditCategory = function (catId) {
 
     const db = getDB();
 
@@ -12041,7 +12316,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleDeleteCategory = function(catId) {
+  window.handleDeleteCategory = function (catId) {
 
     const db = getDB();
 
@@ -12083,7 +12358,7 @@ function registerGlobalEvents() {
 
   // Window handlers cho Student
 
-  window.handleSearchStudentBooks = function() {
+  window.handleSearchStudentBooks = function () {
 
     renderStudentSearchScreen();
 
@@ -12091,7 +12366,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleOpenPdfPreview = function(titleId) {
+  window.handleOpenPdfPreview = function (titleId) {
 
     openPdfPreviewModal(titleId);
 
@@ -12101,7 +12376,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleSelectPdfPage = function(pageNum) {
+  window.handleSelectPdfPage = function (pageNum) {
 
     setPdfPage(pageNum);
 
@@ -12109,7 +12384,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handlePdfPageDelta = function(delta) {
+  window.handlePdfPageDelta = function (delta) {
 
     changePdfPage(delta);
 
@@ -12117,7 +12392,7 @@ function registerGlobalEvents() {
 
 
 
-  window.handleStudentRenewBook = function(copyCode = 'WEB-001') {
+  window.handleStudentRenewBook = function (copyCode = 'WEB-001') {
 
     const btn = document.querySelector(`.btn-student-renew[data-code="${copyCode}"]`) || document.getElementById('btn-student-renew');
 
@@ -12147,7 +12422,7 @@ function registerGlobalEvents() {
 
 
 
-  window.executeStudentRenew = function(copyCode, onSuccess) {
+  window.executeStudentRenew = function (copyCode, onSuccess) {
 
     executeStudentRenew(copyCode, onSuccess);
 
@@ -12155,7 +12430,7 @@ function registerGlobalEvents() {
 
 
 
-  window.verifyBorrowReader = function() {
+  window.verifyBorrowReader = function () {
 
     verifyBorrowReader();
 
@@ -12195,7 +12470,7 @@ function registerGlobalEvents() {
 
 
 
-  window.sendAiMessage = function(customPrompt) {
+  window.sendAiMessage = function (customPrompt) {
 
     const input = document.getElementById('ai-chat-input-field');
 
@@ -12293,24 +12568,24 @@ if (document.readyState === 'loading') {
 
 
 
-  // Click ra ngoài hoặc nhấn phím Escape tự động đóng Search Dropdown của sinh viên
-  document.addEventListener('click', function(e) {
-    const searchWrap = document.querySelector('.student-search-bar');
+// Click ra ngoài hoặc nhấn phím Escape tự động đóng Search Dropdown của sinh viên
+document.addEventListener('click', function (e) {
+  const searchWrap = document.querySelector('.student-search-bar');
+  const dropdown = document.getElementById('student-search-dropdown');
+  if (dropdown && searchWrap && !searchWrap.contains(e.target)) {
+    dropdown.classList.add('hidden');
+    dropdown.style.display = 'none';
+  }
+});
+
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' || e.keyCode === 27) {
     const dropdown = document.getElementById('student-search-dropdown');
-    if (dropdown && searchWrap && !searchWrap.contains(e.target)) {
+    if (dropdown) {
       dropdown.classList.add('hidden');
       dropdown.style.display = 'none';
     }
-  });
-
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' || e.keyCode === 27) {
-      const dropdown = document.getElementById('student-search-dropdown');
-      if (dropdown) {
-        dropdown.classList.add('hidden');
-        dropdown.style.display = 'none';
-      }
-    }
-  });
+  }
+});
 
 })();

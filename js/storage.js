@@ -756,6 +756,25 @@ export function sanitizeDB(dbData) {
 
   }
 
+  if (Array.isArray(INITIAL_DB.accounts) && Array.isArray(dbData.accounts)) {
+    INITIAL_DB.accounts.forEach(initAcc => {
+      const existing = dbData.accounts.find(a => a.username === initAcc.username);
+      if (!existing) {
+        dbData.accounts.push(JSON.parse(JSON.stringify(initAcc)));
+        modified = true;
+      } else {
+        if (!existing.readerType && initAcc.readerType) {
+          existing.readerType = initAcc.readerType;
+          modified = true;
+        }
+        if (!existing.departmentSub && initAcc.departmentSub) {
+          existing.departmentSub = initAcc.departmentSub;
+          modified = true;
+        }
+      }
+    });
+  }
+
   if (Array.isArray(INITIAL_DB.categories) && Array.isArray(dbData.categories)) {
 
     INITIAL_DB.categories.forEach(initCat => {
@@ -1006,9 +1025,11 @@ export function broadcastDBSync(data, actionName) {
 if (typeof window !== 'undefined') {
   window.initRealtimeSync = initRealtimeSync;
   window.broadcastDBSync = broadcastDBSync;
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initRealtimeSync);
-  } else {
-    initRealtimeSync();
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initRealtimeSync);
+    } else {
+      initRealtimeSync();
+    }
   }
 }

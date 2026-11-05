@@ -846,39 +846,49 @@ export function renderReadersScreen() {
   const tbody = document.getElementById('readers-list-tbody');
   if (!tbody) return;
 
-  tbody.innerHTML = readers.map(r => `
-    <tr>
-      <td><span class="cell-bold">${escapeHTML(r.cardId || r.username)}</span></td>
-      <td>
-        <div class="cell-bold">${escapeHTML(r.name)}</div>
-        <div class="cell-sub">${escapeHTML(r.staffId || r.username)}</div>
-      </td>
-      <td>${escapeHTML(r.department || r.className || 'Khoa CNTT')}</td>
-      <td>${escapeHTML(r.issueDate || '15/09/2023')}</td>
-      <td>${escapeHTML(r.cardExpiry || '30/06/2027')}</td>
-      <td>
-        <span class="${r.debt > 0 ? 'cell-amount' : ''}">${Number(r.debt || 0).toLocaleString()} đ</span>
-      </td>
-      <td>
-        <span class="badge ${r.cardStatus === 'HOAT_DONG' ? 'badge-green' : 'badge-red'}">
-          ${r.cardStatus === 'HOAT_DONG' ? 'Hoạt động' : 'Bị khóa'}
-        </span>
-      </td>
-      <td>
-        <div class="cell-actions">
-          ${r.cardStatus === 'HOAT_DONG' ? `
-            <button class="btn-link" onclick="window.handleExtendReaderCard('${r.username}')">Gia hạn thẻ</button>
-            <span>·</span>
-            <button class="btn-link danger" onclick="window.handleToggleLockReader('${r.username}')">Khóa</button>
-          ` : `
-            <button class="btn-link" onclick="window.handleToggleLockReader('${r.username}')">Mở khóa</button>
-            <span>·</span>
-            <button class="btn-link danger" onclick="window.switchScreen('screen-debts')">Thu nợ</button>
-          `}
-        </div>
-      </td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = readers.map(r => {
+    const isGv = r.readerType === 'GIANG_VIEN' || (r.staffId && !r.mssv && !String(r.staffId).startsWith('50.') && !String(r.staffId).startsWith('49.'));
+    const badgeHtml = isGv 
+      ? `<span class="badge badge-blue" style="font-size: 10px; margin-left: 6px; vertical-align: middle;">GIẢNG VIÊN</span>`
+      : `<span class="badge badge-green" style="font-size: 10px; margin-left: 6px; vertical-align: middle;">SINH VIÊN</span>`;
+    const subText = isGv
+      ? `Mã CB: ${escapeHTML(r.staffId || r.username)} · ${escapeHTML(r.departmentSub || 'Giảng viên')}`
+      : `MSSV: ${escapeHTML(r.mssv || r.staffId || r.username)} · ${escapeHTML(r.className || '50.01.SPTIN.B')}`;
+
+    return `
+      <tr>
+        <td><span class="cell-bold">${escapeHTML(r.cardId || r.username)}</span></td>
+        <td>
+          <div class="cell-bold">${escapeHTML(r.name)} ${badgeHtml}</div>
+          <div class="cell-sub">${subText}</div>
+        </td>
+        <td>${escapeHTML(r.department || 'Khoa CNTT')}</td>
+        <td>${escapeHTML(r.issueDate || '15/09/2023')}</td>
+        <td>${escapeHTML(r.cardExpiry || '30/06/2027')}</td>
+        <td>
+          <span class="${r.debt > 0 ? 'cell-amount' : ''}">${Number(r.debt || 0).toLocaleString()} đ</span>
+        </td>
+        <td>
+          <span class="badge ${r.cardStatus === 'HOAT_DONG' ? 'badge-green' : 'badge-red'}">
+            ${r.cardStatus === 'HOAT_DONG' ? 'Hoạt động' : 'Bị khóa'}
+          </span>
+        </td>
+        <td>
+          <div class="cell-actions">
+            ${r.cardStatus === 'HOAT_DONG' ? `
+              <button class="btn-link" onclick="window.handleExtendReaderCard('${r.username}')">Gia hạn thẻ</button>
+              <span>·</span>
+              <button class="btn-link danger" onclick="window.handleToggleLockReader('${r.username}')">Khóa</button>
+            ` : `
+              <button class="btn-link" onclick="window.handleToggleLockReader('${r.username}')">Mở khóa</button>
+              <span>·</span>
+              <button class="btn-link danger" onclick="window.switchScreen('screen-debts')">Thu nợ</button>
+            `}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');;
 }
 
 /**
@@ -906,7 +916,8 @@ export function openCreateReaderCardModal() {
   }
 
   if (window.openModal) {
-    window.openModal('modal-create-reader-card');
+    window.handleSelectReaderCardType('SINH_VIEN');
+  openModal('modal-create-reader-card');
   } else {
     const modal = document.getElementById('modal-create-reader-card');
     if (modal) modal.classList.add('active');
@@ -941,6 +952,69 @@ export function generateCardIdFromMssv(mssv) {
 /**
  * Xử lý khi người dùng nhập MSSV: tự động cập nhật Email và Khung xem trước tài khoản
  */
+let currentReaderCardType = 'SINH_VIEN';
+
+export function handleSelectReaderCardType(type) {
+  currentReaderCardType = type;
+
+  const radioSv = document.getElementById('nc-radio-sv');
+  const radioGv = document.getElementById('nc-radio-gv');
+  if (radioSv) radioSv.checked = (type === 'SINH_VIEN');
+  if (radioGv) radioGv.checked = (type === 'GIANG_VIEN');
+
+  const mssvLabel = document.getElementById('nc-label-mssv');
+  const mssvInput = document.getElementById('nc-mssv');
+  const nameLabel = document.getElementById('nc-label-name');
+  const nameInput = document.getElementById('nc-name');
+  const classLabel = document.getElementById('nc-label-class');
+  const classInput = document.getElementById('nc-class');
+  const emailLabel = document.getElementById('nc-label-email');
+  const emailInput = document.getElementById('nc-email');
+  const expiryLabel = document.getElementById('nc-label-expiry');
+  const expiryInput = document.getElementById('nc-expiry-date');
+
+  if (type === 'SINH_VIEN') {
+    if (mssvLabel) mssvLabel.innerHTML = 'Mã số sinh viên (MSSV) <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (mssvInput) mssvInput.placeholder = 'Ví dụ: 50.01.103.088';
+    if (nameLabel) nameLabel.innerHTML = 'Họ và tên sinh viên <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (nameInput) nameInput.placeholder = 'Ví dụ: Trần Thị Mai Lan';
+    if (classLabel) classLabel.innerHTML = 'Lớp sinh hoạt <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (classInput) {
+      classInput.placeholder = 'Ví dụ: 50.01.SPTIN.A';
+      if (!classInput.dataset.manualEdited || classInput.value.includes('Bộ môn')) classInput.value = '50.01.SPTIN.A';
+    }
+    if (emailLabel) emailLabel.textContent = 'Email sinh viên';
+    if (emailInput && !emailInput.dataset.manualEdited) {
+      const u = (mssvInput?.value || '').trim();
+      emailInput.placeholder = '50.01.103.088@student.hcmue.edu.vn';
+      if (u) emailInput.value = `${u}@student.hcmue.edu.vn`;
+    }
+    if (expiryLabel) expiryLabel.textContent = 'Hạn thẻ (+4 năm niên khóa)';
+    if (expiryInput) expiryInput.value = '30/06/2030';
+  } else {
+    // GIANG_VIEN
+    if (mssvLabel) mssvLabel.innerHTML = 'Mã số Cán bộ / Giảng viên <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (mssvInput) mssvInput.placeholder = 'Ví dụ: GV.CNTT.01';
+    if (nameLabel) nameLabel.innerHTML = 'Họ và tên Giảng viên / Cán bộ <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (nameInput) nameInput.placeholder = 'Ví dụ: TS. Trần Văn Minh';
+    if (classLabel) classLabel.innerHTML = 'Bộ môn / Đơn vị công tác <span style="color: var(--hcmue-crimson); font-weight: 700;">*</span>';
+    if (classInput) {
+      classInput.placeholder = 'Ví dụ: Bộ môn Công nghệ phần mềm';
+      if (!classInput.dataset.manualEdited || classInput.value.includes('.SPTIN.')) classInput.value = 'Bộ môn Công nghệ phần mềm';
+    }
+    if (emailLabel) emailLabel.textContent = 'Email công vụ';
+    if (emailInput && !emailInput.dataset.manualEdited) {
+      const u = (mssvInput?.value || '').trim();
+      emailInput.placeholder = 'gv.minhtv@hcmue.edu.vn';
+      if (u) emailInput.value = `${u}@hcmue.edu.vn`;
+    }
+    if (expiryLabel) expiryLabel.textContent = 'Hạn thẻ (+5 năm công tác)';
+    if (expiryInput) expiryInput.value = '30/06/2031';
+  }
+
+  handleReaderCardMssvInput(mssvInput ? mssvInput.value : '');
+}
+
 export function handleReaderCardMssvInput(val) {
   const raw = String(val || '').trim();
   const emailInput = document.getElementById('nc-email');
@@ -1036,17 +1110,21 @@ export function handleCreateReaderCardSubmit() {
   else if (department.includes('Ngoại ngữ') || department.includes('Anh')) deptKey = 'NGOAI_NGU';
   else if (department.includes('Vật lý')) deptKey = 'VAT_LY';
 
+  const readerType = currentReaderCardType;
   const newAccount = {
     id: mssv,
     username: mssv,
     password: "123456",
     name: name,
     staffId: mssv,
+    mssv: readerType === 'SINH_VIEN' ? mssv : null,
     cardId: generatedCardId,
     role: "DOC_GIA",
+    readerType: readerType,
     email: email,
     phone: phone,
-    className: className,
+    className: readerType === 'SINH_VIEN' ? className : null,
+    departmentSub: readerType === 'GIANG_VIEN' ? className : null,
     department: department,
     departmentKey: deptKey,
     status: "KICH_HOAT",
@@ -1061,10 +1139,14 @@ export function handleCreateReaderCardSubmit() {
   const newReader = {
     id: generatedCardId,
     cardId: generatedCardId,
-    mssv: mssv,
+    username: mssv,
+    mssv: readerType === 'SINH_VIEN' ? mssv : null,
+    staffId: readerType === 'GIANG_VIEN' ? mssv : null,
     name: name,
+    readerType: readerType,
     department: department,
-    className: className,
+    className: readerType === 'SINH_VIEN' ? className : null,
+    departmentSub: readerType === 'GIANG_VIEN' ? className : null,
     email: email,
     phone: phone,
     status: "HOAT_DONG",

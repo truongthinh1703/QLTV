@@ -54,7 +54,7 @@ app.get('/api/db', (req, res) => {
 // 5. Phục vụ tài nguyên tĩnh của SPA (HTML, CSS, JS, Assets)
 app.use(express.static(__dirname, {
   index: 'index.html',
-  maxAge: '1h'
+  maxAge: 0
 }));
 
 // Fallback route cho Single Page Application

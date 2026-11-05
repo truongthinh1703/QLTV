@@ -132,6 +132,10 @@
                     <span><strong>Quản trị:</strong> admin01 (Trần Văn Quản Trị)</span>
                     <span class="badge badge-purple">Admin</span>
                   </div>
+                  <div class="quick-chip" onclick="window.quickLogin('GV.CNTT.01', '123456')">
+                    <span><strong>Giảng viên:</strong> GV.CNTT.01 (TS. Lê Hoàng Nam)</span>
+                    <span class="badge badge-blue">Khoa CNTT</span>
+                  </div>
                   <div class="quick-chip" onclick="window.quickLogin('50.01.103.002', '123456')">
                     <span><strong>Sinh viên:</strong> 50.01.103.002 (Hồng An)</span>
                     <span class="badge badge-green">Còn hạn · Nợ 0đ</span>
@@ -522,7 +526,8 @@
                 <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                   <div class="floating-input-wrap" style="flex: 1;">
                     <span class="floating-label">Mã thẻ độc giả</span>
-                    <input type="text" id="borrow-reader-input" class="floating-input" placeholder="Nhập mã thẻ hoặc MSSV..." value="">
+                    <input type="text" id="borrow-reader-input" class="floating-input"
+                      placeholder="Nhập mã thẻ hoặc MSSV..." value="">
                   </div>
                   <button class="btn btn-primary" onclick="window.handleCheckBorrowReader()">Kiểm tra</button>
                 </div>
@@ -1197,7 +1202,8 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
               <div class="page-subtitle" style="margin-bottom: 0;">Quản lý định danh và quyền truy cập theo vai trò.
               </div>
-              <button class="btn btn-primary" onclick="window.openModal('modal-create-account')">
+              <button class="btn btn-primary"
+                onclick="window.openCreateAccountModal ? window.openCreateAccountModal() : window.openModal('modal-create-account')">
                 <i class="fa-solid fa-plus"></i> Tạo tài khoản mới
               </button>
             </div>
@@ -1720,7 +1726,7 @@
                       <tr>
                         <th style="width: 120px;">Mã sách</th>
                         <th>Tựa sách</th>
-                        <th>Sinh viên mượn (MSSV)</th>
+                        <th>Độc giả mượn</th>
                         <th style="width: 140px;">Hạn trả</th>
                         <th style="width: 170px;">Trễ / Phạt</th>
                       </tr>
@@ -2436,7 +2442,7 @@
           <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
             <div class="modal-title"
               style="color: #ffffff; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; letter-spacing: 0.3px;">
-              CẤP THẺ ĐỘC GIẢ MỚI & TỰ ĐỘNG KHỞI TẠO TÀI KHOẢN
+              <i class="fa-solid fa-id-card"></i> CẤP THẺ ĐỘC GIẢ MỚI & ĐỒNG BỘ TÀI KHOẢN (UC11)
             </div>
             <button type="button" class="modal-close-btn" onclick="window.closeModal('modal-create-reader-card')"
               style="background: rgba(255, 255, 255, 0.15); color: #ffffff; width: 28px; height: 28px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px;">
@@ -2444,8 +2450,7 @@
             </button>
           </div>
           <div style="font-size: 12px; color: #cbd5e1; line-height: 1.4;">
-            Nhập thông tin sinh viên tại quầy. Hệ thống sẽ tự động cấp Mã thẻ thư viện và đồng bộ Tài khoản Cổng sinh
-            viên.
+            Cấp mã thẻ thư viện và kích hoạt tài khoản cổng dịch vụ bạn đọc cho Sinh viên hoặc Giảng viên.
           </div>
         </div>
 
@@ -2460,16 +2465,37 @@
           <form id="create-reader-card-form" onsubmit="event.preventDefault(); window.handleCreateReaderCardSubmit();">
             <div style="display: flex; flex-direction: column; gap: 14px;">
 
+              <!-- Thanh chọn Loại độc giả (Dưới tiêu đề) -->
+              <div id="nc-reader-type-selector"
+                style="display: flex; gap: 12px; padding: 10px 14px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; align-items: center;">
+                <span style="font-size: 12px; font-weight: 700; color: #475569; white-space: nowrap;">Loại đối
+                  tượng:</span>
+                <label
+                  style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #166534; cursor: pointer; margin-right: 8px;">
+                  <input type="radio" name="nc-reader-type" id="nc-radio-sv" value="SINH_VIEN" checked
+                    onchange="window.handleSelectReaderCardType('SINH_VIEN')"
+                    style="accent-color: #16a34a; cursor: pointer;">
+                  <span><i class="fa-solid fa-user-graduate"></i> Sinh viên </span>
+                </label>
+                <label
+                  style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #1e40af; cursor: pointer;">
+                  <input type="radio" name="nc-reader-type" id="nc-radio-gv" value="GIANG_VIEN"
+                    onchange="window.handleSelectReaderCardType('GIANG_VIEN')"
+                    style="accent-color: #1e40af; cursor: pointer;">
+                  <span><i class="fa-solid fa-chalkboard-user"></i> Giảng viên </span>
+                </label>
+              </div>
+
               <!-- Hàng 1: MSSV & Họ tên -->
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
                 <div class="floating-input-wrap">
-                  <span class="floating-label">MSSV / Mã số CB <span
+                  <span class="floating-label" id="nc-label-mssv">Mã số sinh viên (MSSV) <span
                       style="color: var(--hcmue-crimson); font-weight: 700;">*</span></span>
                   <input type="text" id="nc-mssv" class="floating-input" placeholder="Ví dụ: 50.01.103.088" required
                     oninput="window.handleReaderCardMssvInput(this.value)">
                 </div>
                 <div class="floating-input-wrap">
-                  <span class="floating-label">Họ và tên độc giả <span
+                  <span class="floating-label" id="nc-label-name">Họ và tên sinh viên <span
                       style="color: var(--hcmue-crimson); font-weight: 700;">*</span></span>
                   <input type="text" id="nc-name" class="floating-input" placeholder="Ví dụ: Trần Thị Mai Lan" required>
                 </div>
@@ -2495,7 +2521,8 @@
                   </select>
                 </div>
                 <div class="floating-input-wrap">
-                  <span class="floating-label">Lớp sinh hoạt</span>
+                  <span class="floating-label" id="nc-label-class">Lớp sinh hoạt <span
+                      style="color: var(--hcmue-crimson); font-weight: 700;">*</span></span>
                   <input type="text" id="nc-class" class="floating-input" placeholder="Ví dụ: 50.01.SPTIN.A"
                     value="50.01.SPTIN.A">
                 </div>
@@ -2504,7 +2531,7 @@
               <!-- Hàng 3: Email sinh viên & Số điện thoại -->
               <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 14px;">
                 <div class="floating-input-wrap">
-                  <span class="floating-label">Email sinh viên</span>
+                  <span class="floating-label" id="nc-label-email">Email sinh viên</span>
                   <input type="email" id="nc-email" class="floating-input"
                     placeholder="50.01.103.088@student.hcmue.edu.vn">
                 </div>
@@ -2523,7 +2550,7 @@
                     style="background: #f8fafc; color: #64748b; cursor: not-allowed;">
                 </div>
                 <div class="floating-input-wrap">
-                  <span class="floating-label">Hạn thẻ (+4 năm niên khóa)</span>
+                  <span class="floating-label" id="nc-label-expiry">Hạn thẻ (+4 năm niên khóa)</span>
                   <input type="text" id="nc-expiry-date" class="floating-input" value="30/06/2030">
                 </div>
               </div>
@@ -2643,8 +2670,28 @@
                   <div class="ca-role-card active" id="ca-role-label-DOC_GIA"
                     style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 14px 10px; border-radius: 10px; border: 2px solid #16a34a; background: #f0fdf4; cursor: pointer; transition: all 0.2s;"
                     onclick="window.handleSelectAccountRole('DOC_GIA')">
-                    <span style="font-weight: 700; font-size: 13px; color: #166534;">Độc giả / SV</span>
+                    <span style="font-weight: 700; font-size: 13px; color: #166534;"><i
+                        class="fa-solid fa-graduation-cap"></i> Độc giả (SV / Giảng viên)</span>
                     <span class="badge badge-green" style="font-size: 10px;">DOC_GIA</span>
+                  </div>
+                </div>
+
+                <!-- Bộ chọn nhanh Đối tượng Độc giả (Reader Type Segment) -->
+                <div id="ca-reader-type-segment"
+                  style="display: flex; gap: 10px; margin-top: 10px; padding: 8px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; align-items: center;">
+                  <span style="font-size: 12px; font-weight: 600; color: #64748b; white-space: nowrap;">Đối
+                    tượng:</span>
+                  <div style="display: flex; gap: 8px; flex: 1;">
+                    <button type="button" id="ca-type-btn-sv" class="btn-segment active"
+                      style="flex: 1; padding: 6px 12px; font-size: 12px; font-weight: 700; border-radius: 6px; border: 1.5px solid #16a34a; background: #f0fdf4; color: #166534; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;"
+                      onclick="window.handleSelectAccountReaderType('SINH_VIEN')">
+                      <i class="fa-solid fa-user-graduate"></i> Sinh viên
+                    </button>
+                    <button type="button" id="ca-type-btn-gv" class="btn-segment"
+                      style="flex: 1; padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 6px; border: 1.5px solid #cbd5e1; background: #ffffff; color: #475569; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;"
+                      onclick="window.handleSelectAccountReaderType('GIANG_VIEN')">
+                      <i class="fa-solid fa-chalkboard-user"></i> Giảng viên / Cán bộ
+                    </button>
                   </div>
                 </div>
               </div>
@@ -2665,7 +2712,7 @@
                         required oninput="window.handleCreateAccountUsernameInput(this.value)">
                     </div>
                     <div class="floating-input-wrap">
-                      <span class="floating-label">Họ và tên đầy đủ <span
+                      <span class="floating-label" id="ca-label-name">Họ và tên sinh viên <span
                           style="color: var(--hcmue-crimson); font-weight: 700;">*</span></span>
                       <input type="text" id="ca-name" class="floating-input" placeholder="Ví dụ: Nguyễn Văn An"
                         required>
@@ -2709,7 +2756,8 @@
                       </select>
                     </div>
                     <div class="floating-input-wrap" id="ca-wrap-class">
-                      <span class="floating-label">Lớp chuyên ngành</span>
+                      <span class="floating-label" id="ca-label-class">Lớp chuyên ngành / Niên khóa <span
+                          style="color: var(--hcmue-crimson); font-weight: 700;">*</span></span>
                       <input type="text" id="ca-class" class="floating-input" placeholder="Ví dụ: 49.01.CNTT.A"
                         value="49.01.CNTT.A">
                     </div>
@@ -2739,8 +2787,8 @@
                   </div>
                   <div>
                     <span style="color: #64748b;">Thời hạn thẻ:</span>
-                    <strong style="color: #0f172a; margin-left: 6px;">4 năm</strong>
-                    <span style="color: #64748b; font-size: 11px;">(30/06/2030)</span>
+                    <span id="ca-card-expiry-preview"><strong style="color: #0f172a; margin-left: 6px;">4 năm</strong>
+                      <span style="color: #64748b; font-size: 11px;">(30/06/2030)</span></span>
                   </div>
                 </div>
               </div>
@@ -2857,7 +2905,7 @@
       document.write('<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"><\\/script>');
     }
   </script>
-  <script src="js/app.bundle.js"></script>
+  <script src="js/app.bundle.js?v=2.2"></script>
 </body>
 
 </html>

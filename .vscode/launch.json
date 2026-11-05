@@ -1,14 +1,31 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "node",
+            "request": "launch",
+            "name": "Khởi chạy Máy chủ Node.js (server.js)",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/server.js",
+            "console": "integratedTerminal"
+        },
+        {
             "type": "chrome",
             "request": "launch",
-            "name": "Open index.html",
-            "file": "${workspaceFolder}/index.html"
+            "name": "Mở Web trên Chrome (Localhost 3000)",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Khởi chạy Máy chủ & Mở Web (F5 Toàn diện)",
+            "configurations": [
+                "Khởi chạy Máy chủ Node.js (server.js)",
+                "Mở Web trên Chrome (Localhost 3000)"
+            ]
         }
     ]
 }
