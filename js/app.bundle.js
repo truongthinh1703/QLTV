@@ -3695,6 +3695,47 @@ function renewLoanAtDashboard(copyCode) {
 /**
  * Màn hình 07: Lập phiếu mượn UC12
  */
+function resetBorrowScreenInitialState() {
+  verifiedBorrowReader = null;
+  pendingBorrowCopies = [];
+
+  const container = document.getElementById('borrow-reader-card-info');
+  const rulesList = document.getElementById('borrow-rules-checklist');
+
+  if (container) {
+    container.innerHTML = `
+      <div style="border: 1.5px dashed var(--border-color, #e2e8f0); border-radius: 8px; padding: 26px 16px; text-align: center; color: var(--text-muted, #64748b); background: #f8fafc;">
+        <i class="fa-regular fa-id-card" style="font-size: 34px; color: #94a3b8; margin-bottom: 10px; display: block;"></i>
+        <div style="font-weight: 700; font-size: 14px; color: var(--text-main, #1e293b); margin-bottom: 6px;">Chưa xác thực thẻ độc giả</div>
+        <div style="font-size: 12px; line-height: 1.5; color: var(--text-muted, #64748b);">Vui lòng nhập mã thẻ độc giả (Ví dụ: <strong>THE-5001102</strong>) hoặc MSSV rồi nhấn <strong>Kiểm tra</strong> để quét hồ sơ.</div>
+      </div>
+    `;
+  }
+
+  if (rulesList) {
+    rulesList.innerHTML = `
+      <div class="rule-check-item" style="color: #64748b;">
+        <i class="fa-regular fa-circle" style="color: #94a3b8;"></i>
+        <span>[1] Thẻ hợp lệ, còn hạn sử dụng và không bị khóa (Chờ xác thực thẻ).</span>
+      </div>
+      <div class="rule-check-item" style="color: #64748b;">
+        <i class="fa-regular fa-circle" style="color: #94a3b8;"></i>
+        <span>[2] Độc giả không có sách quá hạn chưa trả (Chờ xác thực thẻ).</span>
+      </div>
+      <div class="rule-check-item" style="color: #64748b;">
+        <i class="fa-regular fa-circle" style="color: #94a3b8;"></i>
+        <span>[3] Không có nợ phạt / bồi thường chưa tất toán (Chờ xác thực thẻ).</span>
+      </div>
+      <div class="rule-check-item" style="color: #64748b;">
+        <i class="fa-regular fa-circle" style="color: #94a3b8;"></i>
+        <span>[4] Số lượng đang giữ chưa đạt hạn mức tối đa (Chờ xác thực thẻ).</span>
+      </div>
+    `;
+  }
+
+  renderPendingBorrowTable();
+}
+
 function renderBorrowScreen() {
   const db = getDB();
   const loanDays = Number(db.parameters?.loanDurationDays) || 14;
@@ -3710,36 +3751,11 @@ function renderBorrowScreen() {
   if (dueDateEl) dueDateEl.textContent = dueStr;
 
   const readerInput = document.getElementById('borrow-reader-input');
-  if (readerInput && !readerInput.value) {
-    readerInput.value = 'THE-5001102'; // Giá trị mẫu
+  if (readerInput && readerInput.value && readerInput.value.trim()) {
+    verifyBorrowReader();
+  } else {
+    resetBorrowScreenInitialState();
   }
-
-  verifyBorrowReader();
-
-  // Chỉ nạp demo 2 cuốn lần đầu tiên nếu chưa từng thao tác và sách còn sẵn sàng
-  if (!hasInitializedBorrowDemo && pendingBorrowCopies.length === 0) {
-    const db = getDB();
-
-    // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
-    const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
-    const userName = user?.name || 'Nguyễn Trường Thịnh';
-    const todayStr = getTodayVN();
-    const greetingEl = document.getElementById('dashboard-greeting-subtitle') || document.querySelector('#screen-dashboard .page-subtitle');
-    if (greetingEl) {
-      greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
-    }
-    const c1 = db.copies.find(c => c.code === 'CNPM-002');
-    const c2 = db.copies.find(c => c.code === 'CSDL-004');
-    const isL1Free = c1 && c1.status === 'SAN_SANG' && !db.activeLoans.some(l => l.copyCode.toUpperCase() === 'CNPM-002');
-    const isL2Free = c2 && c2.status === 'SAN_SANG' && !db.activeLoans.some(l => l.copyCode.toUpperCase() === 'CSDL-004');
-
-    if (isL1Free && isL2Free && verifiedBorrowReader && verifiedBorrowReader.cardId === 'THE-5001102') {
-      pendingBorrowCopies = [c1, c2];
-      hasInitializedBorrowDemo = true;
-    }
-  }
-
-  renderPendingBorrowTable();
 }
 
 function verifyBorrowReader() {
@@ -3754,7 +3770,12 @@ function verifyBorrowReader() {
     greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
   }
   const cardInput = document.getElementById('borrow-reader-input');
-  const cardCode = (cardInput && cardInput.value && cardInput.value.trim() ? cardInput.value.trim() : 'THE-5001102');
+  const cardCode = cardInput && cardInput.value ? cardInput.value.trim() : '';
+
+  if (!cardCode) {
+    resetBorrowScreenInitialState();
+    return;
+  }
 
   const reader = db.accounts.find(a =>
     (a.cardId && a.cardId.toUpperCase() === cardCode.toUpperCase()) ||
