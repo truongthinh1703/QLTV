@@ -2598,7 +2598,7 @@ export const INITIAL_DB = {
 
     staffId: "50.01.103.072 - Thủ thư ca 1",
 
-    scope: "Dãy kệ K01 - K05",
+    scope: "Dãy kệ K01 - K08",
 
     startDate: "25/10/2026",
 
@@ -2606,11 +2606,11 @@ export const INITIAL_DB = {
 
     statusBadge: "badge-blue",
 
-    systemCopies: 3892,
+    systemCopies: 81,
 
-    scannedCopies: 3889,
+    scannedCopies: 78,
 
-    matchedCopies: 3887,
+    matchedCopies: 77,
 
     diffCopies: 3,
 

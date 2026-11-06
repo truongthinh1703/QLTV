@@ -813,7 +813,27 @@ export function sanitizeDB(dbData) {
     });
   }
 
+  // Tự động đồng bộ đợt kiểm kê kho khớp với CSDL thực tế (khử số liệu mockup 3892 cũ trong LocalStorage)
+  if (dbData.inventory) {
+    const actualCopiesCount = Array.isArray(dbData.copies) ? dbData.copies.length : 81;
+    if (dbData.inventory.systemCopies > 500 || !dbData.inventory.systemCopies) {
+      dbData.inventory.systemCopies = actualCopiesCount;
+      dbData.inventory.scannedCopies = Math.max(0, actualCopiesCount - 3);
+      dbData.inventory.matchedCopies = Math.max(0, actualCopiesCount - 4);
+      dbData.inventory.scope = "Dãy kệ K01 - K08";
+      modified = true;
+    }
+    if (dbData.inventory.scope === "Dãy kệ K01 - K05") {
+      dbData.inventory.scope = "Dãy kệ K01 - K08";
+      modified = true;
+    }
+  }
 
+  if (modified && typeof localStorage !== 'undefined') {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dbData));
+    } catch (e) {}
+  }
 
   return dbData;
 

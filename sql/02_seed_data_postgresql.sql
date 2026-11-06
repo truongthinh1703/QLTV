@@ -456,7 +456,7 @@ ON CONFLICT (ma_thanh_toan) DO NOTHING;
 
 INSERT INTO dot_kiem_ke (ma_dot_kiem_ke, khu_vuc_kiem_ke, ma_thu_thu, ngay_kiem_ke, trang_thai_dot, tong_so_sach_ly_thuyet, tong_so_sach_thuc_te, tong_so_sach_sai_lech, ghi_chu_sai_lech) VALUES
 
-('KK-2026-Q4', 'Dãy K01 - K05', 'TK-THUTHU-01', '2026-10-25 08:30:00+07', 'Đang tiến hành', 3892, 3889, 3, '2 thiếu/nghi mất · 1 sai vị trí kệ')
+('KK-2026-Q4', 'Dãy kệ K01 - K08', 'TK-THUTHU-01', '2026-10-25 08:30:00+07', 'Đang tiến hành', 81, 78, 3, '2 thiếu/nghi mất · 1 sai vị trí kệ')
 
 ON CONFLICT (ma_dot_kiem_ke) DO NOTHING;
 

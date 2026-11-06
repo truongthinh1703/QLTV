@@ -436,9 +436,19 @@ export function renderInventoryScreen() {
   const diffEl = document.getElementById('inv-kpi-diff');
   const percentEl = document.getElementById('inv-kpi-matched-percent');
 
-  const totalSystem = inv.systemCopies || (db.copies ? db.copies.length : 3892);
-  const totalScanned = inv.scannedCopies || 0;
-  const totalMatched = inv.matchedCopies || 0;
+  const totalSystem = db.copies ? db.copies.length : (inv.systemCopies || 81);
+  if (inv.systemCopies > 500) inv.systemCopies = totalSystem;
+
+  const pendingAnomalies = (inv.anomalies || []).filter(a => a.status === 'PENDING');
+  const pendingCount = pendingAnomalies.length;
+  inv.diffCopies = pendingCount;
+
+  const totalScanned = (inv.scannedCopies !== undefined && inv.scannedCopies <= totalSystem)
+    ? inv.scannedCopies
+    : Math.max(0, totalSystem - pendingCount);
+  const totalMatched = (inv.matchedCopies !== undefined && inv.matchedCopies <= totalScanned)
+    ? inv.matchedCopies
+    : Math.max(0, totalScanned - 1);
   const percent = totalScanned > 0 ? ((totalMatched / totalScanned) * 100).toFixed(2) : '100.00';
 
   if (sysEl) sysEl.textContent = totalSystem.toLocaleString();
@@ -447,11 +457,7 @@ export function renderInventoryScreen() {
   if (percentEl) percentEl.textContent = `${percent}%`;
 
   // 2. Cập nhật động Card Chênh lệch (inv-kpi-diff)
-  const pendingAnomalies = (inv.anomalies || []).filter(a => a.status === 'PENDING');
-  const pendingCount = pendingAnomalies.length;
-  inv.diffCopies = pendingCount;
   if (diffEl) diffEl.textContent = `${pendingCount} cuốn`;
-
   const diffCard = diffEl ? diffEl.closest('.kpi-card') : null;
   if (diffCard) {
     const cardTitle = diffCard.querySelector('.kpi-title');
