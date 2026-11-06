@@ -48,7 +48,7 @@ CREATE TABLE the_doc_gia (
     ngay_het_han DATE NOT NULL,
     trang_thai_the VARCHAR(20) NOT NULL DEFAULT 'Hoạt động',
     ly_do_khoa TEXT,
-    CONSTRAINT chk_the_trang_thai CHECK (trang_thai_the IN ('Hoạt động', 'Bị khóa')),
+    CONSTRAINT chk_the_trang_thai CHECK (trang_thai_the IN ('Hoạt động', 'Bị khóa', 'Hết hạn')),
     CONSTRAINT chk_the_han_su_dung CHECK (ngay_het_han >= ngay_cap)
 );
 

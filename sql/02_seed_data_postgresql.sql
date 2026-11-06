@@ -58,7 +58,7 @@ INSERT INTO the_doc_gia (ma_the, ma_tai_khoan, mssv, ho_ten, don_vi, ngay_cap, n
 
 ('THE-50011077', 'TK-DOCGIA-06', '50.01.103.077', 'Huỳnh Nguyễn Huyền Trân', 'Khoa Toán - Tin học - Lớp 50.01.SPTIN.B', '2023-09-15', '2027-06-30', 'Hoạt động', NULL),
 ('THE-50011088', 'TK-DOCGIA-07', '50.01.103.088', 'Hoàng Văn Khóa', 'Khoa CNTT - Lớp 50.01.SPTIN.A', '2023-09-15', '2028-06-30', 'Bị khóa', 'Thẻ bị khóa vi phạm nội quy thư viện'),
-('THE-49011099', 'TK-DOCGIA-08', '49.01.103.099', 'Trần Thị Hết Hạn', 'Khoa CNTT - Cựu sinh viên', '2019-09-15', '2023-09-15', 'Hết hạn', 'Thẻ độc giả đã hết hạn sử dụng từ ngày 15/09/2023'),
+('THE-49011099', 'TK-DOCGIA-08', '49.01.103.099', 'Trần Thị Hết Hạn', 'Khoa CNTT - Cựu sinh viên', '2019-09-15', '2023-09-15', 'Bị khóa', 'Thẻ độc giả đã hết hạn sử dụng từ ngày 15/09/2023'),
 ('THE-50017012', 'TK-DOCGIA-09', '50.01.701.012', 'Phạm Thùy Linh', 'Khoa Ngoại ngữ - Lớp 50.01.AV.A', '2023-09-15', '2028-06-30', 'Hoạt động', NULL),
 ('THE-50011024', 'TK-DOCGIA-10', '50.01.102.045', 'Vũ Minh Tuấn', 'Khoa Vật lý - Lớp 50.01.SPVL.A', '2023-09-15', '2028-06-30', 'Hoạt động', NULL)
 
