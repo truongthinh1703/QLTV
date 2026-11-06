@@ -513,6 +513,14 @@ export function addPhysicalCopy(copyData) {
     return { success: false, message: "Mã bản sao không được để trống!" };
   }
 
+  const priceNum = Number(copyData.price);
+  if (copyData.price === '' || copyData.price === undefined || isNaN(priceNum) || priceNum <= 0) {
+    return {
+      success: false,
+      message: "Giá bìa bồi thường phải là số dương lớn hơn 0"
+    };
+  }
+
   const db = getDB();
   if (db.copies.some(c => c.code.toUpperCase() === code)) {
     return { 
@@ -527,7 +535,7 @@ export function addPhysicalCopy(copyData) {
       titleId: copyData.titleId,
       titleName: (draft.titles.find(t => t.id === copyData.titleId) || {}).title || "Tài liệu",
       shelf: copyData.shelf || "Kệ K03 - Ngăn 2",
-      price: Number(copyData.price) || 85000,
+      price: priceNum,
       status: copyData.initialStatus || "SAN_SANG",
       statusLabel: copyData.initialStatus === 'SAN_SANG' ? "Sẵn sàng cho mượn" : "Chờ xử lý",
       statusBadge: copyData.initialStatus === 'SAN_SANG' ? "badge-green" : "badge-yellow",
@@ -546,6 +554,103 @@ export function addPhysicalCopy(copyData) {
   }, 'ADD_PHYSICAL_COPY');
 
   return { success: true };
+}
+
+/**
+ * Screen 11c: Cập nhật vị trí kệ và đơn giá bản sao vật lý (Bảng kiểm thử)
+ */
+export function handleEditCopy(copyCode) {
+  const db = getDB();
+  const copy = (db.copies || []).find(c => c.code === copyCode);
+  if (!copy) {
+    if (window.showToast) window.showToast(`Không tìm thấy bản sao [${copyCode}]!`, 'error');
+    return;
+  }
+
+  const codeEl = document.getElementById('edit-copy-code');
+  const titleEl = document.getElementById('edit-copy-title');
+  const shelfEl = document.getElementById('edit-copy-shelf');
+  const priceEl = document.getElementById('edit-copy-price');
+  const statusEl = document.getElementById('edit-copy-status');
+  const noteEl = document.getElementById('edit-copy-note');
+  const errEl = document.getElementById('edit-copy-error-msg');
+
+  if (codeEl) codeEl.value = copy.code;
+  if (titleEl) titleEl.value = copy.titleName || copy.title || '';
+  if (shelfEl) {
+    shelfEl.value = copy.shelf || '';
+    shelfEl.style.borderColor = '';
+  }
+  if (priceEl) {
+    priceEl.value = copy.price || 85000;
+    priceEl.style.borderColor = '';
+  }
+  if (statusEl) statusEl.value = copy.status || 'SAN_SANG';
+  if (noteEl) noteEl.value = copy.note || '';
+  if (errEl) errEl.style.display = 'none';
+
+  if (window.openModal) window.openModal('modal-edit-copy');
+}
+
+export function handleSaveEditCopy(e) {
+  if (e) e.preventDefault();
+
+  const code = document.getElementById('edit-copy-code')?.value;
+  const shelf = document.getElementById('edit-copy-shelf')?.value?.trim();
+  const priceInput = document.getElementById('edit-copy-price');
+  const priceVal = priceInput?.value?.trim();
+  const status = document.getElementById('edit-copy-status')?.value;
+  const note = document.getElementById('edit-copy-note')?.value?.trim();
+  const errEl = document.getElementById('edit-copy-error-msg');
+
+  // Test Case: Nhập đơn giá sách bồi thường <= 0 (ví dụ: -10.000) -> Báo lỗi: "Giá bìa bồi thường phải là số dương lớn hơn 0"
+  const priceNum = Number(priceVal);
+  if (priceVal === '' || priceVal === undefined || isNaN(priceNum) || priceNum <= 0) {
+    if (errEl) {
+      errEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Giá bìa bồi thường phải là số dương lớn hơn 0';
+      errEl.style.display = 'block';
+    }
+    if (priceInput) {
+      priceInput.style.borderColor = '#ef4444';
+      priceInput.focus();
+    }
+    if (window.showToast) {
+      window.showToast("⛔ Giá bìa bồi thường phải là số dương lớn hơn 0", "error");
+    }
+    return;
+  }
+
+  if (!shelf) {
+    if (window.showToast) window.showToast("⛔ Vị trí kệ không được để trống!", "warning");
+    document.getElementById('edit-copy-shelf')?.focus();
+    return;
+  }
+
+  if (errEl) errEl.style.display = 'none';
+
+  mutateDB(draft => {
+    const copy = (draft.copies || []).find(c => c.code === code);
+    if (copy) {
+      copy.shelf = shelf;
+      copy.price = priceNum;
+      if (status) {
+        copy.status = status;
+        copy.statusLabel = status === 'SAN_SANG' ? 'Sẵn sàng cho mượn' : (status === 'HU_HONG' ? 'Hư hỏng' : 'Chờ xử lý');
+        copy.statusBadge = status === 'SAN_SANG' ? 'badge-green' : (status === 'HU_HONG' ? 'badge-red' : 'badge-yellow');
+      }
+      if (note !== undefined) copy.note = note;
+    }
+  }, 'UPDATE_PHYSICAL_COPY');
+
+  if (window.closeModal) window.closeModal('modal-edit-copy');
+  if (window.showToast) window.showToast(`✅ Đã cập nhật vị trí kệ và đơn giá cho bản sao [${code}] thành công!`, 'success');
+
+  if (typeof renderCopiesScreen === 'function') renderCopiesScreen();
+}
+
+if (typeof window !== 'undefined') {
+  window.handleEditCopy = handleEditCopy;
+  window.handleSaveEditCopy = handleSaveEditCopy;
 }
 
 /**
@@ -979,6 +1084,37 @@ export function commitInventorySync() {
 }
 
 /**
+ * Kiểm tra ngày hết hạn thẻ độc giả (BR-02 & UC11)
+ */
+export function checkIsCardExpired(cardExpiry) {
+  if (!cardExpiry) return false;
+  const parts = String(cardExpiry).trim().split('/');
+  if (parts.length !== 3) return false;
+  const expDate = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return expDate < now;
+}
+
+/**
+ * Lấy siêu dữ liệu trạng thái thẻ độc giả chuẩn hóa toàn hệ thống
+ */
+export function getCardStatusMeta(reader) {
+  if (!reader) return { status: 'UNKNOWN', label: 'Không xác định', badgeClass: 'badge-gray' };
+  const isExpired = checkIsCardExpired(reader.cardExpiry) || reader.cardStatus === 'HET_HAN';
+  if (isExpired) {
+    return { status: 'HET_HAN', label: 'Hết hạn', badgeClass: 'badge-red' };
+  }
+  if (reader.cardStatus === 'TAM_KHOA_NO' || (reader.debt && Number(reader.debt) > 50000)) {
+    return { status: 'TAM_KHOA_NO', label: 'Tạm khóa nợ', badgeClass: 'badge-red' };
+  }
+  if (reader.cardStatus === 'KHOA' || reader.cardStatus === 'BI_KHOA' || reader.status === 'KHOA') {
+    return { status: 'KHOA', label: 'Bị khóa', badgeClass: 'badge-red' };
+  }
+  return { status: 'HOAT_DONG', label: 'Hoạt động', badgeClass: 'badge-green' };
+}
+
+/**
  * Screen 14: Quản lý hồ sơ thẻ độc giả UC11
  */
 export function renderReadersScreen() {
@@ -1001,9 +1137,14 @@ export function renderReadersScreen() {
 
   if (statusFilter !== 'ALL') {
     if (statusFilter === 'HOAT_DONG') {
-      readers = readers.filter(r => r.cardStatus === 'HOAT_DONG');
+      readers = readers.filter(r => getCardStatusMeta(r).status === 'HOAT_DONG');
     } else if (statusFilter === 'KHOA') {
-      readers = readers.filter(r => r.cardStatus === 'TAM_KHOA_NO' || r.cardStatus === 'KHOA' || r.cardStatus === 'BI_KHOA' || r.status === 'KHOA');
+      readers = readers.filter(r => {
+        const s = getCardStatusMeta(r).status;
+        return s === 'KHOA' || s === 'TAM_KHOA_NO' || s === 'HET_HAN';
+      });
+    } else if (statusFilter === 'HET_HAN') {
+      readers = readers.filter(r => getCardStatusMeta(r).status === 'HET_HAN');
     }
   }
 
@@ -1026,6 +1167,9 @@ export function renderReadersScreen() {
       ? `Mã CB: ${escapeHTML(r.staffId || r.username)} · ${escapeHTML(r.departmentSub || 'Giảng viên')}`
       : `MSSV: ${escapeHTML(r.mssv || r.staffId || r.username)} · ${escapeHTML(r.className || '50.01.SPTIN.B')}`;
 
+    const statusMeta = getCardStatusMeta(r);
+    const isLocked = statusMeta.status === 'KHOA' || statusMeta.status === 'TAM_KHOA_NO' || r.status === 'KHOA';
+
     return `
       <tr>
         <td><span class="cell-bold">${escapeHTML(r.cardId || r.username)}</span></td>
@@ -1040,16 +1184,20 @@ export function renderReadersScreen() {
           <span class="${r.debt > 0 ? 'cell-amount' : ''}">${Number(r.debt || 0).toLocaleString()} đ</span>
         </td>
         <td>
-          <span class="badge ${r.cardStatus === 'HOAT_DONG' ? 'badge-green' : 'badge-red'}">
-            ${r.cardStatus === 'HOAT_DONG' ? 'Hoạt động' : 'Bị khóa'}
+          <span class="badge ${statusMeta.badgeClass}">
+            ${statusMeta.label}
           </span>
         </td>
         <td>
           <div class="cell-actions">
-            ${r.cardStatus === 'HOAT_DONG' ? `
+            ${statusMeta.status === 'HOAT_DONG' ? `
               <button class="btn-link" onclick="window.handleExtendReaderCard('${r.username}')">Gia hạn thẻ</button>
               <span>·</span>
               <button class="btn-link danger" onclick="window.handleToggleLockReader('${r.username}')">Khóa</button>
+            ` : statusMeta.status === 'HET_HAN' ? `
+              <button class="btn-link" onclick="window.handleExtendReaderCard('${r.username}')">Gia hạn thẻ</button>
+              <span>·</span>
+              <button class="btn-link danger" onclick="window.handleToggleLockReader('${r.username}')">${isLocked ? 'Mở khóa' : 'Khóa'}</button>
             ` : `
               <button class="btn-link" onclick="window.handleToggleLockReader('${r.username}')">Mở khóa</button>
               <span>·</span>

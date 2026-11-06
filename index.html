@@ -1144,9 +1144,10 @@
               <div class="floating-input-wrap" style="width: 220px;">
                 <span class="floating-label">Trạng thái</span>
                 <select id="readers-filter-status" class="form-select" onchange="window.renderReadersScreen()">
-                  <option value="ALL">Hoạt động / Bị khóa</option>
+                  <option value="ALL">Tất cả trạng thái</option>
                   <option value="HOAT_DONG">Hoạt động</option>
                   <option value="KHOA">Bị khóa</option>
+                  <option value="HET_HAN">Hết hạn</option>
                 </select>
               </div>
 
@@ -1757,7 +1758,7 @@
             <div class="student-search-bar">
               <div class="floating-input-wrap" style="position: relative;">
                 <span class="floating-label">Tên sách, tác giả hoặc ISBN</span>
-                <input type="text" id="student-search-input" class="floating-input" value="Kỹ nghệ phần mềm"
+                <input type="text" id="student-search-input" class="floating-input" placeholder="Nhập tên sách, tác giả hoặc ISBN để tra cứu..."
                   oninput="window.handleStudentSearchInput(event)" autocomplete="off">
                 <i class="fa-solid fa-magnifying-glass input-icon-right"></i>
                 <!-- Dropdown Gợi ý tìm kiếm tự động -->
@@ -1766,6 +1767,34 @@
                 </div>
               </div>
               <div class="cell-sub" style="margin-top: 8px;">Tra cứu tài liệu học tập · Giáo trình · Sách tham khảo
+              </div>
+
+              <!-- Category Filter Pills (Lọc theo chuyên ngành) -->
+              <div class="student-category-pills" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px;">
+                <button type="button" class="btn btn-sm btn-category-pill active" onclick="window.handleFilterStudentCategory('')" style="background: var(--hcmue-navy); color: #ffffff; border: 1px solid var(--hcmue-navy); border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                  Tất cả thể loại (35)
+                </button>
+                <button type="button" class="btn btn-sm btn-category-pill" onclick="window.handleFilterStudentCategory('Công nghệ thông tin')" style="background: #f8fafc; color: var(--text-main); border: 1px solid var(--border-color); border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer;">
+                  Công nghệ thông tin (5)
+                </button>
+                <button type="button" class="btn btn-sm btn-category-pill" onclick="window.handleFilterStudentCategory('Toán - Tin học')" style="background: #f8fafc; color: var(--text-main); border: 1px solid var(--border-color); border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer;">
+                  Toán - Tin học (5)
+                </button>
+                <button type="button" class="btn btn-sm btn-category-pill" onclick="window.handleFilterStudentCategory('Sư phạm & Giáo dục học')" style="background: #f8fafc; color: var(--text-main); border: 1px solid var(--border-color); border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer;">
+                  Sư phạm & GD (5)
+                </button>
+                <button type="button" class="btn btn-sm btn-category-pill" onclick="window.handleFilterStudentCategory('Ngoại ngữ')" style="background: #f8fafc; color: var(--text-main); border: 1px solid var(--border-color); border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer;">
+                  Ngoại ngữ (5)
+                </button>
+                <button type="button" class="btn btn-sm btn-category-pill" onclick="window.handleFilterStudentCategory('Khoa học Xã hội')" style="background: #f8fafc; color: var(--text-main); border: 1px solid var(--border-color); border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer;">
+                  Khoa học Xã hội (5)
+                </button>
+                <button type="button" class="btn btn-sm btn-category-pill" onclick="window.handleFilterStudentCategory('Kinh tế & Quản trị kinh doanh')" style="background: #f8fafc; color: var(--text-main); border: 1px solid var(--border-color); border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer;">
+                  Kinh tế & Quản trị (5)
+                </button>
+                <button type="button" class="btn btn-sm btn-category-pill" onclick="window.handleFilterStudentCategory('Pháp luật & Kỹ năng học thuật')" style="background: #f8fafc; color: var(--text-main); border: 1px solid var(--border-color); border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer;">
+                  Pháp luật & Kỹ năng (5)
+                </button>
               </div>
             </div>
 
@@ -2311,11 +2340,81 @@
                 </select>
               </div>
             </div>
+
+            <div id="add-copy-error-msg" style="display: none; padding: 10px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; color: #dc2626; font-size: 13px; font-weight: 600; margin-top: 12px;">
+              <i class="fa-solid fa-circle-exclamation"></i> Giá bìa bồi thường phải là số dương lớn hơn 0
+            </div>
           </div>
 
           <div class="modal-footer">
             <button type="button" class="btn btn-outline" onclick="window.closeModal('modal-add-copy')">Hủy bỏ</button>
             <button type="submit" class="btn btn-primary">Lưu bản sao mới</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+    <!-- Modal 5b: Cập Nhật Vị Trí Kệ & Bản Sao Vật Lý (UC08) -->
+    <div id="modal-edit-copy" class="modal-overlay">
+      <div class="modal-container">
+        <div class="modal-header">
+          <div class="modal-title"><i class="fa-solid fa-pen-to-square" style="color: var(--hcmue-navy); margin-right: 8px;"></i>Cập nhật vị trí kệ & Bản sao vật lý</div>
+          <button class="modal-close-btn" onclick="window.closeModal('modal-edit-copy')">&times;</button>
+        </div>
+        <form onsubmit="window.handleSaveEditCopy(event)">
+          <div class="modal-body">
+            <div class="form-group">
+              <div class="floating-input-wrap">
+                <span class="floating-label">Mã bản sao</span>
+                <input type="text" id="edit-copy-code" class="floating-input" readonly
+                  style="background: #f1f5f9; cursor: not-allowed; font-weight: 700; color: #475569;">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 18px;">
+              <div class="floating-input-wrap">
+                <span class="floating-label">Tựa sách</span>
+                <input type="text" id="edit-copy-title" class="floating-input" readonly
+                  style="background: #f1f5f9; cursor: not-allowed; color: #475569;">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px;">
+              <div class="floating-input-wrap">
+                <span class="floating-label">Vị trí kệ mới (*)</span>
+                <input type="text" id="edit-copy-shelf" class="floating-input" placeholder="Ví dụ: Kệ K03 - Ngăn 2" required>
+              </div>
+              <div class="floating-input-wrap">
+                <span class="floating-label">Đơn giá sách bồi thường / Giá bìa (*)</span>
+                <input type="number" id="edit-copy-price" class="floating-input" placeholder="Ví dụ: 85000"
+                  oninput="if(Number(this.value) > 0){ this.style.borderColor=''; const err = document.getElementById('edit-copy-error-msg'); if(err) err.style.display='none'; }">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px;">
+              <div class="floating-input-wrap">
+                <span class="floating-label">Trạng thái bản sao</span>
+                <select id="edit-copy-status" class="form-select">
+                  <option value="SAN_SANG">Sẵn sàng cho mượn</option>
+                  <option value="HU_HONG">Hư hỏng</option>
+                  <option value="BAO_TRI">Chờ xử lý / Bảo trì</option>
+                </select>
+              </div>
+              <div class="floating-input-wrap">
+                <span class="floating-label">Ghi chú lưu trữ</span>
+                <input type="text" id="edit-copy-note" class="floating-input" placeholder="Ghi chú vị trí hoặc tình trạng...">
+              </div>
+            </div>
+
+            <div id="edit-copy-error-msg" style="display: none; padding: 10px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; color: #dc2626; font-size: 13px; font-weight: 600; margin-top: 12px;">
+              <i class="fa-solid fa-circle-exclamation"></i> Giá bìa bồi thường phải là số dương lớn hơn 0
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" onclick="window.closeModal('modal-edit-copy')">Hủy bỏ</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk" style="margin-right: 6px;"></i>Lưu thay đổi</button>
           </div>
         </form>
       </div>
@@ -2997,7 +3096,7 @@
       document.write('<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"><\\/script>');
     }
   </script>
-  <script src="js/app.bundle.js?v=2.8"></script>
+  <script src="js/app.bundle.js?v=3.0"></script>
 </body>
 
 </html>

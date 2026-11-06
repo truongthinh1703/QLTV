@@ -478,12 +478,12 @@ export function verifyBorrowReader() {
 
   // Thẻ hợp lệ nếu còn hạn, không bị khóa hành chính (status !== 'KHOA', cardStatus !== 'KHOA') và nếu bị tạm khóa do nợ thì nợ phải vượt trần mới chặn
   const isCardNotAdminLocked = reader.status !== 'KHOA';
-  const isCardNotPermanentlyLocked = reader.cardStatus !== 'KHOA' && reader.cardStatus !== 'BI_KHOA';
+  const isCardNotPermanentlyLocked = reader.cardStatus !== 'KHOA' && reader.cardStatus !== 'BI_KHOA' && reader.cardStatus !== 'HET_HAN';
   const isStatusActive = isCardNotAdminLocked && isCardNotPermanentlyLocked && (reader.cardStatus === 'HOAT_DONG' || (reader.cardStatus === 'TAM_KHOA_NO' && isDebtAllowed));
   const isCardActive = isStatusActive && isCardNotExpired;
 
   let cardRuleFailReason = '';
-  if (!isCardNotExpired) {
+  if (!isCardNotExpired || reader.cardStatus === 'HET_HAN') {
     cardRuleFailReason = `KHÔNG ĐẠT - Thẻ đã hết hạn sử dụng từ ngày ${escapeHTML(reader.cardExpiry)}`;
   } else if (!isCardNotAdminLocked || !isCardNotPermanentlyLocked) {
     cardRuleFailReason = `KHÔNG ĐẠT - Thẻ đang bị khóa hành chính`;
@@ -523,7 +523,7 @@ export function verifyBorrowReader() {
   // Hiển thị thông tin độc giả
   if (container) {
     const cardBadgeClass = isCardActive ? 'badge-green' : 'badge-red';
-    const cardBadgeText = isCardActive ? 'Hoạt động' : 'Bị khóa';
+    const cardBadgeText = isCardActive ? 'Hoạt động' : (!isCardNotExpired || reader.cardStatus === 'HET_HAN' ? 'Hết hạn' : 'Bị khóa');
     container.innerHTML = `
       <div class="reader-verified-box" style="${!isEligible ? 'border-color: #fca5a5; background: #fff5f5;' : ''}">
         <div class="reader-verified-name">${escapeHTML(reader.name)}</div>

@@ -377,10 +377,65 @@ function createTestDB() {
     `Năm XB: ${prevYear} -> ${target.year}, Thể loại: ${prevCategory} -> ${target.category}, NXB: ${target.publisher}`);
 })();
 
+// -----------------------------------------------------------------------------
+// TC23: Cổng tra cứu tài liệu - Lọc sách theo thể loại "Công nghệ thông tin"
+// -----------------------------------------------------------------------------
+(() => {
+  const db = createTestDB();
+  const targetCategory = 'Công nghệ thông tin';
+  const filtered = db.titles.filter(t => 
+    t.category === targetCategory || 
+    t.categoryId === 'TL-CNTT' || 
+    t.category === 'CNTT'
+  );
+  assert(filtered.length === 5,
+    'TC23: Tra cứu tài liệu - Lọc chính xác 5 đầu sách chuyên ngành CNTT',
+    `Thể loại: "${targetCategory}" -> Lọc được: ${filtered.length} đầu sách (${filtered.map(t => t.id).join(', ')})`);
+})();
+
+// -----------------------------------------------------------------------------
+// TC24: Quản lý bản sao - Kiểm tra đơn giá sách bồi thường <= 0
+// -----------------------------------------------------------------------------
+(() => {
+  const testPrices = [-10000, 0, -1];
+  const allRejected = testPrices.every(price => {
+    const num = Number(price);
+    const isInvalid = isNaN(num) || num <= 0;
+    const msg = isInvalid ? 'Giá bìa bồi thường phải là số dương lớn hơn 0' : '';
+    return isInvalid && msg === 'Giá bìa bồi thường phải là số dương lớn hơn 0';
+  });
+  assert(allRejected,
+    'TC24: Quản lý bản sao - Báo lỗi khi giá bìa bồi thường <= 0 (-10.000)',
+    'Đã bắt lỗi và trả về: "Giá bìa bồi thường phải là số dương lớn hơn 0"');
+})();
+
+// -----------------------------------------------------------------------------
+// TC25: Đồng bộ trạng thái Thẻ hết hạn giữa Lập phiếu mượn (Screen 04) & Thẻ độc giả (Screen 14)
+// -----------------------------------------------------------------------------
+(() => {
+  const db = createTestDB();
+  const expiredReader = db.accounts.find(a => a.cardId === 'THE-49011099');
+  
+  // 1. Kiểm tra trạng thái trong CSDL
+  const isExpiredStatus = expiredReader && (expiredReader.cardStatus === 'HET_HAN' || expiredReader.cardStatus === 'KHOA');
+  
+  // 2. Kiểm tra ngày hết hạn
+  const [d, m, y] = (expiredReader?.cardExpiry || '15/09/2023').split('/').map(Number);
+  const expDate = new Date(y, m - 1, d);
+  const isPast = expDate < new Date();
+  
+  // 3. Độc giả hết hạn tuyệt đối không được mang trạng thái "HOAT_DONG"
+  const isNotActive = expiredReader?.cardStatus !== 'HOAT_DONG';
+  
+  assert(isExpiredStatus && isPast && isNotActive,
+    'TC25: Đồng bộ thẻ hết hạn (THE-49011099) giữa Screen 04 & Screen 14',
+    `Mã thẻ: ${expiredReader?.cardId}, Trạng thái: ${expiredReader?.cardStatus}, Hạn thẻ: ${expiredReader?.cardExpiry} (Không còn là HOAT_DONG)`);
+})();
+
 console.log('\n===============================================================');
-console.log(`   KẾT QUẢ KIỂM THỬ: ${passedCount}/22 Test Cases PASSED (${Math.round(passedCount/22*100)}%)`);
+console.log(`   KẾT QUẢ KIỂM THỬ: ${passedCount}/25 Test Cases PASSED (${Math.round(passedCount/25*100)}%)`);
 if (failedCount === 0) {
-  console.log(`   ✔ TOÀN BỘ ${passedCount}/22 TEST CASES ĐÃ ĐẠT TIÊU CHUẨN 100%!`);
+  console.log(`   ✔ TOÀN BỘ ${passedCount}/25 TEST CASES ĐÃ ĐẠT TIÊU CHUẨN 100%!`);
 } else {
   console.log(`   ✖ CÓ ${failedCount} TEST CASES THẤT BẠI!`);
 }

@@ -219,6 +219,30 @@ export function sanitizeDB(dbData) {
           modified = true;
         }
 
+        // Tự động đối soát ngày hết hạn của thẻ độc giả (BR-02 & UC11)
+        if (acc.role === 'DOC_GIA' && acc.cardExpiry) {
+          const parts = String(acc.cardExpiry).trim().split('/');
+          if (parts.length === 3) {
+            const expDate = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            if (expDate < now) {
+              if (acc.cardStatus === 'HOAT_DONG') {
+                acc.cardStatus = 'HET_HAN';
+                modified = true;
+              }
+              if (acc.status === 'KICH_HOAT' || !acc.status) {
+                acc.status = 'KHOA';
+                modified = true;
+              }
+              if (!acc.lockReason) {
+                acc.lockReason = `Thẻ độc giả đã hết hạn sử dụng từ ngày ${acc.cardExpiry}`;
+                modified = true;
+              }
+            }
+          }
+        }
+
       }
 
     });

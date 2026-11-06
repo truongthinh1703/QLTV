@@ -75,6 +75,7 @@ import {
   renderMasterTitlesScreen, addMasterTitle, renderCopiesScreen, addPhysicalCopy,
 
   renderCategoriesScreen, renderInventoryScreen, renderReadersScreen, restoreCopyReady,
+  checkIsCardExpired, getCardStatusMeta,
 
   confirmInventoryLost, markInventorySuspect, fixInventoryShelf, updateInventoryShelf,
 
@@ -83,7 +84,8 @@ import {
   openCreateReaderCardModal, handleReaderCardMssvInput, handleCreateReaderCardSubmit, handleSelectReaderCardType,
   setPendingPdfFile, getPendingPdfFile,
   renderCopiesTitleDropdownItems,
-  handleEditTitle, handleSaveEditTitle
+  handleEditTitle, handleSaveEditTitle,
+  handleEditCopy, handleSaveEditCopy
 
 } from './modules/catalog.js';
 
@@ -1027,6 +1029,8 @@ function registerGlobalEvents() {
   window.addMasterTitle = addMasterTitle;
   window.handleEditTitle = handleEditTitle;
   window.handleSaveEditTitle = handleSaveEditTitle;
+  window.handleEditCopy = handleEditCopy;
+  window.handleSaveEditCopy = handleSaveEditCopy;
   window.setPendingPdfFile = setPendingPdfFile;
   window.getPendingPdfFile = getPendingPdfFile;
 
@@ -1081,6 +1085,8 @@ function registerGlobalEvents() {
   window.resetSystemParamsToDefault = resetSystemParamsToDefault;
 
   window.renderReadersScreen = renderReadersScreen;
+  window.checkIsCardExpired = checkIsCardExpired;
+  window.getCardStatusMeta = getCardStatusMeta;
 
   window.renderCategoriesScreen = renderCategoriesScreen;
 
@@ -2342,6 +2348,17 @@ function registerGlobalEvents() {
 
     }
 
+    const priceNum = Number(price);
+    if (price === '' || price === undefined || isNaN(priceNum) || priceNum <= 0) {
+      showToast("⛔ Giá bìa bồi thường phải là số dương lớn hơn 0", "error");
+      const pInp = document.getElementById('add-copy-price');
+      if (pInp) {
+        pInp.style.borderColor = '#ef4444';
+        pInp.focus();
+      }
+      return;
+    }
+
 
 
     const res = addPhysicalCopy({ code, titleId, shelf, price, initialStatus });
@@ -2917,9 +2934,18 @@ function registerGlobalEvents() {
 
     if (!acc) return;
 
+    let isExpiredCard = false;
+    if (acc.cardExpiry) {
+      const parts = String(acc.cardExpiry).trim().split('/');
+      if (parts.length === 3) {
+        const expDate = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        if (expDate < now) isExpiredCard = true;
+      }
+    }
 
-
-    const isCurrentlyLocked = acc.cardStatus === 'TAM_KHOA_NO' || acc.cardStatus === 'KHOA' || acc.status === 'KHOA';
+    const isCurrentlyLocked = acc.cardStatus === 'TAM_KHOA_NO' || acc.cardStatus === 'KHOA' || acc.cardStatus === 'BI_KHOA' || acc.cardStatus === 'HET_HAN' || isExpiredCard || acc.status === 'KHOA';
 
 
 
@@ -3057,7 +3083,7 @@ function registerGlobalEvents() {
 
   window.handleExtendReaderCard = function (username) {
 
-    let nextYear = 2028;
+    let newExpiryStr = '30/06/2027';
 
     mutateDB(draft => {
 
@@ -3067,9 +3093,33 @@ function registerGlobalEvents() {
 
         const parts = (acc.cardExpiry || '30/06/2027').split('/');
 
-        nextYear = parts.length === 3 ? parseInt(parts[2], 10) + 1 : 2028;
+        let expYear = parts.length === 3 ? parseInt(parts[2], 10) : 2026;
 
-        acc.cardExpiry = `30/06/${nextYear}`;
+        const currentYear = new Date().getFullYear();
+
+        if (expYear < currentYear) {
+
+          expYear = currentYear + 1;
+
+        } else {
+
+          expYear = expYear + 1;
+
+        }
+
+        newExpiryStr = `30/06/${expYear}`;
+
+        acc.cardExpiry = newExpiryStr;
+
+        acc.cardStatus = 'HOAT_DONG';
+
+        acc.status = 'KICH_HOAT';
+
+        if (acc.lockReason && acc.lockReason.includes('hết hạn')) {
+
+          delete acc.lockReason;
+
+        }
 
       }
 
@@ -3079,11 +3129,13 @@ function registerGlobalEvents() {
 
     if (window.showToast) {
 
-      window.showToast(`✅ Đã gia hạn thẻ độc giả ${username} thêm 1 năm (Hạn mới: 30/06/${nextYear})!`, 'success');
+      window.showToast(`✅ Đã gia hạn thẻ độc giả ${username} thành công! Hạn mới: ${newExpiryStr}`, 'success');
 
     }
 
     if (typeof renderReadersScreen === 'function') renderReadersScreen();
+
+    if (window.renderAccountsScreen) window.renderAccountsScreen();
 
   };
 

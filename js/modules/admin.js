@@ -30,10 +30,22 @@ export function renderAccountsScreen() {
       return false;
     }
     // 2. Lọc theo trạng thái
-    if (selectedStatus === 'ACTIVE' && acc.status === 'KHOA') {
+    const isDocGiaAcc = acc.role === 'DOC_GIA';
+    let isExpiredAcc = false;
+    if (isDocGiaAcc && acc.cardExpiry) {
+      const parts = String(acc.cardExpiry).trim().split('/');
+      if (parts.length === 3) {
+        const expDate = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        if (expDate < now) isExpiredAcc = true;
+      }
+    }
+    const isNotActive = acc.status === 'KHOA' || acc.cardStatus === 'KHOA' || acc.cardStatus === 'TAM_KHOA_NO' || acc.cardStatus === 'HET_HAN' || isExpiredAcc;
+    if (selectedStatus === 'ACTIVE' && isNotActive) {
       return false;
     }
-    if (selectedStatus === 'KHOA' && acc.status !== 'KHOA') {
+    if (selectedStatus === 'KHOA' && !isNotActive) {
       return false;
     }
     // 3. Lọc theo từ khóa tìm kiếm (hỗ trợ tiếng Việt không dấu & không phân biệt hoa thường)
@@ -103,7 +115,31 @@ export function renderAccountsScreen() {
       }
     }
 
-    const isLocked = acc.status === 'KHOA';
+    const isDocGia = acc.role === 'DOC_GIA';
+    let isExpiredCard = false;
+    if (isDocGia && acc.cardExpiry) {
+      const parts = String(acc.cardExpiry).trim().split('/');
+      if (parts.length === 3) {
+        const expDate = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        if (expDate < now) isExpiredCard = true;
+      }
+    }
+    const isLocked = acc.status === 'KHOA' || acc.cardStatus === 'KHOA';
+    let statusBadge = 'badge-green';
+    let statusLabel = 'Kích hoạt';
+    if (isLocked) {
+      statusBadge = 'badge-red';
+      statusLabel = 'Bị khóa';
+    } else if (isDocGia && (acc.cardStatus === 'HET_HAN' || isExpiredCard)) {
+      statusBadge = 'badge-red';
+      statusLabel = 'Hết hạn';
+    } else if (acc.cardStatus === 'TAM_KHOA_NO') {
+      statusBadge = 'badge-red';
+      statusLabel = 'Tạm khóa nợ';
+    }
+
     const subText = acc.role !== 'DOC_GIA' 
       ? (acc.staffId ? `Mã CB: ${acc.staffId}` : '') 
       : (isGiangVien ? `${acc.name} · Mã CB: ${acc.staffId || acc.username} · ${acc.departmentSub || 'Giảng viên'}` : `${acc.name} · MSSV: ${acc.mssv || acc.username} · ${acc.className || 'Sinh viên'}`);
@@ -118,8 +154,8 @@ export function renderAccountsScreen() {
         <td><span class="badge ${roleBadge}">${roleLabel}</span></td>
         <td>${escapeHTML(acc.lastLogin || '—')}</td>
         <td>
-          <span class="badge ${isLocked ? 'badge-red' : 'badge-green'}">
-            ${isLocked ? 'Bị khóa' : 'Kích hoạt'}
+          <span class="badge ${statusBadge}">
+            ${statusLabel}
           </span>
         </td>
         <td>
@@ -129,7 +165,7 @@ export function renderAccountsScreen() {
             <button class="btn-link" onclick="window.handlePromoteRole('${acc.username}')">Phân vai trò</button>
             <span>·</span>
             <button class="btn-link danger" onclick="window.handleToggleLockAccount('${acc.username}')">
-              ${isLocked ? 'Mở khóa' : 'Khóa tài khoản'}
+              ${isLocked || isExpiredCard || acc.cardStatus === 'HET_HAN' ? 'Mở khóa' : 'Khóa tài khoản'}
             </button>
           </div>
         </td>

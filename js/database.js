@@ -381,12 +381,13 @@ export const INITIAL_DB = {
       className: "49.01.TOAN.A",
       department: "Khoa Toán - Tin học",
       departmentKey: "TOAN_TIN",
-      status: "KICH_HOAT",
-      cardStatus: "HOAT_DONG",
+      status: "KHOA",
+      cardStatus: "HET_HAN",
       cardExpiry: "15/09/2023",
       issueDate: "15/09/2019",
       debt: 0,
-      avatarText: "HH"
+      avatarText: "HH",
+      lockReason: "Thẻ độc giả đã hết hạn sử dụng từ ngày 15/09/2023"
     },
     {
       id: "50.01.701.012",

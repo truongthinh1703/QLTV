@@ -22,6 +22,8 @@ let currentPreviewBookTitle = "Kỹ nghệ phần mềm (Tập 1)";
 
 let currentPreviewBookId = "DS-01";
 
+let selectedStudentCategoryId = '';
+
 
 
 /**
@@ -39,6 +41,19 @@ export function renderStudentSearchScreen() {
       t.author.toLowerCase().includes(kw) || 
       t.isbn.toLowerCase().includes(kw)
     );
+  }
+
+  // Lọc theo thể loại chuyên ngành được chọn
+  if (selectedStudentCategoryId && selectedStudentCategoryId !== 'ALL') {
+    const targetCat = selectedStudentCategoryId;
+    filtered = filtered.filter(t => {
+      if (t.category === targetCat || t.categoryId === targetCat) return true;
+      const isCNTT = (targetCat === 'Công nghệ thông tin' || targetCat === 'CNTT' || targetCat === 'TL-CNTT');
+      if (isCNTT && (t.category === 'CNTT' || t.category === 'Công nghệ thông tin' || t.categoryId === 'TL-CNTT')) {
+        return true;
+      }
+      return false;
+    });
   }
   
   // Cập nhật số lượng tài liệu tìm thấy
@@ -191,6 +206,12 @@ export function handleSelectStudentBookSuggestion(bookTitle) {
 export function handleFilterStudentCategory(catId) {
   selectedStudentCategoryId = catId || '';
 
+  // Khi người dùng bấm lọc thể loại, nếu ô tìm kiếm có giá trị mẫu cũ, xóa để hiển thị trọn bộ sách thuộc thể loại đó
+  const searchInput = document.getElementById('student-search-input');
+  if (searchInput && searchInput.value.trim() === 'Kỹ nghệ phần mềm' && selectedStudentCategoryId) {
+    searchInput.value = '';
+  }
+
   // Cập nhật trạng thái active cho các nút Pill
   const pills = document.querySelectorAll('.student-category-pills .btn-category-pill');
   pills.forEach(btn => {
@@ -200,12 +221,22 @@ export function handleFilterStudentCategory(catId) {
 
     if (isAll || (selectedStudentCategoryId !== '' && isMatch)) {
       btn.classList.add('active');
+      btn.style.setProperty('background', 'var(--hcmue-navy)', 'important');
+      btn.style.setProperty('color', '#ffffff', 'important');
+      btn.style.setProperty('border-color', 'var(--hcmue-navy)', 'important');
     } else {
       btn.classList.remove('active');
+      btn.style.removeProperty('background');
+      btn.style.removeProperty('color');
+      btn.style.removeProperty('border-color');
     }
   });
 
   renderStudentSearchScreen();
+}
+
+if (typeof window !== 'undefined') {
+  window.handleFilterStudentCategory = handleFilterStudentCategory;
 }
 
 
