@@ -161,15 +161,16 @@
               <div class="login-card-desc">Vui lòng nhập Mã số định danh và Email trường cấp để nhận liên kết khôi phục
                 mật khẩu</div>
 
-              <form onsubmit="
+              <form id="forgot-password-form" onsubmit="
                 event.preventDefault();
                 window.showToast('✅ Đã gửi email hướng dẫn khôi phục mật khẩu về hòm thư của bạn!', 'success');
+                this.reset();
                 setTimeout(() => window.switchScreen('screen-login'), 1200);
               ">
                 <div class="form-group">
                   <div class="floating-input-wrap">
                     <span class="floating-label">Tên đăng nhập / Mã thẻ độc giả</span>
-                    <input type="text" class="floating-input" value="50.01.103.072" required>
+                    <input type="text" id="forgot-username-input" class="floating-input" placeholder="Ví dụ: 50.01.103.088 hoặc GV202601" required autocomplete="username">
                     <i class="fa-regular fa-user input-icon-right"></i>
                   </div>
                 </div>
@@ -177,7 +178,7 @@
                 <div class="form-group" style="margin-top: 18px;">
                   <div class="floating-input-wrap">
                     <span class="floating-label">Email sinh viên / Cán bộ (*)</span>
-                    <input type="email" class="floating-input" value="user@student.hcmue.edu.vn" required>
+                    <input type="email" id="forgot-email-input" class="floating-input" placeholder="Ví dụ: hoten@student.hcmue.edu.vn hoặc @hcmue.edu.vn" required autocomplete="email">
                     <i class="fa-regular fa-envelope input-icon-right"></i>
                   </div>
                 </div>
@@ -738,10 +739,13 @@
                 <span class="floating-label">Thể loại</span>
                 <select id="filter-titles-category" class="form-select" onchange="window.handleSearchMasterTitles()">
                   <option value="ALL">Tất cả thể loại</option>
-                  <option value="CNTT">Công nghệ thông tin</option>
-                  <option value="TL-TOAN">Toán - Tin học</option>
-                  <option value="TL-SPGD">Sư phạm & GD</option>
-                  <option value="TL-NN">Ngoại ngữ</option>
+                  <option value="Công nghệ thông tin">Công nghệ thông tin</option>
+                  <option value="Toán - Tin học">Toán - Tin học</option>
+                  <option value="Sư phạm & Giáo dục học">Sư phạm & Giáo dục học</option>
+                  <option value="Ngoại ngữ">Ngoại ngữ</option>
+                  <option value="Khoa học Xã hội">Khoa học Xã hội</option>
+                  <option value="Kinh tế & Quản trị kinh doanh">Kinh tế & Quản trị kinh doanh</option>
+                  <option value="Pháp luật & Kỹ năng học thuật">Pháp luật & Kỹ năng học thuật</option>
                 </select>
               </div>
 
@@ -2103,10 +2107,13 @@
               <div class="floating-input-wrap">
                 <span class="floating-label">Thể loại</span>
                 <select id="add-title-category" class="form-select">
-                  <option value="CNTT">Công nghệ thông tin</option>
-                  <option value="TL-TOAN">Toán - Tin học</option>
-                  <option value="TL-SPGD">Sư phạm & GD</option>
-                  <option value="TL-NN">Ngoại ngữ</option>
+                  <option value="Công nghệ thông tin">Công nghệ thông tin</option>
+                  <option value="Toán - Tin học">Toán - Tin học</option>
+                  <option value="Sư phạm & Giáo dục học">Sư phạm & Giáo dục học</option>
+                  <option value="Ngoại ngữ">Ngoại ngữ</option>
+                  <option value="Khoa học Xã hội">Khoa học Xã hội</option>
+                  <option value="Kinh tế & Quản trị kinh doanh">Kinh tế & Quản trị kinh doanh</option>
+                  <option value="Pháp luật & Kỹ năng học thuật">Pháp luật & Kỹ năng học thuật</option>
                 </select>
               </div>
             </div>
@@ -2159,6 +2166,91 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-outline" onclick="window.closeModal('modal-add-title')">Hủy bỏ</button>
             <button type="submit" class="btn btn-primary">Lưu đầu sách mới</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+    <!-- Modal 4b: Chỉnh Sửa Thông Tin Đầu Sách (Bảng 6.5) -->
+    <div id="modal-edit-title" class="modal-overlay">
+      <div class="modal-container modal-lg">
+        <div class="modal-header">
+          <div class="modal-title"><i class="fa-solid fa-pen-to-square" style="color: var(--hcmue-navy); margin-right: 8px;"></i>Chỉnh sửa thông tin đầu sách</div>
+          <button class="modal-close-btn" onclick="window.closeModal('modal-edit-title')">&times;</button>
+        </div>
+        <form onsubmit="window.handleSaveEditTitle(event)">
+          <div class="modal-body">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+              <div class="floating-input-wrap">
+                <span class="floating-label">Mã đầu sách</span>
+                <input type="text" id="edit-title-id" class="floating-input" readonly style="background: #f1f5f9; cursor: not-allowed; font-weight: 700; color: #475569;">
+              </div>
+              <div class="floating-input-wrap">
+                <span class="floating-label">Mã ISBN-13</span>
+                <input type="text" id="edit-title-isbn" class="floating-input" placeholder="Mã ISBN-13">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+              <div class="floating-input-wrap">
+                <span class="floating-label">Tên sách / Tựa sách (*)</span>
+                <input type="text" id="edit-title-name" class="floating-input" placeholder="Nhập tên đầu sách"
+                  oninput="if(this.value.trim()){ this.style.borderColor=''; const err = document.getElementById('edit-title-error-msg'); if(err) err.style.display='none'; }">
+              </div>
+              <div class="floating-input-wrap">
+                <span class="floating-label">Tác giả (*)</span>
+                <input type="text" id="edit-title-author" class="floating-input" placeholder="Nhập tên tác giả"
+                  oninput="if(this.value.trim()){ this.style.borderColor=''; const err = document.getElementById('edit-title-error-msg'); if(err) err.style.display='none'; }">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+              <div class="floating-input-wrap">
+                <span class="floating-label">Thể loại (*)</span>
+                <select id="edit-title-category" class="form-select">
+                  <option value="Công nghệ thông tin">Công nghệ thông tin</option>
+                  <option value="Toán - Tin học">Toán - Tin học</option>
+                  <option value="Sư phạm & Giáo dục học">Sư phạm & Giáo dục học</option>
+                  <option value="Ngoại ngữ">Ngoại ngữ</option>
+                  <option value="Khoa học Xã hội">Khoa học Xã hội</option>
+                  <option value="Kinh tế & Quản trị kinh doanh">Kinh tế & Quản trị kinh doanh</option>
+                  <option value="Pháp luật & Kỹ năng học thuật">Pháp luật & Kỹ năng học thuật</option>
+                </select>
+              </div>
+              <div class="floating-input-wrap">
+                <span class="floating-label">Nhà xuất bản (NXB) (*)</span>
+                <input type="text" id="edit-title-publisher" class="floating-input" placeholder="Ví dụ: NXB Giáo Dục, NXB ĐH Sư Phạm...">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+              <div class="floating-input-wrap">
+                <span class="floating-label">Năm xuất bản (*)</span>
+                <input type="number" id="edit-title-year" class="floating-input" placeholder="Ví dụ: 2026" min="1900" max="2099">
+              </div>
+              <div class="floating-input-wrap">
+                <span class="floating-label">Vị trí lưu trữ lý thuyết</span>
+                <input type="text" id="edit-title-shelf" class="floating-input" placeholder="Ví dụ: Dãy K03 - Kệ 2 - Ngăn 2">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="floating-input-wrap" style="height: 85px; align-items: flex-start;">
+                <span class="floating-label">Tóm tắt nội dung</span>
+                <textarea id="edit-title-summary" class="floating-input" placeholder="Nhập tóm tắt nội dung tài liệu..."
+                  style="height: 100%; resize: none;"></textarea>
+              </div>
+            </div>
+
+            <div id="edit-title-error-msg" style="display: none; padding: 10px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; color: #dc2626; font-size: 13px; font-weight: 600; margin-top: 10px;">
+              <i class="fa-solid fa-circle-exclamation"></i> Báo lỗi: Tên sách không được để trống!
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" onclick="window.closeModal('modal-edit-title')">Hủy bỏ</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk" style="margin-right: 6px;"></i>Lưu thay đổi</button>
           </div>
         </form>
       </div>
@@ -2905,7 +2997,7 @@
       document.write('<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"><\\/script>');
     }
   </script>
-  <script src="js/app.bundle.js?v=2.4"></script>
+  <script src="js/app.bundle.js?v=2.8"></script>
 </body>
 
 </html>

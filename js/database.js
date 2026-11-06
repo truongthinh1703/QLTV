@@ -509,7 +509,7 @@ export const INITIAL_DB = {
 
       author: "Roger S. Pressman",
 
-      category: "CNTT",
+      category: "Công nghệ thông tin",
 
       categoryId: "TL-CNTT",
 
@@ -545,7 +545,7 @@ export const INITIAL_DB = {
 
       author: "Abraham Silberschatz",
 
-      category: "CNTT",
+      category: "Công nghệ thông tin",
 
       categoryId: "TL-CNTT",
 
@@ -581,7 +581,7 @@ export const INITIAL_DB = {
 
       author: "Stuart Russell, Peter Norvig",
 
-      category: "CNTT",
+      category: "Công nghệ thông tin",
 
       categoryId: "TL-CNTT",
 
@@ -617,7 +617,7 @@ export const INITIAL_DB = {
 
       author: "Jon Duckett",
 
-      category: "CNTT",
+      category: "Công nghệ thông tin",
 
       categoryId: "TL-CNTT",
 
@@ -648,7 +648,7 @@ export const INITIAL_DB = {
       isbn: "978-604-0-55667-1",
       title: "Cấu trúc Dữ liệu và Giải thuật",
       author: "Đinh Mạnh Tường",
-      category: "CNTT",
+      category: "Công nghệ thông tin",
       categoryId: "TL-CNTT",
       publisher: "NXB Giáo Dục",
       year: 2024,

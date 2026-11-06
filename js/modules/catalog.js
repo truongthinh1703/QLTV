@@ -27,7 +27,14 @@ export function renderMasterTitlesScreen() {
     );
   }
   if (cat !== 'ALL') {
-    filtered = filtered.filter(t => t.category === cat || t.categoryId === cat);
+    filtered = filtered.filter(t => {
+      if (t.category === cat || t.categoryId === cat) return true;
+      const isCNTT = (cat === 'Công nghệ thông tin' || cat === 'CNTT' || cat === 'TL-CNTT');
+      if (isCNTT && (t.category === 'CNTT' || t.category === 'Công nghệ thông tin' || t.categoryId === 'TL-CNTT')) {
+        return true;
+      }
+      return false;
+    });
   }
 
   const paginInfo = document.getElementById('titles-pagination-info');
@@ -45,6 +52,8 @@ export function renderMasterTitlesScreen() {
     const copies = db.copies.filter(c => c.titleId === t.id);
     const totalCount = copies.length;
     const availCount = copies.filter(c => c.status === 'SAN_SANG').length;
+    let displayCategory = t.category || '';
+    if (displayCategory === 'CNTT') displayCategory = 'Công nghệ thông tin';
 
     return `
       <tr>
@@ -54,7 +63,7 @@ export function renderMasterTitlesScreen() {
         </td>
         <td><span class="cell-bold">${escapeHTML(t.title)}</span></td>
         <td>${escapeHTML(t.author)}</td>
-        <td>${escapeHTML(t.category)}</td>
+        <td>${escapeHTML(displayCategory)}</td>
         <td>
           <div>${escapeHTML(t.publisher)}</div>
           <div class="cell-sub">${escapeHTML(t.year)}</div>
@@ -126,6 +135,162 @@ export function addMasterTitle(newTitleData) {
       summary: newTitleData.summary || "Đang cập nhật nội dung trích yếu của sách."
     });
   }, 'ADD_MASTER_TITLE');
+}
+
+/**
+ * Screen 10 / Bảng 6.5: Chỉnh sửa thông tin đầu sách
+ */
+export function handleEditTitle(titleId) {
+  const db = getDB();
+  const titleObj = (db.titles || []).find(t => t.id === titleId);
+  if (!titleObj) {
+    if (window.showToast) window.showToast("Không tìm thấy thông tin đầu sách!", "error");
+    return;
+  }
+
+  const idEl = document.getElementById('edit-title-id');
+  const isbnEl = document.getElementById('edit-title-isbn');
+  const nameEl = document.getElementById('edit-title-name');
+  const authorEl = document.getElementById('edit-title-author');
+  const catEl = document.getElementById('edit-title-category');
+  const pubEl = document.getElementById('edit-title-publisher');
+  const yearEl = document.getElementById('edit-title-year');
+  const shelfEl = document.getElementById('edit-title-shelf');
+  const sumEl = document.getElementById('edit-title-summary');
+  const errEl = document.getElementById('edit-title-error-msg');
+
+  if (idEl) idEl.value = titleObj.id || '';
+  if (isbnEl) isbnEl.value = titleObj.isbn || '';
+  if (nameEl) {
+    nameEl.value = titleObj.title || '';
+    nameEl.style.borderColor = '';
+  }
+  if (authorEl) {
+    authorEl.value = titleObj.author || '';
+    authorEl.style.borderColor = '';
+  }
+  if (pubEl) pubEl.value = titleObj.publisher || '';
+  if (yearEl) yearEl.value = titleObj.year || '';
+  if (shelfEl) shelfEl.value = titleObj.shelfLocation || '';
+  if (sumEl) sumEl.value = titleObj.summary || '';
+  if (errEl) errEl.style.display = 'none';
+
+  if (catEl) {
+    catEl.innerHTML = (db.categories || []).map(c => {
+      const isSelected = (c.name === titleObj.category || c.id === titleObj.categoryId || c.code === titleObj.category);
+      return `<option value="${escapeHTML(c.name)}" ${isSelected ? 'selected' : ''}>${escapeHTML(c.name)}</option>`;
+    }).join('');
+  }
+
+  if (window.openModal) window.openModal('modal-edit-title');
+}
+
+export function handleSaveEditTitle(e) {
+  if (e) e.preventDefault();
+
+  const id = document.getElementById('edit-title-id')?.value;
+  const nameEl = document.getElementById('edit-title-name');
+  const titleName = nameEl ? nameEl.value.trim() : '';
+  const authorEl = document.getElementById('edit-title-author');
+  const author = authorEl ? authorEl.value.trim() : '';
+  const category = document.getElementById('edit-title-category')?.value;
+  const publisher = document.getElementById('edit-title-publisher')?.value?.trim();
+  const yearVal = document.getElementById('edit-title-year')?.value?.trim();
+  const shelf = document.getElementById('edit-title-shelf')?.value?.trim();
+  const summary = document.getElementById('edit-title-summary')?.value?.trim();
+  const isbn = document.getElementById('edit-title-isbn')?.value?.trim();
+  const errEl = document.getElementById('edit-title-error-msg');
+
+  // Test Case 1 (Bảng 6.5): Xóa trống trường tên sách khi đang sửa -> Báo lỗi tên sách không được để trống
+  if (!titleName) {
+    if (errEl) {
+      errEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Báo lỗi: Tên sách không được để trống!';
+      errEl.style.display = 'block';
+    }
+    if (nameEl) {
+      nameEl.style.borderColor = '#ef4444';
+      nameEl.focus();
+    }
+    if (window.showToast) {
+      window.showToast("⛔ Báo lỗi: Tên sách không được để trống!", "error");
+    }
+    return;
+  }
+
+  if (!author) {
+    if (errEl) {
+      errEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Báo lỗi: Tên tác giả không được để trống!';
+      errEl.style.display = 'block';
+    }
+    if (authorEl) {
+      authorEl.style.borderColor = '#ef4444';
+      authorEl.focus();
+    }
+    if (window.showToast) {
+      window.showToast("⛔ Báo lỗi: Tên tác giả không được để trống!", "warning");
+    }
+    return;
+  }
+
+  if (errEl) errEl.style.display = 'none';
+
+  // Test Case 2 (Bảng 6.5): Cập nhật lại năm xuất bản và thể loại hợp lệ -> Lưu thông tin cập nhật thành công, danh mục hiển thị thông tin mới
+  mutateDB(draft => {
+    const t = (draft.titles || []).find(item => item.id === id);
+    if (t) {
+      t.title = titleName;
+      t.author = author;
+      if (category) {
+        t.category = category;
+        const catObj = (draft.categories || []).find(c => c.name === category || c.id === category || c.code === category);
+        if (catObj) {
+          t.categoryId = catObj.id;
+          t.category = catObj.name;
+        }
+      }
+      if (publisher) t.publisher = publisher;
+      if (yearVal) {
+        const parsedYear = parseInt(yearVal, 10);
+        t.year = !isNaN(parsedYear) ? parsedYear : yearVal;
+      }
+      if (shelf) t.shelfLocation = shelf;
+      if (summary !== undefined) t.summary = summary;
+      if (isbn) t.isbn = isbn;
+      t.coverTitle = titleName.toUpperCase();
+    }
+
+    // Đồng bộ tên sách sang các bản sao copies
+    if (Array.isArray(draft.copies)) {
+      draft.copies.forEach(c => {
+        if (c.titleId === id) {
+          c.titleName = titleName;
+          c.title = titleName;
+        }
+      });
+    }
+
+    // Đồng bộ tên sách sang các phiếu mượn activeLoans
+    if (Array.isArray(draft.activeLoans)) {
+      draft.activeLoans.forEach(l => {
+        const cp = (draft.copies || []).find(c => c.code.toUpperCase() === (l.copyCode || '').toUpperCase());
+        if (cp && cp.titleId === id) {
+          l.titleName = titleName;
+        }
+      });
+    }
+  }, 'UPDATE_MASTER_TITLE');
+
+  if (window.closeModal) window.closeModal('modal-edit-title');
+  if (window.showToast) window.showToast("✅ Lưu thông tin cập nhật thành công!", "success");
+
+  if (typeof renderMasterTitlesScreen === 'function') renderMasterTitlesScreen();
+  if (typeof renderCopiesScreen === 'function') renderCopiesScreen();
+  if (typeof renderStudentSearchScreen === 'function') renderStudentSearchScreen();
+}
+
+if (typeof window !== 'undefined') {
+  window.handleEditTitle = handleEditTitle;
+  window.handleSaveEditTitle = handleSaveEditTitle;
 }
 
 /**

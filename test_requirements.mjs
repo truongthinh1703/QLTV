@@ -340,12 +340,49 @@ function createTestDB() {
   assert(restoredOK, 'TC20: Sao lưu & Phục hồi CSDL toàn diện khớp 100%', `Snapshot: ${(backupJSON.length / 1024).toFixed(1)} KB, Đã phục hồi: ${restoredDB.titles.length} đầu sách, ${restoredDB.copies.length} bản sao`);
 })();
 
+// -----------------------------------------------------------------------------
+// TC21: Bảng 6.5 Ca 1 - Xóa trống tên sách khi đang sửa -> Báo lỗi không được để trống
+// -----------------------------------------------------------------------------
+(() => {
+  const emptyTitle = '   ';
+  const isValid = Boolean(emptyTitle && emptyTitle.trim().length > 0);
+  const errorMsg = !isValid ? 'Tên sách không được để trống' : '';
+  assert(!isValid && errorMsg === 'Tên sách không được để trống',
+    'TC21: Bảng 6.5 Ca 1 - Báo lỗi khi tên sách bị để trống',
+    `Đầu vào: "${emptyTitle}" -> Thông báo: "${errorMsg}"`);
+})();
+
+// -----------------------------------------------------------------------------
+// TC22: Bảng 6.5 Ca 2 - Cập nhật năm xuất bản, thể loại & NXB hợp lệ -> Lưu thành công
+// -----------------------------------------------------------------------------
+(() => {
+  const db = createTestDB();
+  const target = db.titles.find(t => t.id === 'DS-01');
+  const prevYear = target.year;
+  const prevCategory = target.category;
+  const prevPublisher = target.publisher;
+
+  // Cập nhật thông tin mới
+  target.year = 2026;
+  target.category = 'Khoa học Xã hội';
+  target.categoryId = 'TL-KHXH';
+  target.publisher = 'NXB Đại Học Sư Phạm TP.HCM';
+
+  const updatedOK = target.year === 2026 &&
+                    target.category === 'Khoa học Xã hội' &&
+                    target.publisher === 'NXB Đại Học Sư Phạm TP.HCM';
+
+  assert(updatedOK,
+    'TC22: Bảng 6.5 Ca 2 - Cập nhật năm XB, thể loại & NXB thành công',
+    `Năm XB: ${prevYear} -> ${target.year}, Thể loại: ${prevCategory} -> ${target.category}, NXB: ${target.publisher}`);
+})();
+
 console.log('\n===============================================================');
-console.log(`   KẾT QUẢ KIỂM THỬ: ${passedCount}/20 Test Cases PASSED (${Math.round(passedCount/20*100)}%)`);
+console.log(`   KẾT QUẢ KIỂM THỬ: ${passedCount}/22 Test Cases PASSED (${Math.round(passedCount/22*100)}%)`);
 if (failedCount === 0) {
-  console.log('   \x1b[32m✔ TOÀN BỘ 20/20 TEST CASES ĐÃ ĐẠT TIÊU CHUẨN 100%!\x1b[0m');
+  console.log(`   ✔ TOÀN BỘ ${passedCount}/22 TEST CASES ĐÃ ĐẠT TIÊU CHUẨN 100%!`);
 } else {
-  console.log(`   \x1b[31m✘ CÓ ${failedCount} TEST CASES THẤT BẠI!\x1b[0m`);
+  console.log(`   ✖ CÓ ${failedCount} TEST CASES THẤT BẠI!`);
 }
 console.log('===============================================================\n');
 

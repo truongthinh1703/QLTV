@@ -82,7 +82,8 @@ import {
 
   openCreateReaderCardModal, handleReaderCardMssvInput, handleCreateReaderCardSubmit, handleSelectReaderCardType,
   setPendingPdfFile, getPendingPdfFile,
-  renderCopiesTitleDropdownItems
+  renderCopiesTitleDropdownItems,
+  handleEditTitle, handleSaveEditTitle
 
 } from './modules/catalog.js';
 
@@ -490,6 +491,17 @@ export function refreshGlobalDropdowns() {
 
   }
 
+  // 4b. Dropdown chọn thể loại trong Modal chỉnh sửa đầu sách (Bảng 6.5)
+  const editTitleCatSelect = document.getElementById('edit-title-category');
+  if (editTitleCatSelect) {
+    const currentVal = editTitleCatSelect.value;
+    editTitleCatSelect.innerHTML = db.categories.map(c => `
+      <option value="${escapeHTML(c.name)}" ${c.name === currentVal ? 'selected' : ''}>
+        ${escapeHTML(c.name)}
+      </option>
+    `).join('');
+  }
+
 }
 
 
@@ -607,6 +619,16 @@ export function reRenderScreen(targetScreenId = activeScreenId) {
       renderStudentLoansScreen();
 
       break;
+
+    case 'screen-forgot': {
+      const forgotForm = document.getElementById('forgot-password-form');
+      if (forgotForm) forgotForm.reset();
+      const uInp = document.getElementById('forgot-username-input');
+      const eInp = document.getElementById('forgot-email-input');
+      if (uInp) uInp.value = '';
+      if (eInp) eInp.value = '';
+      break;
+    }
 
   }
 
@@ -1003,6 +1025,8 @@ function registerGlobalEvents() {
   window.mutateDB = mutateDB;
 
   window.addMasterTitle = addMasterTitle;
+  window.handleEditTitle = handleEditTitle;
+  window.handleSaveEditTitle = handleSaveEditTitle;
   window.setPendingPdfFile = setPendingPdfFile;
   window.getPendingPdfFile = getPendingPdfFile;
 
@@ -3066,31 +3090,9 @@ function registerGlobalEvents() {
 
 
   window.handleEditTitle = function (titleId) {
-
-    const db = getDB();
-
-    const t = db.titles.find(x => x.id === titleId);
-
-    if (!t) return;
-
-    const newName = prompt(`Sửa tựa sách ${t.id}:`, t.title);
-
-    if (newName && newName.trim()) {
-
-      mutateDB(draft => {
-
-        const target = draft.titles.find(x => x.id === titleId);
-
-        if (target) target.title = newName.trim();
-
-      });
-
-      showToast(`Đã cập nhật tựa sách ${titleId}!`, 'success');
-
-      renderMasterTitlesScreen();
-
+    if (typeof handleEditTitle === 'function') {
+      handleEditTitle(titleId);
     }
-
   };
 
 

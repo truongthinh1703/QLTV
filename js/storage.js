@@ -801,6 +801,13 @@ export function sanitizeDB(dbData) {
         modified = true;
       }
     });
+
+    dbData.titles.forEach(t => {
+      if (t.category === 'CNTT') {
+        t.category = 'Công nghệ thông tin';
+        modified = true;
+      }
+    });
   }
 
   // Tự động đồng bộ các bản sao sách mới
