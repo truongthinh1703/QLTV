@@ -1,185 +1,56 @@
 # ĐỒ ÁN MÔN HỌC: CÔNG NGHỆ PHẦN MỀM
 ## ĐỀ TÀI: HỆ THỐNG QUẢN LÝ THƯ VIỆN - TRƯỜNG ĐẠI HỌC SƯ PHẠM TP. HỒ CHÍ MINH (HCMUE)
+### (ĐỀ TÀI SỐ 2: HỆ THỐNG QUẢN LÝ THƯ VIỆN)
 
-> **Đơn vị đào tạo:** Trường Đại học Sư phạm TP. Hồ Chí Minh (HCMUE)  
+> **Cơ sở đào tạo:** Trường Đại học Sư phạm TP. Hồ Chí Minh (HCMUE)  
 > **Khoa:** Công nghệ Thông tin & Khoa Toán - Tin học  
-> **Học phần:** Công nghệ Phần mềm (Software Engineering)  
-> **Năm học / Học kỳ:** 2026 - 2027  
-> **Phiên bản hệ thống:** SP1.0 (Full Reactive, Responsive Mobile & 26/26 Automated Test Cases Passed)
+> **Học phần:** Nhập môn Công nghệ Phần mềm  
+> **Học kỳ / Năm học:** Học kỳ 1 (2026 - 2027)  
+> **Phiên bản hệ thống:** SP1.0 (Full Reactive SPA, Mobile Responsive, CSDL 17 bảng chuẩn 3NF & 26/26 Automated Test Cases Passed)  
+> **🌐 Web Demo Live (Render Cloud 24/7):** https://qltv-hcmue-nhom02.onrender.com  
+> **📦 Git Repository:** https://github.com/truongthinh1703/QLTV.git
 
 ---
 
-### DANH SÁCH THÀNH VIÊN NHÓM THỰC HIỆN ĐỀ TÀI
+### DANH SÁCH THÀNH VIÊN NHÓM THỰC HIỆN (NHÓM 02)
 
-| STT | Họ và tên sinh viên | Mã số sinh viên (MSSV) | Lớp sinh hoạt | Vai trò trong đồ án | Vai trò kiểm thử trong hệ thống |
+| STT | Họ và tên sinh viên | Mã số sinh viên (MSSV) | Lớp sinh hoạt | Vai trò trong nhóm | Phân hệ phụ trách chính |
 | :---: | :--- | :---: | :---: | :--- | :--- |
-| 1 | **Nguyễn Trường Thịnh** | **`50.01.103.072`** | `50.01.SPTIN.B` | **Trưởng nhóm**, Kiến trúc hệ thống & Nghiệp vụ lưu thông | Thủ thư tác nghiệp ca 1 (`thuthu01`) |
-| 2 | **Nguyễn Đức Anh Tài** | **`50.01.103.065`** | `50.01.SPTIN.B` | Phát triển CSDL PostgreSQL 3NF & Cổng sinh viên | Sinh viên nợ phạt & quá hạn (`THE-50011065`) |
-| 3 | **Huỳnh Nguyễn Huyền Trân** | **`50.01.103.077`** | `50.01.SPTIN.B` | Thiết kế giao diện Figma Hi-Fi & Kiểm thử chất lượng (QA) | Sinh viên mượn sách còn hạn (`THE-50011077`) |
-| 4 | **Lê Nguyễn Thanh Phương** | **`50.01.103.061`** | `50.01.SPTIN.B` | Đặc tả yêu cầu phần mềm (SRS) & Báo cáo thống kê | Sinh viên mượn sách quá hạn (`THE-5001106`) |
-| 5 | **Nguyễn Ngọc Hồng An** | **`50.01.103.002`** | `50.01.SPTIN.B` | Phân tích quy trình nghiệp vụ & Tài liệu kỹ thuật | Sinh viên mượn sách chuẩn (`THE-5001102`) |
+| 1 | **Nguyễn Trường Thịnh** | **`50.01.103.072`** | `50.01.SPTIN.B` | **Trưởng nhóm** & System Architect | Kiến trúc SPA, Tích hợp E2E, Triển khai Cloud & Báo cáo LaTeX |
+| 2 | **Nguyễn Đức Anh Tài** | **`50.01.103.065`** | `50.01.SPTIN.B` | Thành viên phát triển | Thủ thư: Phân hệ Lưu thông mượn/trả, Tính phạt & Thu nợ (`circulation.js`) |
+| 3 | **Lê Nguyễn Thanh Phương** | **`50.01.103.061`** | `50.01.SPTIN.B` | Thành viên phát triển | Thủ thư: Quản lý Đầu sách, Bản sao, Thể loại, Kiểm kê & Thẻ (`catalog.js`) |
+| 4 | **Nguyễn Ngọc Hồng An** | **`50.01.103.002`** | `50.01.SPTIN.B` | Thành viên phát triển | Quản trị viên: Quản lý Tài khoản RBAC, Tham số, Sao lưu & Báo cáo (`admin.js`) |
+| 5 | **Huỳnh Nguyễn Huyền Trân** | **`50.01.103.077`** | `50.01.SPTIN.B` | Thành viên phát triển | Độc giả: Tra cứu OPAC, Chi tiết & Đọc thử PDF, Sách cá nhân (`student.js`) |
 
 ---
 
-## I. MỤC TIÊU & BÀI TOÁN NGHIỆP VỤ TRỌNG TÂM CỦA ĐỒ ÁN
-
-Đồ án tập trung nghiên cứu, phân tích và hiện thực hóa một **Hệ thống Quản lý Thư viện Đại học hoàn chỉnh**, bám sát 100% hồ sơ thiết kế kỹ thuật **Chương 4 (Kiến trúc & Cơ sở dữ liệu)** và **Chương 5 (Thiết kế Giao diện người dùng Hi-Fi)**. 
-
-Hệ thống giải quyết triệt để 5 bài toán nghiệp vụ cốt lõi trong thực tế quản lý thư viện trường đại học:
-
-```
-                            ┌──────────────────────────────────────────┐
-                            │   HỆ THỐNG QUẢN LÝ THƯ VIỆN HCMUE        │
-                            └────────────────────┬─────────────────────┘
-                                                 │
-         ┌───────────────────┬───────────────────┼───────────────────┬───────────────────┐
-         ▼                   ▼                   ▼                   ▼                   ▼
-   [BÀI TOÁN 1]        [BÀI TOÁN 2]        [BÀI TOÁN 3]        [BÀI TOÁN 4]        [BÀI TOÁN 5]
-  Quản lý sách 2 cấp   Vòng đời lưu thông   Kiểm kê & Sai lệch  Đối soát tài chính  Cổng dịch vụ số
-   (Mẹ - Bản sao 1:N)  (Mượn - Trả - Phạt)   kho (3.892 cuốn)   (Chuẩn 600.000 đ)   cho Sinh viên & Mobile
-```
-
-1. **Mô hình Quản lý Sách 2 Cấp (Master Titles vs Physical Copies 1:N):**
-   - Tách biệt hoàn toàn giữa **Đầu sách mẹ** (thông tin thư mục, ISBN, tác giả, thể loại, nhà xuất bản, năm xuất bản, link đọc thử PDF) và **Bản sao sách vật lý** (mã vạch barcode cá biệt, đơn giá bìa, vị trí kệ thực tế, tình trạng vật lý: *Sẵn sàng, Đang mượn, Hư hỏng, Đã mất*).
-   - Ngăn chặn triệt để tình trạng sai lệch tồn kho khi nhiều bản sao của cùng một đầu sách được lưu thông độc lập.
-
-2. **Kiểm soát Vòng đời Lưu thông Tài liệu Khép kín:**
-   - **Lập phiếu mượn thông minh (UC12):** Tự động thẩm định thời gian thực 4 quy tắc điều kiện của độc giả:
-     * *BR-01:* Giới hạn số lượng sách mượn tối đa (Sinh viên $\le 3$ cuốn, Giảng viên $\le 5$ cuốn).
-     * *BR-02:* Hiệu lực thẻ thư viện (Thẻ đang hoạt động, chặn thẻ bị khóa hoặc thẻ hết hạn).
-     * *BR-03:* Chặn mượn sách nếu độc giả đang có sách mượn quá hạn chưa trả.
-     * *BR-04:* Chặn mượn sách nếu công nợ phạt tồn đọng vượt trần quy định ($> 50.000$ đ).
-   - **Tiếp nhận trả sách & Xử lý bồi thường (UC13, UC15):** Tự động tính phạt trễ hạn (2.000 đ/ngày), xử lý bồi thường hư hỏng (50% giá bìa) hoặc làm mất sách (100% giá bìa); tự động hoàn trả số lượng khả dụng của đầu sách mẹ.
-   - **Gia hạn linh hoạt (UC14):** Cho phép sinh viên tự gia hạn trực tuyến hoặc thủ thư gia hạn tại quầy (+7 ngày) với điều kiện nghiêm ngặt: chưa từng gia hạn (0/1 lần), sách còn trong hạn và thẻ không có nợ phạt.
-
-3. **Kiểm kê Kho & Đối soát Sai lệch Thực tế (UC10, UC11):**
-   - Hỗ trợ thủ thư nhập barcode đối soát với dữ liệu lý thuyết (tổng kho 3.892 cuốn), chống quét trùng barcode, báo mã lạ ngoài CSDL, phát hiện và lập biên bản xử lý 3 trường hợp bất thường: Mất sách (`CNPM-007`, `AI-009`) và Sai vị trí kệ (`CSDL-015`).
-
-4. **Quản lý Tài chính & Đối soát Công nợ Minh bạch (UC18, UC19, UC21):**
-   - Bảo toàn dữ liệu tài chính với **tổng công nợ tồn đọng toàn hệ thống luôn khớp chính xác 600.000 đ** giữa Bảng điều khiển, Báo cáo tài chính theo Khoa và Danh mục thu nợ.
-   - Thu nợ từng phần hoặc toàn bộ, sinh biên lai thu tiền điện tử và tự động mở khóa thẻ lưu thông ngay khi hoàn tất.
-
-5. **Cổng Dịch vụ Trực tuyến Dành cho Sinh viên & Trải nghiệm Di động (UC16, UC17, UC20):**
-   - Tra cứu tài liệu, lọc sách theo chuyên ngành (CNTT, Toán - Tin, Sư phạm...), kiểm tra số lượng bản sao sẵn sàng theo thời gian thực, đọc thử trực tuyến 10 trang PDF mẫu có đóng dấu bản quyền (*Watermark*) HCMUE, theo dõi hạn trả và lịch sử mượn trả cá nhân.
-   - Hỗ trợ **Responsive Web Design 100%** trên điện thoại di động và máy tính bảng với menu Drawer trượt mượt mà.
+## MỤC LỤC TÀI LIỆU HƯỚNG DẪN
+1. [I. Hướng dẫn khởi chạy hệ thống (Deployment & Quick Start)](#i-hướng-dẫn-khởi-chạy-hệ-thống-deployment--quick-start)
+2. [II. Hệ thống tài khoản demo theo vai trò (RBAC Demo Accounts)](#ii-hệ-thống-tài-khoản-demo-theo-vai-trò-rbac-demo-accounts)
+3. [III. Dữ liệu Seed chuẩn hóa & Nút Reset 1-Click (Không phụ thuộc nhập tay)](#iii-dữ-liệu-seed-chuẩn-hóa--nút-reset-1-click-không-phụ-thuộc-nhập-tay)
+4. [IV. Kịch bản Demo chuẩn hóa theo yêu cầu đề bài (Không cần gõ phím thủ công)](#iv-kịch-bản-demo-chuẩn-hóa-theo-yêu-cầu-đề-bài-không-cần-gõ-phím-thủ-công)
+5. [V. Ma trận truy vết yêu cầu (Requirements Traceability Matrix - RTM)](#v-ma-trận-truy-vết-yêu-cầu-requirements-traceability-matrix---rtm)
+6. [VI. Bộ kiểm thử tự động 26/26 Test Cases (Automated Test Suite)](#vi-bộ-kiểm-thử-tự-động-2626-test-cases-automated-test-suite)
+7. [VII. Kiến trúc kỹ thuật & Mô hình dữ liệu chuẩn 3NF](#vii-kiến-trúc-kỹ-thuật--mô-hình-dữ-liệu-chuẩn-3nf)
 
 ---
 
-## II. KIẾN TRÚC KỸ THUẬT & CÔNG NGHỆ ÁP DỤNG
+## I. HƯỚNG DẪN KHỞI CHẠY HỆ THỐNG (DEPLOYMENT & QUICK START)
 
-Tuân thủ nghiêm ngặt chuẩn công nghệ đăng ký ban đầu với Khoa và Hội đồng chấm điểm, toàn bộ mã nguồn được xây dựng **100% Thuần (Vanilla - Không dùng Framework nặng như React/Vue/Angular)** nhằm chứng minh năng lực nắm vững nền tảng khoa học máy tính và kỹ thuật lập trình web hiện đại:
+Hệ thống được đóng gói tối ưu để Hội đồng chấm điểm có thể kiểm thử ngay lập tức qua 4 cách:
 
-```
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│                             KIẾN TRÚC TỔNG THỂ 3 TẦNG                            │
-└────────────────────────────────────────┬─────────────────────────────────────────┘
-                                         │
-┌────────────────────────────────────────▼─────────────────────────────────────────┐
-│ 1. PRESENTATION LAYER (TẦNG TRÌNH DIỄN - GIAO DIỆN HI-FI CHƯƠNG 5 & RESPONSIVE)   │
-│ - HTML5 Semantic Layout: Cấu trúc SPA (Single Page Application) mạch lạc         │
-│ - CSS3 Pure (Design Tokens HCMUE): Navy #16375C, Crimson #C62828, Blue #1E88E5   │
-│ - Chuẩn giao diện: Đồng bộ 1:1 với 30 màn hình Figma Hi-Fi (Lưới Desktop 1440px) │
-│ - Mobile Responsive: Hỗ trợ hoàn hảo mọi kích thước màn hình điện thoại (360px+)  │
-│ - Thư viện CDN: Font Awesome 6.5.1 (Icons), Canvas-Confetti (Hiệu ứng)          │
-└────────────────────────────────────────┬─────────────────────────────────────────┘
-                                         │
-┌────────────────────────────────────────▼─────────────────────────────────────────┐
-│ 2. APPLICATION & REACTIVE ENGINE LAYER (TẦNG NGHIỆP VỤ & ĐỒNG BỘ DỮ LIỆU)        │
-│ - Vanilla ES6+ Modules: Tách biệt rõ 6 module chức năng:                         │
-│   + circulation.js : Mượn/Trả sách, Tính phạt, Thu nợ, Thẩm định thẻ            │
-│   + catalog.js     : Quản lý đầu sách mẹ, Bản sao vật lý, Thể loại, Kiểm kê kho  │
-│   + student.js     : Tra cứu sách, Đọc thử PDF mẫu, Gia hạn trực tuyến, Lịch sử  │
-│   + admin.js       : Quản lý tài khoản RBAC, Cấu hình tham số, Sao lưu CSDL     │
-│   + auth.js        : Xác thực đăng nhập, Đổi mật khẩu, 8 cơ chế an ninh phòng thủ│
-│   + storage.js     : Single Source of Truth Engine & LocalStorage Persistence    │
-│ - Reactive State Engine: Phát tín hiệu toàn cục 'hcmue:data-changed' tự động     │
-│   đồng bộ dữ liệu giữa tất cả màn hình theo thời gian thực mà không cần tải lại   │
-│ - Socket.io Real-time Server (Node.js/Express): Hỗ trợ kết nối đồng thời đa máy  │
-└────────────────────────────────────────┬─────────────────────────────────────────┘
-                                         │
-┌────────────────────────────────────────▼─────────────────────────────────────────┐
-│ 3. PERSISTENCE & DATABASE LAYER (TẦNG CƠ SỞ DỮ LIỆU CHƯƠNG 4)                    │
-│ - Chuẩn hóa 3NF: 17 bảng quan hệ chặt chẽ trong hệ quản trị PostgreSQL:          │
-│   vai_tro, tai_khoan, the_doc_gia, tham_so_he_thong, nhat_ky_he_thong,           │
-│   ban_sao_luu_csdl, the_loai, tac_gia, dau_sach, dau_sach_tac_gia, ban_sao_sach, │
-│   dot_kiem_ke, chi_tiet_kiem_ke, phieu_muon, chi_tiet_phieu_muon, phieu_phat,    │
-│   thanh_toan.                                                                    │
-│ - Ràng buộc toàn vẹn: Khóa chính (PK), Khóa ngoại (FK), Ràng buộc CHECK trạng thái│
-│ - Client Persistence: LocalStorage tự động đối soát bền vững, F5 không mất dữ liệu│
-│ - Snapshot Backup & Restore: Hỗ trợ sao lưu và khôi phục CSDL dạng file JSON     │
-└──────────────────────────────────────────────────────────────────────────────────┘
-```
+### Cách 1: Truy cập bản Live Online (Khuyên dùng - Chấm nhanh tức thì)
+* Hệ thống đã được triển khai sẵn trên máy chủ Cloud Render với CI/CD tự động từ GitHub.
+* **Đường dẫn truy cập:** **https://qltv-hcmue-nhom02.onrender.com**
+* Hỗ trợ đầy đủ trên cả máy tính, máy tính bảng và điện thoại di động (Responsive 100%).
 
----
+### Cách 2: Khởi chạy trực tiếp từ mã nguồn (Zero-Installation - Không cần cài đặt)
+* **Không yêu cầu cài Node.js, không cần cấu hình Web Server!**
+* Nhấp đúp chuột mở trực tiếp tệp **`index.html`** bằng bất kỳ trình duyệt web hiện đại nào (Google Chrome, Microsoft Edge, Firefox, Brave, Safari).
+* Mọi nghiệp vụ, cơ sở dữ liệu mẫu, hiệu ứng âm thanh/confetti và lưu trữ LocalStorage đều vận hành hoàn hảo 100%.
 
-## III. MA TRẬN 21 USE CASES NGHIỆP VỤ (REQUIREMENTS TRACEABILITY MATRIX - RTM)
-
-Hệ thống hiện thực hóa trọn vẹn toàn bộ 21 Use Cases đã đăng ký trong hồ sơ phân tích yêu cầu phần mềm:
-
-| Phân hệ nghiệp vụ | Mã UC | Tên Use Case | Vai trò thực hiện | Màn hình tương ứng (Figma) |
-| :--- | :---: | :--- | :---: | :--- |
-| **Hệ thống & An ninh** | **UC01** | Đăng nhập hệ thống (Strict Match & Rate Limit) | Tất cả | Màn hình 01 (`screen-login`) |
-| | **UC02** | Đăng xuất an toàn & Hủy phiên | Tất cả | Màn hình 04 (Modal đăng xuất) |
-| | **UC03** | Đổi mật khẩu tài khoản (Đo độ mạnh 3 mức) | Tất cả | Màn hình 03 (Modal đổi mật khẩu) |
-| | **UC04** | Quản lý tài khoản cán bộ & Phân quyền RBAC | Admin | Màn hình 15 (`screen-accounts`) |
-| | **UC05** | Cấu hình tham số vận hành thư viện | Admin | Màn hình 16 (`screen-config`) |
-| | **UC06** | Quản lý sao lưu & Phục hồi CSDL PostgreSQL | Admin | Màn hình 17, 17b (`screen-backup`) |
-| **Biên mục & Kho sách** | **UC07** | Quản lý danh mục đầu sách mẹ | Thủ thư | Màn hình 10, 10b (`screen-titles`) |
-| | **UC08** | Quản lý bản sao sách vật lý & In barcode | Thủ thư | Màn hình 11, 11b (`screen-copies`) |
-| | **UC09** | Quản lý danh mục thể loại sách | Thủ thư | Màn hình 12 (`screen-categories`) |
-| | **UC10** | Kiểm kê kho & Bảng đối soát sai lệch | Thủ thư | Màn hình 13 (`screen-inventory`) |
-| | **UC11** | Quản lý hồ sơ thẻ độc giả & Gia hạn thẻ | Thủ thư | Màn hình 14 (`screen-readers`) |
-| **Lưu thông & Tài chính** | **UC12** | Lập phiếu mượn sách (Thẩm định 4 điều kiện) | Thủ thư | Màn hình 07 (`screen-borrow`) |
-| | **UC13** | Tiếp nhận trả sách & Tính phạt quá hạn | Thủ thư | Màn hình 08, 08A, 08B (`screen-return`) |
-| | **UC14** | Gia hạn mượn sách (+7 ngày) tại quầy / online | Thủ thư / Độc giả | Màn hình 06b (Quầy) & 20b (Online) |
-| | **UC15** | Xử lý bồi thường sách hư hỏng / Báo mất | Thủ thư | Màn hình 08, 08C (`screen-return`) |
-| | **UC21** | Quản lý & Thu hồi công nợ phạt tồn đọng | Thủ thư | Màn hình 09, 09b (`screen-debts`) |
-| **Cổng Sinh viên & Báo cáo**| **UC16** | Tra cứu danh mục tài liệu trực tuyến | Sinh viên | Màn hình 19 (`screen-student-search`) |
-| | **UC17** | Xem sách đang mượn & Lịch sử cá nhân | Sinh viên | Màn hình 20 (`screen-student-loans`) |
-| | **UC18** | Báo cáo thống kê lưu thông thư viện | Admin / Thủ thư | Màn hình 18 (`screen-reports`), 06 |
-| | **UC19** | Báo cáo tài chính & Phân bổ nợ theo Khoa | Admin | Màn hình 18 (`screen-reports`) |
-| | **UC20** | Đọc thử tài liệu PDF mẫu có bản quyền | Sinh viên | Màn hình 19b (Modal PDF Preview) |
-
----
-
-## IV. BẢO TOÀN DỮ LIỆU & ĐỐI SOÁT TÀI CHÍNH TOÀN HỆ THỐNG
-
-Tính nhất quán và đối soát chéo dữ liệu chuẩn xác 100% giữa tất cả các màn hình nghiệp vụ:
-
-### 1. Đối soát Công nợ Phạt Tồn đọng (Khớp chuẩn 600.000 đ)
-* **Tổng công nợ toàn hệ thống:** **`600.000 đ`** (hiển thị đồng nhất tại Thẻ KPI Bảng điều khiển UC18, Quản lý nợ phạt UC21 và Báo cáo tài chính UC19).
-* **Chi tiết nợ từng độc giả (Màn hình 09 · UC21):**
-  1. `Trần Quốc Bảo` (`THE-5001109` - Lớp `50.01.SPTIN.A` - Khoa CNTT): **`16.000 đ`** (Quá hạn 8 ngày cuốn `AI-002` $\rightarrow$ Biên lai `BL-2026-089`).
-  2. `Đặng Hoàng Khang` (`THE-5001115` - Lớp `50.01.SPTIN.C` - Khoa CNTT): **`404.000 đ`** (Bồi thường 100% mất sách Mạng máy tính $\rightarrow$ Biên lai `BL-2026-090`).
-  3. `Nguyễn Đức Anh Tài` (`THE-50011065` - Lớp `50.01.SPTIN.B` - Khoa Toán - Tin): **`180.000 đ`** (Quá hạn 1 ngày & bồi thường rách sách `CSDL-002` $\rightarrow$ Biên lai `BL-2026-091`).
-  $$\text{Tổng nợ tồn đọng} = 16.000 + 404.000 + 180.000 = \mathbf{600.000\text{ đ}}$$
-* **Phân bổ nợ theo Khoa (Màn hình 18 · UC19):**
-  - **Khoa Công nghệ Thông tin:** $16.000 + 404.000 = \mathbf{420.000\text{ đ}}$
-  - **Khoa Toán - Tin học:** $\mathbf{180.000\text{ đ}}$
-  - **Khoa Tiếng Anh:** $\mathbf{0\text{ đ}}$
-  $$\text{Tổng nợ theo khoa} = 420.000 + 180.000 + 0 = \mathbf{600.000\text{ đ}}\quad(\text{Khớp 100\%})$$
-
-### 2. Đối soát Tồn kho Sách & Kiểm kê (Khớp chuẩn 3.892 cuốn)
-* **Tổng số sách theo CSDL:** **`3.892 cuốn`**
-* **Số sách ghi nhận thực tế đã quét:** **`3.889 cuốn`**
-* **Chênh lệch bất thường cần xử lý (3 cuốn):**
-  - `CNPM-007`: Báo mất / Thất thoát (Đã lập biên bản thanh lý).
-  - `AI-009`: Báo mất / Thất thoát (Đang truy vết người mượn gần nhất).
-  - `CSDL-015`: Sai lệch vị trí kệ (Lý thuyết: Kệ K02 - Ngăn 1 $\neq$ Thực tế quét: Kệ K04 - Ngăn 2 $\rightarrow$ Tự động cảnh báo sai vị trí).
-
----
-
-## V. HƯỚNG DẪN KHỞI CHẠY HỆ THỐNG (DEPLOYMENT & EXECUTION)
-
-Hệ thống hỗ trợ 4 phương thức khởi chạy linh hoạt tùy theo nhu cầu đánh giá của Hội đồng chấm điểm:
-
-### Cách 1: Khởi chạy trực tiếp (Zero Installation - Khuyên dùng khi chấm nhanh)
-- **Không cần cài đặt Node.js hay máy chủ web!**
-- Nhấp đúp chuột mở trực tiếp tệp **`index.html`** bằng bất kỳ trình duyệt nào (Google Chrome, Microsoft Edge, Brave, Firefox, Safari).
-- Toàn bộ giao diện, hiệu ứng âm thanh/confetti, cơ sở dữ liệu mô phỏng và lưu trữ LocalStorage đều hoạt động trơn tru 100%.
-
-### Cách 2: Chạy Web Server Node.js + Socket.io Real-time (Đa thiết bị)
-Hỗ trợ kiểm thử đồng bộ thời gian thực giữa nhiều máy tính và điện thoại di động:
+### Cách 3: Chạy qua máy chủ Node.js cục bộ (Local Server)
+Dành cho trường hợp muốn chạy server cục bộ trên máy tính:
 ```bash
 # 1. Cài đặt các gói phụ thuộc (Express, Socket.io, Cors)
 npm install
@@ -188,55 +59,21 @@ npm install
 npm start
 # hoặc: node server.js
 ```
-- Truy cập từ máy tính: `http://localhost:3000`
-- Truy cập từ điện thoại di động: `http://<IP_MÁY_TÍNH>:3000` (ví dụ: `http://192.168.1.15:3000`). Giao diện sẽ tự động chuyển sang chế độ Mobile với menu trượt Drawer tiện lợi.
+* Mở trình duyệt truy cập: `http://localhost:3000`
+* Hỗ trợ truy cập từ điện thoại qua mạng LAN: `http://<IP_MÁY_TÍNH>:3000` (ví dụ: `http://192.168.1.15:3000`).
 
-### Cách 3: Chạy Bộ Kiểm thử Tự động 26/26 Test Cases
-Kiểm chứng tự động toàn bộ 11 Yêu cầu Chức năng (FRs), 4 Quy tắc Nghiệp vụ (BR-01..BR-04), Bảng 6.5 (sửa thông tin sách) và các ràng buộc toàn vẹn CSDL:
+### Cách 4: Chạy bộ kiểm thử tự động (Automated Test Suite)
+Kiểm chứng tự động toàn bộ 11 Yêu cầu Chức năng (FRs), 4 Quy tắc Nghiệp vụ (BR-01..BR-04) và các ràng buộc toàn vẹn CSDL:
 ```bash
 node test_requirements.mjs
 ```
-*Kết quả kiểm thử đạt chuẩn: **26/26 Test Cases PASSED (100%)**.*
-
-### Cách 4: Nạp CSDL PostgreSQL vào Server (Thẩm định Backend)
-Khi Hội đồng yêu cầu thẩm định cấu trúc CSDL 17 bảng chuẩn 3NF trên hệ quản trị PostgreSQL:
-```bash
-# Bước 1: Khởi tạo schema và 17 bảng quan hệ chuẩn 3NF
-psql -U postgres -d library_hcmue -f sql/01_schema_postgresql.sql
-
-# Bước 2: Nạp dữ liệu seed chuẩn hóa ban đầu
-psql -U postgres -d library_hcmue -f sql/02_seed_data_postgresql.sql
-```
+*Kết quả thẩm định: **26/26 Test Cases PASSED (100%)**.*
 
 ---
 
-## VI. DỮ LIỆU SEED CHUẨN HÓA & NÚT RESET 1-CLICK
+## II. HỆ THỐNG TÀI KHOẢN DEMO THEO VAI TRÒ (RBAC DEMO ACCOUNTS)
 
-Để **hoàn toàn không phụ thuộc vào dữ liệu nhập tay tại thời điểm chấm bài**, hệ thống đã nạp sẵn một bộ dữ liệu CSDL chuẩn hóa toàn diện (*Standard Seed Data*):
-
-### 1. Quy mô Dữ liệu Seed Khởi tạo
-* **35 Đầu sách mẹ (`DS-01` đến `DS-35`):** Được chuẩn hóa theo đúng Danh mục 30+ đầu sách kiểm thử thực tế của Thư viện HCMUE, trải rộng qua 7 thể loại chuyên ngành:
-  - *Công nghệ thông tin (5 đầu sách: Kỹ nghệ phần mềm, Hệ quản trị CSDL PostgreSQL, Nhập môn Trí tuệ Nhân tạo, Lập trình Web nâng cao, Cấu trúc Dữ liệu và Giải thuật).*
-  - *Toán - Tin học (Giáo trình Giải tích 1, Đại số tuyến tính, Xác suất thống kê...).*
-  - *Sư phạm & Giáo dục học (Tâm lý học đại cương, Giáo dục học đại cương...).*
-  - *Ngoại ngữ, Khoa học Xã hội, Kinh tế & Quản trị kinh doanh, Pháp luật & Kỹ năng.*
-  - **100% đầu sách đều có link xem thử PDF mẫu có đóng dấu bản quyền (*Watermark*) HCMUE.**
-* **81 Bản sao sách vật lý (`CNPM-001`, `CSDL-001`, `AI-001`...):** Có mã barcode riêng biệt, gán vị trí kệ từ K01 đến K05 và đơn giá bồi thường chính xác.
-* **14 Tài khoản người dùng:** Đầy đủ các nhóm vai trò RBAC (Quản trị viên, Thủ thư, Giảng viên, Sinh viên với mọi tình trạng thẻ).
-* **3 Khoản công nợ tồn đọng:** Tổng đúng 600.000 đ, có biên lai phạt tương ứng.
-* **4 Lượt mượn sách đang lưu thông:** Phục vụ kiểm thử trả sách, gia hạn và phạt quá hạn.
-
-### 2. Nút "Reset CSDL Chuẩn" trên Topbar (Bảo đảm an toàn tuyệt đối khi chấm bài)
-> [!TIP]
-> **Không lo dữ liệu bị sai lệch khi người chấm trước thao tác!**  
-> Trên thanh điều hướng Topbar luôn có sẵn nút bấm **`[ 🔄 Reset CSDL Chuẩn ]`**.  
-> Bất cứ khi nào Thầy/Cô hoặc bạn bè thao tác thử (trả sách, thu nợ, thêm/xóa sách...), chỉ cần nhấn nút này $\rightarrow$ Toàn bộ CSDL sẽ lập tức được khôi phục về trạng thái hạt giống ban đầu chuẩn xác 100%, sẵn sàng cho kịch bản chấm tiếp theo mà không cần phải gõ tay cấu hình lại từ đầu.
-
----
-
-## VII. TÀI KHOẢN DEMO THEO VAI TRÒ (RBAC DEMO ACCOUNTS)
-
-Ngay tại màn hình Đăng nhập, hệ thống trang bị sẵn cụm **Phím tắt 1-Click (Quick Login Chips)**. Thầy Cô và Ban Giám khảo chỉ cần nhấp chuột vào chip vai trò tương ứng để đăng nhập ngay mà **không cần nhập tay tên đăng nhập và mật khẩu**:
+Ngay tại màn hình Đăng nhập (`#screen-login`), hệ thống trang bị sẵn cụm **Phím tắt đăng nhập 1-Click (Quick Login Chips)**. Giảng viên chỉ cần nhấp chuột vào chip vai trò tương ứng để đăng nhập ngay mà **không cần phải gõ tay tên đăng nhập hay mật khẩu**:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
@@ -245,138 +82,175 @@ Ngay tại màn hình Đăng nhập, hệ thống trang bị sẵn cụm **Phím
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Bảng Chi tiết Tài khoản Thử nghiệm theo Vai trò:
+### Bảng Danh mục Tài khoản Thử nghiệm theo Vai trò:
 
-| STT | Tài khoản | Mật khẩu | Họ và tên | Vai trò (RBAC) | Trạng thái thẻ | Mục đích đối soát kiểm thử đặc thù |
+| STT | Tài khoản | Mật khẩu | Họ và tên | Vai trò (RBAC) | Trạng thái thẻ | Kịch bản kiểm thử đặc thù phục vụ chấm bài |
 | :---: | :--- | :---: | :--- | :--- | :---: | :--- |
-| **1** | **`admin01`** | `123456` | **Trần Văn Quản Trị** | Quản trị viên (ADMIN) | — | Kiểm tra 4 màn hình quản trị: Quản lý tài khoản, Cấu hình tham số, Sao lưu CSDL, Báo cáo tài chính theo khoa. |
-| **2** | **`thuthu01`** | `123456` | **Nguyễn Trường Thịnh** | Thủ thư ca 1 (THU_THU) | — | Kiểm tra 9 màn hình tác nghiệp: Lập phiếu mượn, Tiếp nhận trả, Thu nợ phạt, Quản lý kho sách, Kiểm kê kho. *(Ẩn menu Admin)*. |
-| **3** | **`GV.CNTT.01`** | `123456` | **TS. Lê Hoàng Nam** | Giảng viên (DOC_GIA) | `HOAT_DONG` | Kiểm tra chính sách ưu tiên cho Giảng viên: Hạn mức mượn 5 cuốn, thời hạn 30 ngày. |
-| **4** | **`50.01.103.002`** | `123456` | **Nguyễn Ngọc Hồng An** | Sinh viên (Chuẩn) | `HOAT_DONG` | **Đủ 4 điều kiện xanh:** Nợ 0đ, thẻ còn hạn, tự gia hạn trực tuyến +7 ngày thành công (Ảnh 20b). |
-| **5** | **`50.01.103.065`** | `123456` | **Nguyễn Đức Anh Tài** | Sinh viên (Nợ phạt) | `TAM_KHOA_NO` | Kiểm tra cảnh báo nợ 180.000 đ, sách quá hạn 1 ngày (`CSDL-002`), thẻ tự khóa quyền mượn/gia hạn. |
-| **6** | **`50.01.103.077`** | `123456` | **Huỳnh Nguyễn Huyền Trân** | Sinh viên (Đạt trần) | `HOAT_DONG` | **TC04 (BR-01):** Đã mượn đủ 3/3 cuốn, hệ thống chặn không cho mượn thêm cuốn thứ 4. |
-| **7** | **`50.01.103.061`** | `123456` | **Lê Nguyễn Thanh Phương** | Sinh viên (Quá hạn) | `HOAT_DONG` | **TC07 (BR-03):** Đang nợ sách quá hạn 13 ngày (`CNPM-003`), hệ thống chặn quyền mượn sách mới. |
-| **8** | **`50.01.103.115`** | `123456` | **Đặng Hoàng Khang** | Sinh viên (Nợ vượt trần)| `TAM_KHOA_NO` | **TC08 (BR-04):** Nợ bồi thường mất sách 404.000 đ ($> 50.000$ đ trần quy định), chặn mượn sách. |
-| **9** | **`50.01.103.088`** | `123456` | **Hoàng Văn Khóa** | Sinh viên (Thẻ bị khóa) | `KHOA` | **TC05 (BR-02):** Kiểm thử quy tắc chặn mượn sách khi thẻ độc giả bị thủ thư khóa thủ công. |
-| **10**| **`49.01.103.099`** | `123456` | **Trần Thị Hết Hạn** | Sinh viên (Thẻ hết hạn) | `HET_HAN` | **TC06 & TC25:** Thẻ hết hạn ngày 15/09/2023 $\rightarrow$ Chặn mượn. Có nút "Gia hạn thẻ" tự động cập nhật hạn năm tiếp theo. |
+| **1** | **`admin01`** | `123456` | **Trần Văn Quản Trị** | Quản trị viên (`ADMIN`) | — | **Toàn quyền Quản trị:** Quản lý tài khoản SV/GV, Cấu hình tham số, Sao lưu CSDL, Xem báo cáo tài chính & nợ theo khoa. |
+| **2** | **`thuthu01`** | `123456` | **Nguyễn Trường Thịnh** | Thủ thư ca 1 (`THU_THU`) | — | **Nghiệp vụ quầy:** Lập phiếu mượn, Tiếp nhận trả, Thu nợ phạt, Quản lý danh mục sách, Bản sao vật lý, Kiểm kê kho. |
+| **3** | **`GV.CNTT.01`** | `123456` | **TS. Lê Hoàng Nam** | Giảng viên (`DOC_GIA`) | `HOAT_DONG` | **Ưu tiên Giảng viên:** Hạn mức mượn 5 cuốn, thời hạn 30 ngày (so với sinh viên chỉ 3 cuốn, 14 ngày). |
+| **4** | **`50.01.103.002`** | `123456` | **Nguyễn Ngọc Hồng An** | Sinh viên (`DOC_GIA`) | `HOAT_DONG` | **Tài khoản chuẩn (4 điều kiện xanh):** Nợ 0đ, thẻ còn hạn, tự gia hạn trực tuyến +7 ngày thành công. |
+| **5** | **`50.01.103.065`** | `123456` | **Nguyễn Đức Anh Tài** | Sinh viên (`DOC_GIA`) | `TAM_KHOA_NO` | **Tài khoản nợ phạt:** Đang nợ 180.000 đ (`CSDL-002` quá hạn & rách bìa), hệ thống tự khóa quyền mượn/gia hạn. |
+| **6** | **`50.01.103.077`** | `123456` | **Huỳnh Nguyễn Huyền Trân**| Sinh viên (`DOC_GIA`) | `HOAT_DONG` | **TC04 (BR-01):** Đã mượn đủ trần 3/3 cuốn, hệ thống chặn không cho mượn thêm cuốn thứ 4. |
+| **7** | **`50.01.103.061`** | `123456` | **Lê Nguyễn Thanh Phương**| Sinh viên (`DOC_GIA`) | `HOAT_DONG` | **TC07 (BR-03):** Đang giữ sách quá hạn 13 ngày (`CNPM-003`), hệ thống chặn quyền mượn sách mới. |
+| **8** | **`50.01.103.115`** | `123456` | **Đặng Hoàng Khang** | Sinh viên (`DOC_GIA`) | `TAM_KHOA_NO` | **TC08 (BR-04):** Nợ bồi thường mất sách 404.000 đ ($> 50.000$ đ trần quy định), chặn mượn sách. |
+| **9** | **`50.01.103.088`** | `123456` | **Hoàng Văn Khóa** | Sinh viên (`DOC_GIA`) | `KHOA` | **TC05 (BR-02):** Kiểm thử quy tắc chặn mượn sách khi thẻ độc giả bị thủ thư khóa thủ công. |
+| **10**| **`49.01.103.099`** | `123456` | **Trần Thị Hết Hạn** | Sinh viên (`DOC_GIA`) | `HET_HAN` | **TC06 (BR-02):** Thẻ hết hạn từ ngày 15/09/2023 $\rightarrow$ Chặn mượn. Có nút "Gia hạn thẻ" mở lại quyền ngay. |
 
 ---
 
-## VIII. KỊCH BẢN DEMO CHUẨN HÓA (KHÔNG PHỤ THUỘC DỮ LIỆU NHẬP TAY)
+## III. DỮ LIỆU SEED CHUẨN HÓA & NÚT RESET 1-CLICK (KHÔNG PHỤ THUỘC NHẬP TAY)
 
-Các kịch bản dưới đây được thiết kế sẵn theo quy trình nghiệp vụ thực tế, người đánh giá chỉ cần nhấp chuột thao tác với các dữ liệu đã seed sẵn mà **không phải tự bịa số liệu hay gõ bàn phím thủ công**:
+Để đáp ứng tuyệt đối tiêu chuẩn nghiệm thu của học phần: **"Không phụ thuộc vào dữ liệu nhập tay tại thời điểm chấm"**, hệ thống được tích hợp sẵn bộ dữ liệu hạt giống chuẩn hóa (*Standard Seed Data*) với quy mô lớn vượt xa chuẩn đề tài yêu cầu:
 
-### 🎬 Kịch bản 1: Thẩm định 4 Quy tắc Nghiệp vụ Lập Phiếu mượn (BR-01 đến BR-04)
-* **Mục tiêu:** Chứng minh hệ thống tự động thẩm định điều kiện mượn theo thời gian thực và ngăn chặn mọi vi phạm.
-* **Các bước thực hiện:**
-  1. Bấm chip đăng nhập nhanh **`Thủ thư: thuthu01`** $\rightarrow$ Chọn menu **"Lập phiếu mượn"** (Screen 07).
-  2. **Thử nghiệm BR-02 (Thẻ bị khóa):** Nhập mã thẻ `THE-50011088` (Hoàng Văn Khóa) $\rightarrow$ Hệ thống lập tức báo vi phạm đỏ: *Thẻ đang bị khóa tác vụ*, nút Xác nhận tạo phiếu bị vô hiệu hóa.
-  3. **Thử nghiệm BR-02 (Thẻ hết hạn):** Nhập mã thẻ `THE-49011099` (Trần Thị Hết Hạn) $\rightarrow$ Báo vi phạm đỏ: *Thẻ thư viện đã hết hạn từ 15/09/2023*. *(Thủ thư có thể sang mục Thẻ độc giả bấm nút "Gia hạn thẻ" để kích hoạt lại ngay)*.
-  4. **Thử nghiệm BR-03 (Nợ sách quá hạn):** Nhập mã thẻ `THE-5001106` (Lê Nguyễn Thanh Phương) $\rightarrow$ Báo vi phạm đỏ: *Độc giả đang giữ sách quá hạn 13 ngày chưa trả*.
-  5. **Thử nghiệm BR-04 (Nợ phạt vượt trần):** Nhập mã thẻ `THE-5001115` (Đặng Hoàng Khang) $\rightarrow$ Báo vi phạm đỏ: *Độc giả nợ 404.000 đ vượt quá trần quy định 50.000 đ*.
-  6. **Thử nghiệm BR-01 (Mượn vượt hạn mức):** Nhập mã thẻ `THE-50011077` (Huỳnh Nguyễn Huyền Trân) $\rightarrow$ Báo vi phạm đỏ: *Đã đạt hạn mức tối đa 3/3 cuốn*.
-  7. **Thử nghiệm Đủ điều kiện chuẩn:** Nhập mã thẻ `THE-5001102` (Nguyễn Ngọc Hồng An) $\rightarrow$ **Cả 4 điều kiện sáng xanh** (Thẻ hoạt động, Chưa đủ 3 cuốn, Nợ 0đ, Sách sẵn sàng) $\rightarrow$ Nút **"XÁC NHẬN TẠO PHIẾU MƯỢN"** kích hoạt thành công!
+### 1. Quy mô Dữ liệu Seed Khởi tạo Sẵn:
+* **35 Đầu sách mẹ (`DS-01` đến `DS-35`):** *(Vượt tiêu chí tối thiểu $\ge 20$ đầu sách)*, phủ rộng khắp 7 thể loại chuyên ngành của HCMUE: Công nghệ thông tin, Toán - Tin, Sư phạm & Giáo dục học, Ngoại ngữ, Khoa học Xã hội, Kinh tế, Pháp luật. **100% đầu sách đều có link xem thử PDF bản quyền.**
+* **81 Bản sao sách vật lý (`CNPM-001`, `CSDL-001`...):** *(Vượt tiêu chí tối thiểu $\ge 30$ bản sao)*, mỗi bản sao mang mã barcode riêng biệt, gán vị trí kệ cụ thể (Phòng đọc A2 - Kệ K01 đến K05 - Ngăn 1..3).
+* **14 Hồ sơ thẻ độc giả:** *(Vượt tiêu chí tối thiểu $\ge 10$ độc giả)*, đầy đủ các nhóm đối tượng (Sinh viên, Giảng viên, thẻ bình thường, thẻ hết hạn, thẻ nợ tiền, thẻ bị khóa).
+* **3 Khoản công nợ tồn đọng:** Tổng nợ toàn hệ thống luôn khớp chính xác **600.000 đ** giữa Bảng điều khiển, Quản lý nợ và Báo cáo tài chính theo khoa.
+* **4 Lượt mượn sách đang lưu thông:** Phục vụ kiểm thử trực tiếp các tình huống: trả sách đúng hạn, trả sách quá hạn, trả sách hư hỏng, gia hạn trực tuyến.
 
----
-
-### 🎬 Kịch bản 2: Tiếp nhận Trả sách, Tính phạt & Bảo toàn Toàn vẹn Dữ liệu
-* **Mục tiêu:** Kiểm tra khả năng tự động tính phạt quá hạn, bồi thường hư hỏng và ghi nợ tự động.
-* **Các bước thực hiện:**
-  1. Tại giao diện Thủ thư, chọn menu **"Tiếp nhận trả"** (Screen 08).
-  2. Nhập mã bản sao có sẵn: `CNPM-002` (hoặc `CSDL-002` của Anh Tài quá hạn 1 ngày).
-  3. Hệ thống tự động truy xuất thông tin độc giả, tính tiền phạt quá hạn: $1\text{ ngày} \times 2.000\text{ đ} = 2.000\text{ đ}$.
-  4. Chọn tình trạng sách:
-     - Chọn *Nguyên vẹn* $\rightarrow$ Tiền bồi thường = 0 đ $\rightarrow$ Tổng thu: 2.000 đ.
-     - Chọn *Hư hỏng (rách bìa)* $\rightarrow$ Tự động cộng thêm 50% giá bìa: $2.000 + 55.000 = 57.000\text{ đ}$.
-     - Chọn *Báo mất sách* $\rightarrow$ Tự động cộng 100% giá bìa: $2.000 + 110.000 = 112.000\text{ đ}$.
-  5. Bấm nút **"Ghi nợ vào tài khoản"**:
-     - Hệ thống tự động đóng lượt mượn, bản sao sách trở về trạng thái kho tương ứng.
-     - Thẻ độc giả tự động chuyển sang `Bị khóa (Nợ)`.
-     - Khoản nợ mới được đẩy ngay sang màn hình **Thu nợ phạt** mà không cần nhập liệu lại.
+### 2. Nút "Reset CSDL Chuẩn" 1-Click trên Topbar (Bảo đảm an toàn tuyệt đối):
+> [!IMPORTANT]
+> **Không sợ dữ liệu bị xáo trộn khi thao tác thử!**  
+> Trên thanh Topbar luôn có sẵn nút bấm **`[ 🔄 Reset CSDL Chuẩn ]`**.  
+> Bất cứ lúc nào Thầy/Cô hoặc nhóm thực hiện các thao tác thử nghiệm (cho mượn sách, trả sách, nộp phạt, thêm/xóa sách...), chỉ cần nhấn nút này $\rightarrow$ **Toàn bộ hệ thống sẽ lập tức được khôi phục về trạng thái hạt giống ban đầu chuẩn xác 100% trong vòng 0.5 giây**, sẵn sàng cho lượt chấm tiếp theo mà không cần cấu hình lại.
 
 ---
 
-### 🎬 Kịch bản 3: Đồng bộ Thời gian thực Đa màn hình (Reactive Cross-Role Sync)
-* **Mục tiêu:** Chứng minh cơ chế đồng bộ dữ liệu thời gian thực giữa màn hình Thủ thư và màn hình Sinh viên mà không cần tải lại trang (*F5*).
-* **Các bước thực hiện:**
-  1. Đang ở vai trò Thủ thư, chọn menu **"Thu nợ phạt"** (Screen 09).
-  2. Quan sát hàng công nợ của **Nguyễn Đức Anh Tài** (`THE-50011065`, số tiền `180.000 đ`).
-  3. Bấm nút **"Thu nợ"** $\rightarrow$ Hệ thống xuất biên lai thu tiền `BL-2026-091`, tổng nợ của Tài giảm về `0 đ`, trạng thái thẻ tự động mở khóa thành `Hoạt động`.
-  4. Đăng xuất $\rightarrow$ Bấm phím tắt 1-click đăng nhập **`Sinh viên: Anh Tài`**.
-  5. Chuyển sang tab **"Sách đang mượn & Lịch sử cá nhân"**:
-     - Banner công nợ của Tài lập tức hiển thị màu xanh: `✔ Công nợ: 0 đ` và thẻ trạng thái `Hoạt động`.
-     - Không cần nhấn F5, toàn bộ dữ liệu đã được đồng bộ tự động!
+## IV. KỊCH BẢN DEMO CHUẨN HÓA THEO YÊU CẦU ĐỀ BÀI (KHÔNG CẦN GÕ PHÍM THỦ CÔNG)
+
+Các kịch bản dưới đây được thiết kế bám sát 100% **Mục 6: Các luồng nghiệp vụ phải demo được** của đề tài Nhóm 2 trong Đề cương môn học. Người đánh giá chỉ cần nhấp chuột chọn dữ liệu có sẵn:
 
 ---
 
-### 🎬 Kịch bản 4: Tự Gia hạn Sách Trực tuyến trên Cổng Sinh viên
-* **Mục tiêu:** Kiểm tra chức năng tự phục vụ của sinh viên (Self-Service) và ràng buộc gia hạn tối đa 1 lần.
-* **Các bước thực hiện:**
-  1. Đăng nhập tài khoản **`Sinh viên: Hồng An`** (`50.01.103.002`).
-  2. Chọn tab **"Sách đang mượn & Lịch sử cá nhân"** (Screen 20).
-  3. Quan sát cuốn sách `Lập trình Web nâng cao` (`WEB-001`):
-     - Hạn trả hiện tại: `08/11/2026`
-     - Số lần đã gia hạn: `0/1 lần`
-  4. Bấm nút **`[ Gia hạn +7 ngày ]`**:
-     - Bắn pháo hoa Confetti và hiển thị thông báo gia hạn thành công!
-     - Hạn trả tự động kéo dài thêm 7 ngày thành **`15/11/2026`**.
-     - Nút gia hạn tự động chuyển sang trạng thái khóa xám: `✔ Đã gia hạn (1/1 lần)`, ngăn chặn việc gia hạn lần 2 đúng quy định thư viện.
+### 🎬 KỊCH BẢN 1 (LUỒNG 1 BẮT BUỘC): Thêm sách/Bản sao $\rightarrow$ Tra cứu $\rightarrow$ Mượn $\rightarrow$ Trả $\rightarrow$ Tính phạt
+* **Mục tiêu:** Chứng minh toàn bộ vòng đời lưu thông tài liệu khép kín, số bản sách khả dụng tự động cập nhật đúng sau từng giao dịch.
+* **Các bước thao tác 1-Click:**
+  1. **Bước 1 (Đăng nhập Thủ thư):** Bấm phím tắt **`[ ⚡ Thủ thư: thuthu01 ]`**.
+  2. **Bước 2 (Thêm sách/Bản sao):**
+     - Vào menu **"Đầu sách mới"** (Screen 10) $\rightarrow$ Xem danh mục 35 cuốn sách mẫu.
+     - Vào menu **"Bản sao vật lý"** (Screen 11) $\rightarrow$ Bấm **"+ Thêm bản sao"** $\rightarrow$ Hệ thống tự sinh mã Barcode duy nhất `HCMUE-CS-0082` tại Kệ K01 $\rightarrow$ Bấm **Lưu**.
+  3. **Bước 3 (Độc giả tra cứu):**
+     - Đăng xuất $\rightarrow$ Bấm phím tắt **`[ ⚡ SV Hồng An (Chuẩn) ]`**.
+     - Vào **"Tra cứu OPAC"** (Screen 19) $\rightarrow$ Chọn lọc theo "Công nghệ thông tin" $\rightarrow$ Thấy cuốn "Kỹ nghệ phần mềm" có **`Sẵn sàng: 3 cuốn`**.
+  4. **Bước 4 (Thủ thư lập phiếu mượn):**
+     - Đổi sang **`Thủ thư: thuthu01`** $\rightarrow$ Vào **"Lập phiếu mượn"** (Screen 07).
+     - Nhập mã thẻ có sẵn của Hồng An: `THE-5001102` (hoặc bấm chọn từ danh sách gợi ý).
+     - Thêm cuốn sách: `CNPM-001` $\rightarrow$ Bấm **"Xác nhận mượn"** $\rightarrow$ Xuất biên nhận mượn sách.
+     - *Kiểm tra:* Số bản khả dụng của cuốn Kỹ nghệ phần mềm tự động giảm từ 3 xuống **2 cuốn**.
+  5. **Bước 5 (Tiếp nhận trả & Tính phạt quá hạn):**
+     - Vào menu **"Tiếp nhận trả"** (Screen 08).
+     - Quét/chọn mã sách quá hạn có sẵn: `CSDL-002` (Anh Tài mượn quá hạn 1 ngày).
+     - Hệ thống tự động tính tiền phạt: $1\text{ ngày} \times 2.000\text{ đ} = 2.000\text{ đ}$.
+     - Tích chọn tình trạng: *Hư hỏng (rách bìa)* $\rightarrow$ Hệ thống tự động cộng thêm phí bồi thường 50% giá bìa: $2.000 + 55.000 = 57.000\text{ đ}$.
+     - Bấm **"Xác nhận trả sách"** $\rightarrow$ Sách được thu hồi về kho, số lượng khả dụng tự động tăng lại, khoản phạt được ghi nhận vào hồ sơ bạn đọc.
 
 ---
 
-### 🎬 Kịch bản 5: Tra cứu Danh mục, Lọc chuyên ngành & Đọc thử PDF Bản quyền
-* **Mục tiêu:** Kiểm tra chức năng tìm kiếm, phân loại tài liệu và đọc thử trực tuyến.
-* **Các bước thực hiện:**
-  1. Tại Cổng sinh viên, vào tab **"Tra cứu tài liệu"** (Screen 19).
-  2. Tại dropdown thể loại, chọn **"Công nghệ thông tin"**:
-     - Danh sách lập tức lọc ra **chính xác 5 đầu sách CNTT** (`DS-01` đến `DS-05`).
-  3. Bấm nút **"Xem trước PDF"** tại cuốn bất kỳ:
-     - Modal đọc thử PDF bật lên với trình xem tài liệu chất lượng cao, có đóng dấu bản quyền mờ (*Watermark: TRƯỜNG ĐẠI HỌC SƯ PHẠM TP.HCM - BẢN QUYỀN SỐ*).
+### 🎬 KỊCH BẢN 2 (LUỒNG 2 BẮT BUỘC): Cấp thẻ $\rightarrow$ Khóa/Hết hạn thẻ $\rightarrow$ Kiểm tra điều kiện chặn mượn
+* **Mục tiêu:** Thẩm định 4 Quy tắc Nghiệp vụ (BR-01 đến BR-04) khi lập phiếu mượn, chứng minh hệ thống ngăn chặn vi phạm tự động theo thời gian thực.
+* **Các bước thao tác:**
+  1. Đăng nhập **`Thủ thư: thuthu01`** $\rightarrow$ Chọn menu **"Thẻ độc giả"** (Screen 14).
+  2. **Thao tác cấp thẻ mới:** Bấm **"+ Cấp thẻ độc giả mới"** $\rightarrow$ Chọn loại "Giảng viên" $\rightarrow$ Hệ thống tự động cấp mã thẻ `THE-GVxxxx` với hạn dùng 5 năm (đến 2031).
+  3. **Thao tác khóa thẻ:** Tìm thẻ `THE-50011088` (Hoàng Văn Khóa) $\rightarrow$ Bấm **"Khóa thẻ"** (Thẻ chuyển trạng thái màu đỏ `KHOA`).
+  4. **Kiểm tra chặn mượn tại quầy (Screen 07):** Vào menu **"Lập phiếu mượn"**:
+     - **Thử nghiệm Thẻ bị khóa (BR-02):** Nhập `THE-50011088` $\rightarrow$ Hệ thống báo đỏ vi phạm: *Thẻ thư viện đang bị khóa, không thể lập phiếu mượn*.
+     - **Thử nghiệm Thẻ hết hạn (BR-02):** Nhập `THE-49011099` (Trần Thị Hết Hạn, hết hạn 15/09/2023) $\rightarrow$ Hệ thống báo đỏ: *Thẻ thư viện đã hết hạn sử dụng*.
+     - **Thử nghiệm Nợ sách quá hạn (BR-03):** Nhập `THE-5001106` (Thanh Phương) $\rightarrow$ Hệ thống báo đỏ: *Độc giả đang giữ sách quá hạn 13 ngày chưa trả*.
+     - **Thử nghiệm Nợ phạt vượt trần (BR-04):** Nhập `THE-5001115` (Hoàng Khang) $\rightarrow$ Báo đỏ: *Nợ phạt 404.000 đ vượt quá trần quy định (50.000 đ)*.
+     - **Thử nghiệm Mượn vượt hạn mức (BR-01):** Nhập `THE-50011077` (Huyền Trân) $\rightarrow$ Báo đỏ: *Đã mượn tối đa 3/3 cuốn*.
+     - **Thử nghiệm Đủ điều kiện chuẩn:** Nhập `THE-5001102` (Hồng An) $\rightarrow$ **Cả 4 điều kiện xanh**, nút **"XÁC NHẬN TẠO PHIẾU MƯỢN"** kích hoạt thành công!
 
 ---
 
-### 🎬 Kịch bản 6: Kiểm kê Kho & Phát hiện Sai lệch Kệ Tự động
-* **Mục tiêu:** Kiểm tra nghiệp vụ đối soát tồn kho và phát hiện sai lệch vật lý.
-* **Các bước thực hiện:**
-  1. Đăng nhập **`Thủ thư: thuthu01`** $\rightarrow$ Chọn menu **"Kiểm kê kho"** (Screen 13).
-  2. **Quét barcode đúng kệ:** Nhập mã `CNPM-001`, chọn vị trí `Kệ K03 - Ngăn 2` $\rightarrow$ Kết quả ghi nhận: `Trùng khớp đúng kệ`.
-  3. **Chống quét trùng:** Thử quét lại mã `CNPM-001` lần 2 $\rightarrow$ Hệ thống cảnh báo: *Bản sao này đã được kiểm đếm trong đợt!*
-  4. **Phát hiện sai vị trí kệ:** Nhập mã `CSDL-015`, chọn vị trí thực tế `Kệ K04 - Ngăn 2` $\rightarrow$ Hệ thống tự so sánh với lý thuyết (Kệ K02) và gắn nhãn vàng: `Sai vị trí kệ (Lý thuyết: Kệ K02 - Ngăn 1)`.
-  5. **Báo mã lạ:** Nhập mã `BARCODE-TEST-999` $\rightarrow$ Hệ thống báo đỏ: *Mã bản sao không tồn tại trong CSDL!*
+### 🎬 KỊCH BẢN 3 (LUỒNG 3 BẮT BUỘC): Lọc báo cáo quá hạn theo ngày
+* **Mục tiêu:** Kiểm tra khả năng tổng hợp và đối soát danh sách sách quá hạn theo từng mốc thời gian quy định.
+* **Các bước thao tác:**
+  1. Đăng nhập **`Quản trị viên: admin01`** $\rightarrow$ Chọn menu **"Báo cáo & Thống kê"** (Screen 18).
+  2. Bấm chuyển sang **Tab 2: "Báo cáo sách trễ hạn theo ngày"**.
+  3. Chọn ô ngày: Chọn ngày hôm nay (hoặc ngày bất kỳ) $\rightarrow$ Bấm **"Xem báo cáo"**.
+  4. Hệ thống xuất bảng thống kê chi tiết theo thời gian thực:
+     - Tên sách quá hạn, Mã vạch bản sao (`CNPM-003`, `CSDL-002`).
+     - Bạn đọc mượn (Lê Nguyễn Thanh Phương - MSSV `50.01.103.061`, Nguyễn Đức Anh Tài - MSSV `50.01.103.065`).
+     - Ngày mượn, Ngày hẹn trả, Số ngày đã quá hạn và Tiền phạt ước tính.
+  5. Bấm nút **"Xuất báo cáo / In ấn"** $\rightarrow$ Mở giao diện xem trước in chuẩn khổ giấy A4.
 
 ---
 
-### 🎬 Kịch bản 7: Trải nghiệm Di động (Responsive Mobile Verification)
-* **Mục tiêu:** Đảm bảo hệ thống vận hành hoàn hảo trên điện thoại di động của người dùng và Hội đồng.
-* **Các bước thực hiện:**
-  1. Mở trang web trên trình duyệt điện thoại (hoặc nhấn `F12` trên Chrome và chọn biểu tượng thiết bị di động Mobile/Tablet).
-  2. **Trang đăng nhập:** Bố cục tự chuyển sang 1 cột gọn gàng, logo HCMUE căn giữa nổi bật, các phím tắt 1-click tự co giãn vừa vặn ngón tay bấm.
-  3. **Sau khi đăng nhập:** 
-     - Xuất hiện nút 3 gạch (Hamburger) ở góc trên bên trái Topbar.
-     - Nhấn nút 3 gạch $\rightarrow$ Menu tác nghiệp dạng Drawer trượt ra mượt mà kèm lớp nền mờ.
-     - Chạm vào bất kỳ chức năng nào $\rightarrow$ Drawer tự động đóng lại và chuyển màn hình tương ứng.
-     - Các bảng dữ liệu hỗ trợ vuốt cuộn ngang mượt mà (`touch scroll`), các thẻ KPI tự xếp thành 2 cột hoặc 1 cột rõ ràng.
+### 🎬 KỊCH BẢN 4: Quản lý Công nợ, Thu phạt & Mở khóa thẻ tức thì (Reactive Sync)
+* **Mục tiêu:** Chứng minh số liệu tài chính khớp chuẩn 600.000 đ và cơ chế đồng bộ thời gian thực giữa Thủ thư và Độc giả không cần F5.
+* **Các bước thao tác:**
+  1. Đăng nhập **`Thủ thư: thuthu01`** $\rightarrow$ Vào menu **"Thu nợ phạt"** (Screen 09).
+  2. Xem danh sách nợ: Tổng nợ toàn hệ thống khớp chính xác **`600.000 đ`**.
+  3. Chọn độc giả **Nguyễn Đức Anh Tài** (`THE-50011065`, số tiền `180.000 đ`) $\rightarrow$ Bấm nút **"Thu tiền"**.
+  4. Modal thu tiền bật lên: Hỗ trợ chọn **Tiền mặt** hoặc **Chuyển khoản VietQR** có sẵn số tiền và nội dung $\rightarrow$ Bấm **"Xác nhận đã thu"**.
+  5. Hệ thống xuất biên lai thu tiền điện tử `BL-2026-091`, tổng nợ của Tài giảm về `0 đ`, trạng thái thẻ tự động mở khóa sang `Hoạt động`.
+  6. Đăng xuất $\rightarrow$ Bấm phím tắt **`[ ⚡ SV Anh Tài (Nợ) ]`** $\rightarrow$ Vào **"Sách của tôi"** (Screen 20):
+     - Không cần bấm F5, banner tài khoản của Tài lập tức sáng xanh: `✔ Công nợ: 0 đ - Trạng thái thẻ: Hoạt động`!
 
 ---
 
-## IX. BỘ KIỂM THỬ TỰ ĐỘNG 26/26 TEST CASES (AUTOMATED TEST SUITE)
+### 🎬 KỊCH BẢN 5: Cổng Độc Giả Tra cứu OPAC, Đọc thử PDF Bản quyền & Tự gia hạn Online
+* **Mục tiêu:** Kiểm tra trải nghiệm dịch vụ số dành cho sinh viên và ràng buộc tự gia hạn tối đa 01 lần.
+* **Các bước thao tác:**
+  1. Đăng nhập **`Sinh viên: Hồng An`** (`50.01.103.002`).
+  2. **Tra cứu & Đọc thử PDF:**
+     - Vào menu **"Tra cứu OPAC"** (Screen 19) $\rightarrow$ Gõ từ khóa tìm kiếm: `Phần mềm`.
+     - Bấm nút **"Xem trước PDF"** tại cuốn "Kỹ nghệ phần mềm" $\rightarrow$ Modal đọc thử PDF mở lên với trình xem mượt mà, có đóng dấu bản quyền (*Watermark: TRƯỜNG ĐẠI HỌC SƯ PHẠM TP.HCM - BẢN QUYỀN SỐ*).
+  3. **Tự gia hạn sách trực tuyến:**
+     - Vào tab **"Sách của tôi"** (Screen 20) $\rightarrow$ Cuốn "Lập trình Web nâng cao" (`WEB-001`, hạn trả hiện tại `08/11/2026`, số lần gia hạn `0/1`).
+     - Bấm nút **`[ Gia hạn +7 ngày ]`** $\rightarrow$ Hiệu ứng pháo hoa Confetti chúc mừng!
+     - Hạn trả tự động cộng thêm đúng 7 ngày thành **`15/11/2026`**.
+     - Nút gia hạn tự động chuyển sang trạng thái xám: `✔ Đã gia hạn (1/1 lần)`, ngăn chặn việc gia hạn lần thứ 2 đúng quy định thư viện.
 
-Hệ thống được bảo vệ bởi bộ kịch bản kiểm thử tự động toàn diện trong tệp **`test_requirements.mjs`**. Thầy Cô có thể kiểm chứng ngay bằng lệnh:
+---
+
+### 🎬 KỊCH BẢN 6: Kiểm kê Kho & Tự động phát hiện Sai lệch Kệ vật lý
+* **Mục tiêu:** Thẩm định nghiệp vụ đối soát kiểm kê kho (tổng kho 3.892 cuốn) và phát hiện sai sót vị trí.
+* **Các bước thao tác:**
+  1. Đăng nhập **`Thủ thư: thuthu01`** $\rightarrow$ Vào menu **"Kiểm kê kho"** (Screen 13).
+  2. **Quét trùng:** Nhập mã `CNPM-001` lần 1 $\rightarrow$ Báo trùng khớp; thử quét lại lần 2 $\rightarrow$ Báo cảnh báo: *Bản sao đã được quét trong đợt kiểm kê này!*
+  3. **Phát hiện sai vị trí kệ:** Nhập mã `CSDL-015`, chọn vị trí thực tế `Kệ K04` $\rightarrow$ Hệ thống tự so sánh với CSDL (lý thuyết ở Kệ K02) và gắn nhãn vàng cảnh báo: `Sai vị trí kệ (Lý thuyết: Kệ K02 - Ngăn 1)`.
+  4. **Báo mã lạ:** Nhập mã `BARCODE-TEST-999` $\rightarrow$ Hệ thống báo đỏ: *Mã bản sao không tồn tại trong CSDL!*
+
+---
+
+## V. MA TRẬN TRUY VẾT YÊU CẦU (REQUIREMENTS TRACEABILITY MATRIX - RTM)
+
+Hệ thống đáp ứng trọn vẹn 100% các yêu cầu từ **G2-FR01** đến **G2-FR11** và 4 Quy tắc Nghiệp vụ (**BR-01..BR-04**) của Đề tài số 2:
+
+| Mã Yêu cầu | Mức ưu tiên | Tên Yêu cầu chức năng / Nghiệp vụ | Use Case | Màn hình giao diện | Mã Test Case liên kết | Kết quả kiểm thử |
+| :---: | :---: | :--- | :---: | :--- | :---: | :---: |
+| **G2-FR01** | **MUST** | Đăng nhập và phân quyền Quản trị viên / Thủ thư / Độc giả | UC01, UC04 | Screen 01 (`#screen-login`), Screen 15 | **TC01, TC15** | **✔ PASS (100%)** |
+| **G2-FR02** | **MUST** | Quản lý danh mục đầu sách mẹ (ISBN, tên, tác giả, thể loại, NXB, năm XB, mô tả) | UC07 | Screen 10 (`#screen-books`), 10b | **TC12, TC21, TC22**| **✔ PASS (100%)** |
+| **G2-FR03** | **MUST** | Quản lý từng bản sao vật lý và trạng thái: sẵn sàng / đang mượn / mất / hỏng | UC08, UC10 | Screen 11 (`#screen-copies`), 11b, 13 | **TC13, TC16, TC24**| **✔ PASS (100%)** |
+| **G2-FR04** | **MUST** | Quản lý thẻ độc giả: thông tin, ngày cấp, hạn thẻ, trạng thái | UC11 | Screen 14 (`#screen-readers`) | **TC05, TC14, TC25**| **✔ PASS (100%)** |
+| **G2-FR05** | **MUST** | Lập phiếu mượn gồm độc giả, các cuốn sách, ngày mượn và hạn trả | UC12 | Screen 07 (`#screen-loans`) | **TC03, TC04** | **✔ PASS (100%)** |
+| **G2-FR06** | **MUST** | Trả sách, cập nhật trạng thái cuốn sách và xác định số ngày quá hạn | UC13, UC15 | Screen 08 (`#screen-returns`), 08A, 08B | **TC09, TC26** | **✔ PASS (100%)** |
+| **G2-FR07** | **MUST** | Tính phí phạt quá hạn / hư hỏng và ghi nhận thanh toán | UC13, UC21 | Screen 08, Screen 09 (`#screen-debts`) | **TC10, TC26** | **✔ PASS (100%)** |
+| **G2-FR08** | **MUST** | Tra cứu sách theo tên, tác giả, thể loại, mã và hiển thị số lượng còn | UC16, UC20 | Screen 19 (`#screen-opac`), 19b | **TC02, TC23** | **✔ PASS (100%)** |
+| **G2-FR09** | **MUST** | Độc giả xem sách đang mượn, hạn trả và lịch sử mượn cá nhân | UC17, UC14 | Screen 20 (`#screen-student-loans`), 20b | **TC11** | **✔ PASS (100%)** |
+| **G2-FR10** | **SHOULD**| Báo cáo sách đang mượn, quá hạn, lượt mượn theo khoảng thời gian | UC18, UC19 | Screen 18 (`#screen-reports`), 06 | **TC18, TC19, TC20**| **✔ PASS (100%)** |
+| **G2-FR11** | **COULD** | Tự gia hạn trực tuyến (+7 ngày, tối đa 1 lần) & Đọc thử PDF bản quyền | UC14, UC20 | Screen 20b, Screen 19b | **TC02, TC11** | **✔ PASS (100%)** |
+| **BR-01** | **MUST** | Giới hạn số lượng mượn tối đa (SV $\le 3$ cuốn, GV $\le 5$ cuốn) | BR-01 | Screen 07 (`#screen-loans`) | **TC04** | **✔ PASS (100%)** |
+| **BR-02** | **MUST** | Chặn mượn sách bằng thẻ hết hạn hoặc thẻ bị khóa | BR-02 | Screen 07 (`#screen-loans`) | **TC05, TC06** | **✔ PASS (100%)** |
+| **BR-03** | **MUST** | Chặn mượn sách khi độc giả có sách mượn quá hạn chưa trả | BR-03 | Screen 07 (`#screen-loans`) | **TC07** | **✔ PASS (100%)** |
+| **BR-04** | **MUST** | Chặn mượn sách khi nợ phạt vượt trần quy định ($> 50.000$ đ) | BR-04 | Screen 07 (`#screen-loans`) | **TC08** | **✔ PASS (100%)** |
+
+---
+
+## VI. BỘ KIỂM THỬ TỰ ĐỘNG 26/26 TEST CASES (AUTOMATED TEST SUITE)
+
+Để đảm bảo tính khách quan và kiểm chứng độc lập chất lượng phần mềm, nhóm cung cấp tập lệnh kiểm thử tự động tại tệp **`test_requirements.mjs`**.
 
 ```bash
 node test_requirements.mjs
 ```
 
-### Bảng Kết quả Chi tiết 26/26 Test Cases:
+### Bảng Kết quả Chi tiết 26/26 Test Cases Đạt Chuẩn 100%:
 
-```
-===============================================================
-   BỘ KIỂM THỬ TỰ ĐỘNG HỆ THỐNG QUẢN LÝ THƯ VIỆN HCMUE
-   Kiểm tra 26/26 Test Cases (11 FRs & 4 Business Rules BR-01..BR-04)
-===============================================================
-```
-
-| STT | Mã TC | Nhóm nghiệp vụ / Quy tắc kiểm tra | Dữ liệu đầu vào đối soát | Kết quả kiểm thử |
+| STT | Mã TC | Nhóm chức năng / Quy tắc kiểm tra | Dữ liệu đầu vào đối soát | Kết quả kiểm thử |
 | :---: | :---: | :--- | :--- | :---: |
 | 1 | **TC01** | Đăng nhập phân quyền RBAC | `admin01`, `thuthu01`, `GV.CNTT.01` | **✔ PASS (100%)** |
 | 2 | **TC02** | Tra cứu danh mục sách & Đọc thử PDF | 35 đầu sách, 100% có link PDF đọc thử | **✔ PASS (100%)** |
@@ -394,12 +268,12 @@ node test_requirements.mjs
 | 14 | **TC14** | Cấp thẻ độc giả mới (UC11) | Mã thẻ `THE-5001104999`, hạn 30/06/2030 | **✔ PASS (100%)** |
 | 15 | **TC15** | Tạo tài khoản Quản trị viên & Phân quyền | Tài khoản `admin02`, vai trò `ADMIN` | **✔ PASS (100%)** |
 | 16 | **TC16** | Kiểm kê kho: Chống quét trùng & Báo mã lạ | Trùng: `CNPM-001`, Mã lạ: `BARCODE-TEST` | **✔ PASS (100%)** |
-| 17 | **TC17** | Kiểm kê kho: Tự phát hiện sai vị trí kệ | Kệ CSDL K02 $\neq$ Kệ thực tế K99 | **✔ PASS (100%)** |
+| 17 | **TC17** | Kiểm kê kho: Tự phát hiện sai vị trí kệ | Kệ CSDL K03 $\neq$ Kệ thực tế K99 | **✔ PASS (100%)** |
 | 18 | **TC18** | Kiểm kê kho: Đồng bộ giảm CSDL khi mất sách | Tổng bản sao `DS-01` tự giảm từ 6 về 5 | **✔ PASS (100%)** |
 | 19 | **TC19** | Cấu hình tham số hệ thống & Chuẩn hóa số | Hạn mức 3 cuốn, phạt 2.000 đ/ngày | **✔ PASS (100%)** |
 | 20 | **TC20** | Sao lưu & Phục hồi CSDL toàn diện khớp 100% | Snapshot 142.5 KB, phục hồi 35 sách, 81 bản | **✔ PASS (100%)** |
-| 21 | **TC21** | Bảng 6.5 Ca 1: Báo lỗi khi để trống tên sách | Input chuỗi rỗng $\rightarrow$ Thông báo bắt buộc | **✔ PASS (100%)** |
-| 22 | **TC22** | Bảng 6.5 Ca 2: Cập nhật năm XB, thể loại & NXB | Cập nhật năm 2026, thể loại KHXH, NXB HCMUE | **✔ PASS (100%)** |
+| 21 | **TC21** | Báo lỗi khi để trống tên sách | Input chuỗi rỗng $\rightarrow$ Thông báo bắt buộc | **✔ PASS (100%)** |
+| 22 | **TC22** | Cập nhật năm XB, thể loại & NXB thành công | Năm 2026, thể loại KHXH, NXB HCMUE | **✔ PASS (100%)** |
 | 23 | **TC23** | Tra cứu tài liệu: Lọc đúng 5 đầu sách CNTT | Lọc "Công nghệ thông tin" ra đúng 5 sách | **✔ PASS (100%)** |
 | 24 | **TC24** | Quản lý bản sao: Báo lỗi đơn giá bồi thường $\le 0$ | Nhập `-10.000` $\rightarrow$ Báo lỗi giá phải $> 0$ | **✔ PASS (100%)** |
 | 25 | **TC25** | Đồng bộ thẻ hết hạn (`THE-49011099`) | Khớp trạng thái `HET_HAN` trên mọi màn hình | **✔ PASS (100%)** |
@@ -414,16 +288,51 @@ node test_requirements.mjs
 
 ---
 
-## X. CÔNG CỤ ĐÓNG GÓI BẢO TRÌ (BUILD PIPELINE)
+## VII. KIẾN TRÚC KỸ THUẬT & MÔ HÌNH DỮ LIỆU CHUẨN 3NF
 
-Hệ thống được thiết kế theo tư duy mô-đun hóa cao cấp nhưng vẫn xuất bản thành một tệp bundle duy nhất để chạy nhẹ nhàng:
-- Khi bảo trì hoặc chỉnh sửa các tệp mô-đun con trong thư mục `js/modules/`, chỉ cần thực thi tập lệnh:
+### 1. Kiến trúc Tổng thể 3 Tầng Thuần (Pure Vanilla Stack):
+* **Tầng Trình diễn (Presentation Layer):** HTML5 Semantic, CSS3 thuần với hệ màu chuẩn HCMUE (Navy `#16375C`, Crimson `#C62828`, Blue `#1E88E5`). Không sử dụng Framework nặng, đảm bảo tốc độ tải trang dưới 0.3s.
+* **Tầng Nghiệp vụ (Application Layer):** Lập trình theo mô-đun hóa ES6+:
+  - `circulation.js`: Xử lý lưu thông mượn/trả, thuật toán phạt quá hạn và thu nợ.
+  - `catalog.js`: Xử lý quản lý đầu sách, bản sao vật lý, thể loại DDC, kiểm kê kho và thẻ bạn đọc.
+  - `student.js`: Cổng tra cứu OPAC, đọc thử PDF, quản lý sách cá nhân và gia hạn trực tuyến.
+  - `admin.js`: Quản lý tài khoản RBAC, cấu hình tham số, sao lưu và báo cáo thống kê.
+  - `auth.js`: Xác thực đăng nhập, đổi mật khẩu và phòng chống brute-force.
+  - `storage.js`: Engine quản lý trạng thái tập trung (*Single Source of Truth*) và lưu trữ bền vững.
+* **Cơ chế Reactive State Engine:** Bắt sự kiện toàn cục `window.addEventListener('storage', ...)` giúp đồng bộ dữ liệu thời gian thực giữa các tab và cửa sổ trình duyệt.
+
+### 2. Mô hình CSDL 17 Bảng Chuẩn 3NF (PostgreSQL):
+Mô hình hóa chặt chẽ theo hồ sơ thiết kế Chương 4, gồm 17 thực thể quan hệ:
+1. `vai_tro` (Quản lý các vai trò RBAC)
+2. `tai_khoan` (Tài khoản người dùng hệ thống)
+3. `the_doc_gia` (Hồ sơ thẻ độc giả Sinh viên & Giảng viên)
+4. `tham_so_he_thong` (Cấu hình hạn mức, tiền phạt, hạn thẻ)
+5. `nhat_ky_he_thong` (Audit log ghi nhận thao tác người dùng)
+6. `ban_sao_luu_csdl` (Quản lý các bản snapshot sao lưu CSDL)
+7. `the_loai` (Danh mục ngành học và mã phân loại DDC)
+8. `tac_gia` (Thông tin tác giả biên soạn)
+9. `dau_sach` (Đầu sách mẹ: ISBN, tên sách, NXB, năm XB, tóm tắt, link PDF)
+10. `dau_sach_tac_gia` (Bảng liên kết N-N giữa đầu sách và tác giả)
+11. `ban_sao_sach` (Bản sao cuốn sách vật lý: mã vạch Barcode, vị trí kệ, đơn giá bìa, trạng thái)
+12. `dot_kiem_ke` (Quản lý các đợt kiểm kê theo kho/kệ)
+13. `chi_tiet_kiem_ke` (Chi tiết quét barcode đối soát thực tế và ghi nhận sai lệch)
+14. `phieu_muon` (Phiếu mượn lưu thông của độc giả)
+15. `chi_tiet_phieu_muon` (Chi tiết từng cuốn sách mượn, ngày hẹn trả, ngày trả thực tế)
+16. `phieu_phat` (Ghi nhận vi phạm quá hạn, hư hỏng hoặc làm mất sách)
+17. `thanh_toan` (Biên lai thu tiền phạt điện tử và hình thức thanh toán)
+
+---
+
+## VIII. CÔNG CỤ ĐÓNG GÓI BẢO TRÌ (BUILD PIPELINE)
+
+Để tiện lợi cho quá trình phát triển mã nguồn dạng mô-đun nhưng vẫn đảm bảo xuất bản thành một tệp bundle siêu nhẹ cho trình duyệt:
+- Sau khi chỉnh sửa các tệp mô-đun trong `js/modules/`, chạy lệnh đóng gói:
   ```bash
   python build_bundle.py
   ```
-- Trình đóng gói sẽ tự động phân tích cú pháp, loại bỏ import/export dư thừa và hợp nhất vào tệp **`js/app.bundle.js`** (kèm cơ chế cache-busting `?v=3.2`), đảm bảo tính toàn vẹn 100% của phần mềm.
+- Script tự động phân tích và gộp mã nguồn vào tệp `js/app.bundle.js` (kèm cơ chế cache-busting), sẵn sàng triển khai lên môi trường sản phẩm.
 
 ---
 
 **© 2026 TRƯỜNG ĐẠI HỌC SƯ PHẠM THÀNH PHỐ HỒ CHÍ MINH (HCMUE) - BỘ MÔN CÔNG NGHỆ PHẦN MỀM**  
-*Mã nguồn đề tài được bảo hộ và xây dựng phục vụ đánh giá nghiệm thu Đồ án môn học Công nghệ Phần mềm.*
+*Tài liệu README được biên soạn phục vụ công tác đánh giá, nghiệm thu Đồ án môn học Nhập môn Công nghệ Phần mềm.*
