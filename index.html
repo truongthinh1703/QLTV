@@ -18,11 +18,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- Custom Stylesheets (CSS3 pure variables) -->
-  <link rel="stylesheet" href="css/hcmue-variables.css">
-  <link rel="stylesheet" href="css/layout.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/modals.css">
-  <link rel="stylesheet" href="css/screens.css">
+  <link rel="stylesheet" href="css/hcmue-variables.css?v=3.2">
+  <link rel="stylesheet" href="css/layout.css?v=3.2">
+  <link rel="stylesheet" href="css/components.css?v=3.2">
+  <link rel="stylesheet" href="css/modals.css?v=3.2">
+  <link rel="stylesheet" href="css/screens.css?v=3.2">
 
   <!-- Canvas Confetti CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
@@ -215,6 +215,9 @@
       <!-- Topbar 64px -->
       <header class="app-topbar">
         <div class="topbar-left">
+          <button id="btn-sidebar-toggle" class="btn-sidebar-toggle" onclick="window.toggleMobileSidebar()" title="Mở menu tác nghiệp" aria-label="Mở menu tác nghiệp">
+            <i class="fa-solid fa-bars"></i>
+          </button>
           <div class="topbar-logo-box">
             <img src="assets/logo-hcmue.png" alt="HCMUE Logo">
           </div>
@@ -256,6 +259,9 @@
         </div>
       </header>
 
+      <!-- Lớp phủ mờ nền khi bật menu trên thiết bị di động -->
+      <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="window.toggleMobileSidebar(false)"></div>
+
       <!-- Student 2-Tab Navigation Bar (Chỉ hiển thị khi vai trò DOC_GIA) -->
       <nav id="student-subnav-bar" class="student-subnav-bar" style="display: none;">
         <a href="javascript:void(0)" class="student-nav-tab active" data-target="screen-student-search"
@@ -275,6 +281,9 @@
         <!-- 2A. SIDEBAR THỦ THƯ (9 MENU TÁC NGHIỆP - ẨN MENU ADMIN)           -->
         <!-- ================================================================= -->
         <aside id="sidebar-librarian" class="app-sidebar">
+          <button class="sidebar-close-btn" onclick="window.toggleMobileSidebar(false)" title="Đóng menu" aria-label="Đóng menu">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
 
           <div class="sidebar-profile-card">
             <div class="sidebar-profile-row">
@@ -356,6 +365,9 @@
         <!-- 2B. SIDEBAR QUẢN TRỊ VIÊN (4 MENU ADMIN + GIÁM SÁT)               -->
         <!-- ================================================================= -->
         <aside id="sidebar-admin" class="app-sidebar" style="display: none;">
+          <button class="sidebar-close-btn" onclick="window.toggleMobileSidebar(false)" title="Đóng menu" aria-label="Đóng menu">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
 
           <div class="sidebar-profile-card">
             <div class="sidebar-profile-row">
@@ -3096,7 +3108,7 @@
       document.write('<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"><\\/script>');
     }
   </script>
-  <script src="js/app.bundle.js?v=3.0"></script>
+  <script src="js/app.bundle.js?v=3.2"></script>
 </body>
 
 </html>

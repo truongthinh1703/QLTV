@@ -913,6 +913,18 @@ export function getAllActiveReturnLoans(db) {
         return false;
       }
     }
+
+    // Chặn tuyệt đối: Nếu bản sao này đã có công nợ tồn đọng trong debts do trả sách trước đó
+    if (Array.isArray(db.debts)) {
+      const isAlreadyInDebt = db.debts.some(d =>
+        ((d.readerCard && d.readerCard.toUpperCase() === (l.readerCard || '').toUpperCase()) ||
+         (d.readerName && d.readerName === l.readerName)) &&
+        d.reason && d.reason.includes(l.copyCode) && Number(d.amount) > 0
+      );
+      if (isAlreadyInDebt) {
+        return false;
+      }
+    }
     return true;
   });
 }
@@ -1732,10 +1744,24 @@ export function renewCurrentReturnLoan() {
 }
 
 export function executeReturnBook(asDebt = false, onDone) {
-  if (!currentReturnLoan) return;
+  if (!currentReturnLoan || !currentReturnLoan.loan) {
+    if (window.showToast) window.showToast('Không có lượt mượn nào được chọn để tiếp nhận trả!', 'warning');
+    return;
+  }
 
   const { loan, copy } = currentReturnLoan;
   const db = getDB();
+
+  // RÀNG BUỘC TOÀN VẸN: Kiểm tra lượt mượn có thực sự còn đang mượn không (chống trả trùng / ghi nợ lần 2)
+  const isStillActive = (db.activeLoans || []).some(l => l.copyCode && l.copyCode.toUpperCase() === loan.copyCode.toUpperCase());
+  if (!isStillActive) {
+    if (window.showToast) {
+      window.showToast(`Bản sao ${loan.copyCode} đã được tiếp nhận trả sách trước đó! Không thể thực hiện lại.`, 'warning');
+    }
+    currentReturnLoan = null;
+    renderEmptyReturnState();
+    return;
+  }
 
   // Cập nhật câu chào thời gian thực và chuẩn hóa dấu hai chấm theo yêu cầu
   const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
@@ -1908,6 +1934,8 @@ export function executeReturnBook(asDebt = false, onDone) {
       paymentStatus: asDebt ? "Ghi nhận công nợ" : "Đã tất toán biên lai"
     });
   }, 'RETURN_BOOK');
+
+  currentReturnLoan = null;
 
   if (onDone) onDone(totalFee, asDebt, loan, copy);
 }

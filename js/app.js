@@ -326,6 +326,38 @@ export function switchScreen(targetScreenId, pushToHistory = true) {
   reRenderScreen(targetScreenId);
 
   window.scrollTo(0, 0);
+
+  // 12. Tự động đóng Sidebar trên thiết bị di động khi chuyển màn hình
+  if (typeof toggleMobileSidebar === 'function') {
+    toggleMobileSidebar(false);
+  }
+}
+
+/**
+ * Đóng / Mở menu Sidebar dạng Drawer trên thiết bị di động
+ */
+export function toggleMobileSidebar(forceState) {
+  const currentUser = getCurrentUser();
+  const libSidebar = document.getElementById('sidebar-librarian');
+  const admSidebar = document.getElementById('sidebar-admin');
+  const backdrop = document.getElementById('sidebar-backdrop');
+
+  const activeSidebar = (currentUser?.role === 'ADMIN') ? admSidebar : libSidebar;
+  if (!activeSidebar) return;
+
+  const isOpen = activeSidebar.classList.contains('mobile-open');
+  const willOpen = typeof forceState === 'boolean' ? forceState : !isOpen;
+
+  if (willOpen) {
+    activeSidebar.classList.add('mobile-open');
+    if (backdrop) backdrop.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  } else {
+    if (libSidebar) libSidebar.classList.remove('mobile-open');
+    if (admSidebar) admSidebar.classList.remove('mobile-open');
+    if (backdrop) backdrop.classList.remove('active');
+    document.body.style.overflow = '';
+  }
 }
 
 
@@ -758,6 +790,8 @@ export function syncUserInterface(user) {
 
   const studentNav = document.getElementById('student-subnav-bar');
 
+  const sidebarToggleBtn = document.getElementById('btn-sidebar-toggle');
+
 
 
   // Topbar Elements
@@ -806,6 +840,8 @@ export function syncUserInterface(user) {
 
     if (studentNav) studentNav.style.display = 'none';
 
+    if (sidebarToggleBtn) sidebarToggleBtn.style.display = '';
+
 
 
     if (topbarTitle) topbarTitle.textContent = 'CỔNG QUẢN TRỊ HỆ THỐNG';
@@ -836,6 +872,8 @@ export function syncUserInterface(user) {
 
     if (studentNav) studentNav.style.display = 'none';
 
+    if (sidebarToggleBtn) sidebarToggleBtn.style.display = '';
+
 
 
     if (topbarTitle) topbarTitle.textContent = 'HỆ THỐNG QUẢN LÝ THƯ VIỆN';
@@ -865,6 +903,8 @@ export function syncUserInterface(user) {
     if (adminSidebar) adminSidebar.style.display = 'none';
 
     if (studentNav) studentNav.style.display = 'flex';
+
+    if (sidebarToggleBtn) sidebarToggleBtn.style.display = 'none';
 
 
 
@@ -1009,6 +1049,7 @@ function registerGlobalEvents() {
 
   window.handleBrowserBackNavigation = handleBrowserBackNavigation;
   window.switchScreen = switchScreen;
+  window.toggleMobileSidebar = toggleMobileSidebar;
 
   window.reRenderScreen = reRenderScreen;
 
@@ -1648,6 +1689,8 @@ function registerGlobalEvents() {
 
 
   window.handleCompleteReturn = function (asDebt) {
+    const actionBtns = document.querySelectorAll('.return-actions-row button');
+    actionBtns.forEach(b => { b.disabled = true; b.style.opacity = '0.5'; b.style.pointerEvents = 'none'; });
 
     const curReturn = (typeof getCurrentReturnLoan === 'function') ? getCurrentReturnLoan() : null;
 

@@ -718,3 +718,145 @@
   }
 }
 
+/* ========================================================================== */
+/* RESPONSIVE MEDIA QUERIES (COMPONENTS & TABLES)                             */
+/* ========================================================================== */
+
+@media (max-width: 900px) {
+  /* Cards */
+  .hcmue-card {
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .hcmue-card-header {
+    margin-bottom: 14px !important;
+  }
+
+  .hcmue-card-title {
+    font-size: 15px !important;
+  }
+
+  /* KPI Grids */
+  .kpi-grid-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .kpi-grid-3,
+  .kpi-grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .kpi-card {
+    padding: 14px 16px !important;
+  }
+
+  .kpi-value {
+    font-size: 22px !important;
+  }
+
+  /* Data Tables */
+  .table-responsive {
+    border-radius: var(--radius-md);
+    margin-bottom: 14px;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .table-responsive .hcmue-table {
+    min-width: 620px; /* Chống co rúm các cột bảng trên điện thoại */
+  }
+
+  .hcmue-table th,
+  .hcmue-table td {
+    padding: 10px 12px !important;
+    font-size: 12px !important;
+  }
+
+  .table-pagination-bar {
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 10px !important;
+  }
+
+  /* Form & Actions */
+  .form-actions-row,
+  .filter-bar,
+  .search-bar-row,
+  .table-action-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .form-actions-row .btn,
+  .filter-bar .btn,
+  .search-bar-row .btn {
+    width: 100% !important;
+  }
+
+  /* Modals */
+  .modal-overlay {
+    padding: 10px !important;
+  }
+
+  .modal-container,
+  .modal-container.modal-lg,
+  .modal-container.modal-xl {
+    max-width: 100% !important;
+    width: 100% !important;
+    max-height: 94vh !important;
+  }
+
+  .modal-header {
+    padding: 12px 16px !important;
+  }
+
+  .modal-body {
+    padding: 16px !important;
+  }
+
+  .modal-footer {
+    padding: 12px 16px !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .modal-footer .btn {
+    flex: 1 1 auto !important;
+  }
+
+  /* Floating AI Chat */
+  .ai-chat-bubble-toggle {
+    bottom: 16px !important;
+    right: 16px !important;
+    width: 46px !important;
+    height: 46px !important;
+    font-size: 18px !important;
+  }
+
+  .ai-chat-window {
+    bottom: 70px !important;
+    right: 12px !important;
+    left: 12px !important;
+    width: auto !important;
+    max-width: calc(100vw - 24px) !important;
+    height: 72vh !important;
+    max-height: 520px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-grid-4 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+

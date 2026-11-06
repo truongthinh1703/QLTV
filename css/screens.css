@@ -1597,3 +1597,95 @@
   background-color: #eff6ff !important;
   border-left: 3px solid var(--hcmue-navy) !important;
 }
+
+/* ========================================================================== */
+/* RESPONSIVE MEDIA QUERIES (SCREENS SPECIFIC)                                */
+/* ========================================================================== */
+
+@media (max-width: 900px) {
+  /* Screen 07: Lập phiếu mượn */
+  .borrow-grid-layout {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Screen 08: Tiếp nhận trả & đối soát */
+  .return-checkout-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .timeline-boxes-row {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* Screen 15: Vai trò Quản trị */
+  .role-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* Screen 16: Cấu hình tham số */
+  .params-grid-4 {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* Screen 18: Báo cáo & Thống kê */
+  .report-split-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .report-date-filters {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  .date-pickers-group {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  /* Screen 19: Cổng tra cứu sinh viên */
+  .student-books-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .student-search-box-wrap {
+    max-width: 100% !important;
+  }
+
+  /* Screen 13: Kiểm kê kho */
+  .inventory-manual-input-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .inventory-scanner-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .book-card-horizontal {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .book-card-horizontal .book-cover-mock {
+    margin-bottom: 12px;
+  }
+
+  .book-card-horizontal .book-meta-list {
+    text-align: left;
+  }
+}
+

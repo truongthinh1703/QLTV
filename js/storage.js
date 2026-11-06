@@ -333,54 +333,74 @@ export function sanitizeDB(dbData) {
 
   }
 
-  // 3b. Tự động đồng bộ bản sao AI-002 và lượt mượn quá hạn (Ca kiểm thử 3.2)
-  if (Array.isArray(dbData.copies) && !dbData.copies.some(cp => cp.code === "AI-002")) {
-    const ai001Idx = dbData.copies.findIndex(cp => cp.code === "AI-001");
-    const ai002Copy = {
-      code: "AI-002",
-      titleId: "DS-03",
-      titleName: "Nhập môn Trí tuệ Nhân tạo",
-      shelf: "Dãy K04 - Kệ 4 - Ngăn 3",
-      price: 110000,
-      status: "DANG_MUON",
-      statusLabel: "Đang mượn",
-      statusBadge: "badge-yellow",
-      borrowerName: "Trần Quốc Bảo",
-      borrowerCard: "THE-5001109",
-      condition: "BINH_THUONG"
-    };
-    if (ai001Idx >= 0) {
-      dbData.copies.splice(ai001Idx + 1, 0, ai002Copy);
-    } else {
-      dbData.copies.push(ai002Copy);
-    }
-    const ds03 = dbData.titles ? dbData.titles.find(t => t.id === "DS-03") : null;
-    if (ds03) {
-      ds03.totalCopies = Math.max(ds03.totalCopies || 0, 4);
-      ds03.availableCopies = 2;
-    }
-    modified = true;
-  }
-
-  if (Array.isArray(dbData.activeLoans) && Array.isArray(dbData.copies)) {
-    const ai002Copy = dbData.copies.find(cp => cp.code === "AI-002");
-    if (ai002Copy && ai002Copy.status === "DANG_MUON" && !dbData.activeLoans.some(l => l.copyCode === "AI-002")) {
-      dbData.activeLoans.push({
-        id: "LOAN-005",
-        copyCode: "AI-002",
+  // 3b. Đảm bảo toàn vẹn nghiệp vụ: Bản sao đã phát sinh công nợ trong debts tuyệt đối KHÔNG đồng thời tồn tại trong activeLoans
+  if (Array.isArray(dbData.copies)) {
+    // Đảm bảo AI-002 có mặt và ở trạng thái Sẵn sàng (do Trần Quốc Bảo đã trả sách và chuyển sang nợ phạt DEBT-01)
+    let ai002Copy = dbData.copies.find(cp => cp.code === "AI-002");
+    if (!ai002Copy) {
+      const ai001Idx = dbData.copies.findIndex(cp => cp.code === "AI-001");
+      ai002Copy = {
+        code: "AI-002",
+        titleId: "DS-03",
         titleName: "Nhập môn Trí tuệ Nhân tạo",
-        readerName: "Trần Quốc Bảo",
-        readerCard: "THE-5001109",
-        readerClass: "50.01.SPTIN.A",
-        borrowDate: "14/10/2026",
-        dueDate: "28/10/2026",
-        overdueDays: 8,
-        statusBadge: "badge-red",
-        statusText: "Quá hạn 8 ngày",
-        actionText: "Tiếp nhận trả sách →"
-      });
+        shelf: "Dãy K04 - Kệ 4 - Ngăn 3",
+        price: 110000,
+        status: "SAN_SANG",
+        statusLabel: "Sẵn sàng cho mượn",
+        statusBadge: "badge-green",
+        borrowerName: "—",
+        borrowerCard: "",
+        condition: "BINH_THUONG"
+      };
+      if (ai001Idx >= 0) {
+        dbData.copies.splice(ai001Idx + 1, 0, ai002Copy);
+      } else {
+        dbData.copies.push(ai002Copy);
+      }
       modified = true;
     }
+  }
+
+  // RÀNG BUỘC TOÀN VẸN NGHIỆP VỤ (Chống Phantom Loans & Duplicate Returns):
+  // Nếu một bản sao đã có bản ghi công nợ chưa tất toán trong debts (đã trả sách và chốt nợ trễ hạn/hư hỏng/mất sách),
+  // bản sao đó bắt buộc phải bị loại bỏ khỏi activeLoans và cập nhật trạng thái kho sách tương ứng!
+  if (Array.isArray(dbData.debts) && Array.isArray(dbData.activeLoans)) {
+    dbData.debts.forEach(d => {
+      const match = d.reason ? d.reason.match(/([A-Z]+-\d+)/) : null;
+      const copyCode = match ? match[1].toUpperCase() : null;
+      if (copyCode) {
+        const loanIdx = dbData.activeLoans.findIndex(l => l.copyCode && l.copyCode.toUpperCase() === copyCode);
+        if (loanIdx >= 0) {
+          dbData.activeLoans.splice(loanIdx, 1);
+          modified = true;
+        }
+
+        if (Array.isArray(dbData.copies)) {
+          const cp = dbData.copies.find(c => c.code && c.code.toUpperCase() === copyCode);
+          if (cp && cp.status === 'DANG_MUON') {
+            if (d.reason && (d.reason.includes('rách') || d.reason.includes('hư hỏng') || d.reason.includes('Hư hỏng'))) {
+              cp.status = 'HU_HONG';
+              cp.statusLabel = 'Hư hỏng';
+              cp.statusBadge = 'badge-purple';
+              cp.note = 'Hư hỏng - Chờ phục hồi';
+            } else if (d.reason && (d.reason.includes('mất') || d.reason.includes('Mất'))) {
+              cp.status = 'DA_MAT';
+              cp.statusLabel = 'Đã mất';
+              cp.statusBadge = 'badge-red';
+              cp.note = 'Đã thanh lý';
+            } else {
+              cp.status = 'SAN_SANG';
+              cp.statusLabel = 'Sẵn sàng cho mượn';
+              cp.statusBadge = 'badge-green';
+              cp.note = '';
+            }
+            cp.borrowerName = '—';
+            cp.borrowerCard = '';
+            modified = true;
+          }
+        }
+      }
+    });
   }
 
 

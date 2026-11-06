@@ -592,7 +592,7 @@ export const INITIAL_DB = {
 
       totalCopies: 4,
 
-      availableCopies: 2,
+      availableCopies: 3,
 
       shelfLocation: "Dãy K04 - Kệ 4 - Ngăn 3",
 
@@ -1540,11 +1540,11 @@ export const INITIAL_DB = {
       titleName: "Nhập môn Trí tuệ Nhân tạo",
       shelf: "Dãy K04 - Kệ 4 - Ngăn 3",
       price: 110000,
-      status: "DANG_MUON",
-      statusLabel: "Đang mượn",
-      statusBadge: "badge-yellow",
-      borrowerName: "Trần Quốc Bảo",
-      borrowerCard: "THE-5001109",
+      status: "SAN_SANG",
+      statusLabel: "Sẵn sàng cho mượn",
+      statusBadge: "badge-green",
+      borrowerName: "—",
+      borrowerCard: "",
       condition: "BINH_THUONG"
     },
 
@@ -2379,20 +2379,6 @@ export const INITIAL_DB = {
 
       renewCount: 0
 
-    },
-    {
-      id: "LOAN-005",
-      copyCode: "AI-002",
-      titleName: "Nhập môn Trí tuệ Nhân tạo",
-      readerName: "Trần Quốc Bảo",
-      readerCard: "THE-5001109",
-      readerClass: "50.01.SPTIN.A",
-      borrowDate: "14/10/2026",
-      dueDate: "28/10/2026",
-      overdueDays: 8,
-      statusBadge: "badge-red",
-      statusText: "Quá hạn 8 ngày",
-      actionText: "Tiếp nhận trả sách →"
     }
 
   ],

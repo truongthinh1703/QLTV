@@ -432,10 +432,34 @@ function createTestDB() {
     `Mã thẻ: ${expiredReader?.cardId}, Trạng thái: ${expiredReader?.cardStatus}, Hạn thẻ: ${expiredReader?.cardExpiry} (Không còn là HOAT_DONG)`);
 })();
 
+// -----------------------------------------------------------------------------
+// TC26: Toàn vẹn nghiệp vụ Tiếp nhận trả & Công nợ (Bảo đã trả sách AI-002, chống ghi nợ trùng)
+// -----------------------------------------------------------------------------
+(() => {
+  const db = createTestDB();
+  const baoAccount = db.accounts.find(a => a.cardId === 'THE-5001109');
+  const baoDebt = db.debts.find(d => d.readerCard === 'THE-5001109');
+  const ai002Copy = db.copies.find(c => c.code === 'AI-002');
+  const ai002ActiveLoan = db.activeLoans.find(l => l.copyCode === 'AI-002');
+
+  // 1. Bảo đã có nợ tồn đọng 16.000 đ do quá hạn 8 ngày cuốn AI-002
+  const hasDebtRecord = baoDebt && Number(baoDebt.amount) === 16000 && baoAccount?.debt === 16000;
+
+  // 2. Vì sách đã được trả và chuyển thành nợ, cuốn AI-002 phải ở trạng thái SAN_SANG trong kho
+  const isCopyAvailable = ai002Copy && ai002Copy.status === 'SAN_SANG' && ai002Copy.borrowerName === '—';
+
+  // 3. Cuốn AI-002 tuyệt đối không được còn nằm trong activeLoans
+  const notInActiveLoans = !ai002ActiveLoan;
+
+  assert(hasDebtRecord && isCopyAvailable && notInActiveLoans,
+    'TC26: Ràng buộc toàn vẹn Tiếp nhận trả & Công nợ (AI-002 đã trả, không lặp lại ghi nợ)',
+    `Khoản nợ: ${baoDebt?.amount} đ, Bản sao AI-002: ${ai002Copy?.status}, Lượt mượn activeLoans: ${ai002ActiveLoan ? 'Tồn tại' : 'Đã xóa sạch'}`);
+})();
+
 console.log('\n===============================================================');
-console.log(`   KẾT QUẢ KIỂM THỬ: ${passedCount}/25 Test Cases PASSED (${Math.round(passedCount/25*100)}%)`);
+console.log(`   KẾT QUẢ KIỂM THỬ: ${passedCount}/26 Test Cases PASSED (${Math.round(passedCount/26*100)}%)`);
 if (failedCount === 0) {
-  console.log(`   ✔ TOÀN BỘ ${passedCount}/25 TEST CASES ĐÃ ĐẠT TIÊU CHUẨN 100%!`);
+  console.log(`   ✔ TOÀN BỘ ${passedCount}/26 TEST CASES ĐÃ ĐẠT TIÊU CHUẨN 100%!`);
 } else {
   console.log(`   ✖ CÓ ${failedCount} TEST CASES THẤT BẠI!`);
 }
