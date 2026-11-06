@@ -776,19 +776,41 @@ export function sanitizeDB(dbData) {
   }
 
   if (Array.isArray(INITIAL_DB.categories) && Array.isArray(dbData.categories)) {
-
     INITIAL_DB.categories.forEach(initCat => {
-
-      if (!dbData.categories.some(cat => cat.id === initCat.id)) {
-
+      const existing = dbData.categories.find(cat => cat.id === initCat.id);
+      if (!existing) {
         dbData.categories.push(JSON.parse(JSON.stringify(initCat)));
-
         modified = true;
-
+      } else {
+        existing.bookCount = initCat.bookCount;
+        existing.scope = initCat.scope;
       }
-
     });
+  }
 
+  // Tự động đồng bộ 35 đầu sách chuẩn (5 CNTT + 30 sách nghiệm thu HCMUE)
+  if (Array.isArray(INITIAL_DB.titles) && Array.isArray(dbData.titles)) {
+    INITIAL_DB.titles.forEach(initTitle => {
+      const idx = dbData.titles.findIndex(t => t.id === initTitle.id);
+      if (idx === -1) {
+        dbData.titles.push(JSON.parse(JSON.stringify(initTitle)));
+        modified = true;
+      } else {
+        // Cập nhật thông tin chuẩn
+        dbData.titles[idx] = { ...dbData.titles[idx], ...JSON.parse(JSON.stringify(initTitle)) };
+        modified = true;
+      }
+    });
+  }
+
+  // Tự động đồng bộ các bản sao sách mới
+  if (Array.isArray(INITIAL_DB.copies) && Array.isArray(dbData.copies)) {
+    INITIAL_DB.copies.forEach(initCopy => {
+      if (!dbData.copies.some(c => c.code === initCopy.code)) {
+        dbData.copies.push(JSON.parse(JSON.stringify(initCopy)));
+        modified = true;
+      }
+    });
   }
 
 

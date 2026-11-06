@@ -301,8 +301,14 @@ export function renderReportsScreen() {
   const finesEl = document.getElementById('rep-kpi-fines');
   const compEl = document.getElementById('rep-kpi-compensation');
 
-  if (loansEl) loansEl.textContent = r.monthlyLoans.toLocaleString('vi-VN');
-  if (returnsEl) returnsEl.textContent = r.monthlyReturns.toLocaleString('vi-VN');
+  // Tính toán số liệu thống kê thực tế trong hệ thống
+  const actualActiveLoans = Array.isArray(db.activeLoans) ? db.activeLoans.length : 0;
+  const actualHistoryLoans = Array.isArray(db.studentHistory) ? db.studentHistory.length : 0;
+  const totalMonthlyLoans = actualActiveLoans + actualHistoryLoans;
+  const totalMonthlyReturns = actualHistoryLoans;
+
+  if (loansEl) loansEl.textContent = totalMonthlyLoans.toLocaleString('vi-VN');
+  if (returnsEl) returnsEl.textContent = totalMonthlyReturns.toLocaleString('vi-VN');
   if (finesEl) finesEl.textContent = `${r.finesCollected.toLocaleString('vi-VN')} đ`;
   if (compEl) compEl.textContent = `${r.compensationCollected.toLocaleString('vi-VN')} đ`;
 

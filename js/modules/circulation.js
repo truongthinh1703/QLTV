@@ -55,13 +55,11 @@ export function renderDashboard() {
     greetingEl.textContent = `Chào ${userName}: Tổng quan hoạt động thư viện ngày hôm nay, ${todayStr}.`;
   }
 
-  // Tính toán KPI
-  const totalTitles = db.titles.length + 1244; // Hiển thị 1,248 theo mockup
-  const baseAvail = 3880;
-  const baseBorrow = 410;
-  const borrowingCopies = baseBorrow + (db.activeLoans ? db.activeLoans.length : 0);
-  const availableCopies = baseAvail + (db.copies ? db.copies.filter(c => c.status === 'SAN_SANG').length : 0);
-  const pendingDebt = db.debts.reduce((sum, d) => sum + Number(d.amount), 0);
+  // Tính toán KPI thời gian thực, đồng bộ 100% với CSDL thực tế trong web
+  const totalTitles = db.titles ? db.titles.length : 0;
+  const borrowingCopies = db.activeLoans ? db.activeLoans.length : 0;
+  const availableCopies = db.copies ? db.copies.filter(c => c.status === 'SAN_SANG').length : 0;
+  const pendingDebt = db.debts ? db.debts.reduce((sum, d) => sum + Number(d.amount || 0), 0) : 0;
 
   const kpiTotalTitles = document.getElementById('kpi-total-titles');
   const kpiAvailableCopies = document.getElementById('kpi-available-copies');
