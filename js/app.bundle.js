@@ -10973,164 +10973,124 @@ function closeModal(modalId) {
 
 
 
+// Helper trích xuất 2 chữ cái đầu của tên làm Avatar
+function getAvatarInitials(name, fallback) {
+  if (!name) return fallback || 'U';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+  return (parts[parts.length - 2][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 /**
-
  * Cập nhật giao diện theo Role của người dùng (Topbar & Sidebar RBAC)
-
  */
-
 function syncUserInterface(user) {
-
   const portalLayout = document.getElementById('portal-main-layout');
-
   const authLayout = document.getElementById('auth-fullscreen-layout');
   const hashScreen = (typeof window !== 'undefined' && window.location.hash) ? window.location.hash.replace(/^#/, '') : '';
 
-
-
   if (!user) {
-
     if (portalLayout) portalLayout.style.display = 'none';
-
     if (authLayout) authLayout.style.display = 'flex';
-
     switchScreen('screen-login');
-
     return;
-
   }
 
-
-
   if (authLayout) authLayout.style.display = 'none';
-
   if (portalLayout) portalLayout.style.display = 'flex';
 
-
-
   const librarianSidebar = document.getElementById('sidebar-librarian');
-
   const adminSidebar = document.getElementById('sidebar-admin');
-
   const studentNav = document.getElementById('student-subnav-bar');
-
   const sidebarToggleBtn = document.getElementById('btn-sidebar-toggle');
 
-
-
   // Topbar Elements
-
   const topbarTitle = document.getElementById('topbar-app-title');
-
   const topbarUserName = document.getElementById('topbar-user-name');
-
   const topbarUserRole = document.getElementById('topbar-user-role');
-
   const topbarAvatar = document.getElementById('topbar-avatar');
-
-
 
   if (topbarUserName) topbarUserName.textContent = user.name;
 
-
-
   // Cập nhật câu chào Dashboard chuẩn hóa
-
   const greetingEl = document.getElementById('dashboard-greeting-subtitle');
-
   if (greetingEl) {
-
     const now = new Date();
-
     const day = String(now.getDate()).padStart(2, '0');
-
     const month = String(now.getMonth() + 1).padStart(2, '0');
-
     const year = now.getFullYear();
-
     greetingEl.textContent = `Chào ${user.name}: Tổng quan hoạt động thư viện ngày hôm nay, ${day}/${month}/${year}.`;
-
   }
 
-
-
   if (user.role === 'ADMIN') {
-
     // 1. Quản trị viên
-
     if (librarianSidebar) librarianSidebar.style.display = 'none';
-
     if (adminSidebar) adminSidebar.style.display = 'flex';
-
     if (studentNav) studentNav.style.display = 'none';
-
     if (sidebarToggleBtn) sidebarToggleBtn.style.display = '';
 
-
+    const avatar = user.avatarText || getAvatarInitials(user.name, 'AD');
+    const staffIdText = user.staffId ? `MS: ${user.staffId}` : (user.username ? `MS: ${user.username}` : 'MS: QT-HCMUE-01');
 
     if (topbarTitle) topbarTitle.textContent = 'CỔNG QUẢN TRỊ HỆ THỐNG';
-
-    if (topbarUserRole) topbarUserRole.textContent = `MS: ${user.staffId} - Quản trị viên`;
-
+    if (topbarUserRole) topbarUserRole.textContent = `${user.staffId || user.username} - Quản trị viên`;
     if (topbarAvatar) {
-
       topbarAvatar.className = 'user-avatar-circle admin';
-
-      topbarAvatar.textContent = user.avatarText || 'AD';
-
+      topbarAvatar.textContent = avatar;
     }
 
-
+    // Cập nhật thông tin góc bên trái Sidebar Quản trị viên
+    const adminSidebarName = document.getElementById('sidebar-admin-name');
+    const adminSidebarId = document.getElementById('sidebar-admin-id');
+    const adminSidebarAvatar = document.getElementById('sidebar-admin-avatar');
+    const adminSidebarBadge = document.getElementById('sidebar-admin-badge');
+    if (adminSidebarName) adminSidebarName.textContent = user.name;
+    if (adminSidebarId) adminSidebarId.textContent = staffIdText;
+    if (adminSidebarAvatar) adminSidebarAvatar.textContent = avatar;
+    if (adminSidebarBadge) adminSidebarBadge.textContent = 'Quản trị viên';
 
     const initialScreen = (hashScreen && document.getElementById(hashScreen) && ADMIN_SCREENS.includes(hashScreen)) ? hashScreen : 'screen-accounts';
     switchScreen(initialScreen, false);
     try { window.history.replaceState({ screenId: initialScreen }, '', '#' + initialScreen); } catch (e) { }
 
   } else if (user.role === 'THU_THU') {
-
     // 2. Thủ thư
-
     if (librarianSidebar) librarianSidebar.style.display = 'flex';
-
     if (adminSidebar) adminSidebar.style.display = 'none';
-
     if (studentNav) studentNav.style.display = 'none';
-
     if (sidebarToggleBtn) sidebarToggleBtn.style.display = '';
 
-
+    const avatar = user.avatarText || getAvatarInitials(user.name, 'TT');
+    const staffIdText = user.staffId ? `MS: ${user.staffId}` : (user.username ? `MS: ${user.username}` : 'MS: 50.01.103.072');
+    const shiftBadgeText = user.shift || 'Thủ thư ca 1';
 
     if (topbarTitle) topbarTitle.textContent = 'HỆ THỐNG QUẢN LÝ THƯ VIỆN';
-
-    if (topbarUserRole) topbarUserRole.textContent = `${user.staffId} - ${user.shift || 'Thủ thư ca 1'}`;
-
+    if (topbarUserRole) topbarUserRole.textContent = `${user.staffId || user.username} - ${shiftBadgeText}`;
     if (topbarAvatar) {
-
       topbarAvatar.className = 'user-avatar-circle';
-
-      topbarAvatar.textContent = user.avatarText || 'TT';
-
+      topbarAvatar.textContent = avatar;
     }
 
-
+    // Cập nhật thông tin góc bên trái Sidebar Thủ thư
+    const libSidebarName = document.getElementById('sidebar-librarian-name');
+    const libSidebarId = document.getElementById('sidebar-librarian-id');
+    const libSidebarAvatar = document.getElementById('sidebar-librarian-avatar');
+    const libSidebarBadge = document.getElementById('sidebar-librarian-badge');
+    if (libSidebarName) libSidebarName.textContent = user.name;
+    if (libSidebarId) libSidebarId.textContent = staffIdText;
+    if (libSidebarAvatar) libSidebarAvatar.textContent = avatar;
+    if (libSidebarBadge) libSidebarBadge.textContent = shiftBadgeText;
 
     const initialScreen = (hashScreen && document.getElementById(hashScreen) && (LIBRARIAN_SCREENS.includes(hashScreen) || hashScreen === 'screen-student-search')) ? hashScreen : 'screen-dashboard';
     switchScreen(initialScreen, false);
     try { window.history.replaceState({ screenId: initialScreen }, '', '#' + initialScreen); } catch (e) { }
 
   } else if (user.role === 'DOC_GIA') {
-
     // 3. Độc giả / Sinh viên
-
     if (librarianSidebar) librarianSidebar.style.display = 'none';
-
     if (adminSidebar) adminSidebar.style.display = 'none';
-
     if (studentNav) studentNav.style.display = 'flex';
-
     if (sidebarToggleBtn) sidebarToggleBtn.style.display = 'none';
-
-
 
     if (topbarTitle) topbarTitle.textContent = 'HỆ THỐNG QUẢN LÝ THƯ VIỆN';
 
@@ -11138,21 +11098,17 @@ function syncUserInterface(user) {
     const roleTitle = isGiangVien ? 'Giảng viên' : 'Sinh viên';
     if (topbarUserRole) topbarUserRole.textContent = `${user.staffId || user.username} - ${roleTitle}`;
 
+    const avatar = user.avatarText || getAvatarInitials(user.name, 'HA');
     if (topbarAvatar) {
-
       topbarAvatar.className = 'user-avatar-circle student';
-
-      topbarAvatar.textContent = user.avatarText || 'HA';
-
+      topbarAvatar.textContent = avatar;
     }
-
-
 
     const initialScreen = (hashScreen && document.getElementById(hashScreen) && STUDENT_SCREENS.includes(hashScreen)) ? hashScreen : 'screen-student-search';
     switchScreen(initialScreen, false);
     try { window.history.replaceState({ screenId: initialScreen }, '', '#' + initialScreen); } catch (e) { }
-
   }
+}
 
 }
 
@@ -12026,6 +11982,11 @@ function registerGlobalEvents() {
           if (reasonEl) reasonEl.textContent = `Quá hạn ${loan?.overdueDays || 8} ngày cuốn ${copyCode}`;
           if (amountEl) amountEl.textContent = `${Number(fee).toLocaleString('vi-VN')} đ`;
           if (receiptDateEl && typeof getTodayVN === 'function') receiptDateEl.textContent = `Ngày thu: ${getTodayVN()}`;
+          const collectorEl = document.getElementById('receipt-collector-name');
+          const currentLibrarian = getCurrentUser();
+          if (collectorEl && currentLibrarian) {
+            collectorEl.textContent = `${currentLibrarian.name} · ${currentLibrarian.shift || (currentLibrarian.role === 'ADMIN' ? 'Quản trị viên' : 'Thủ thư ca 1')}`;
+          }
           if (alertBox) alertBox.className = 'alert-banner alert-banner-success';
           if (alertIcon) alertIcon.className = 'fa-solid fa-circle-check';
           if (alertTextEl) alertTextEl.textContent = `Đã thu tiền mặt ${Number(fee).toLocaleString('vi-VN')} đ tại quầy. Lượt trả sách đã hoàn tất!`;
@@ -12284,6 +12245,12 @@ function registerGlobalEvents() {
     if (payerEl) payerEl.textContent = `${d.readerName} · ${d.readerCard} · Lớp ${d.readerClass || '50.01.SPTIN.B'}`;
 
     if (reasonEl) reasonEl.textContent = d.reason;
+
+    const collectorEl = document.getElementById('receipt-collector-name');
+    const currentLibrarian = getCurrentUser();
+    if (collectorEl && currentLibrarian) {
+      collectorEl.textContent = `${currentLibrarian.name} · ${currentLibrarian.shift || (currentLibrarian.role === 'ADMIN' ? 'Quản trị viên' : 'Thủ thư ca 1')}`;
+    }
 
     const receiptDateEl = document.getElementById('receipt-date-display');
 
@@ -13184,27 +13151,28 @@ function registerGlobalEvents() {
 
 
   window.handlePromoteRole = function (username) {
-
     const roles = ['ADMIN', 'THU_THU', 'DOC_GIA'];
+    let updatedRole = '';
 
     mutateDB(draft => {
-
       const acc = draft.accounts.find(a => a.username === username);
-
       if (acc) {
-
         const nextIdx = (roles.indexOf(acc.role) + 1) % roles.length;
-
         acc.role = roles[nextIdx];
-
+        updatedRole = acc.role;
       }
-
     });
 
+    // Nếu tài khoản được đổi vai trò chính là tài khoản đang đăng nhập trong phiên:
+    const currentUser = getCurrentUser();
+    if (currentUser && (currentUser.username === username || currentUser.staffId === username || currentUser.cardId === username)) {
+      currentUser.role = updatedRole;
+      setCurrentUser(currentUser);
+      syncUserInterface(currentUser);
+    }
+
     showToast(`✅ Đã cập nhật phân quyền vai trò cho ${username}!`, 'success');
-
     renderAccountsScreen();
-
   };
 
 
