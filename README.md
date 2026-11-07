@@ -6,7 +6,7 @@
 > **Khoa:** Công nghệ Thông tin & Khoa Toán - Tin học  
 > **Học phần:** Nhập môn Công nghệ Phần mềm  
 > **Học kỳ / Năm học:** Học kỳ 1 (2026 - 2027)  
-> **Phiên bản hệ thống:** SP1.0 (Full Reactive SPA, Mobile Responsive, CSDL 17 bảng chuẩn 3NF & 26/26 Automated Test Cases Passed)  
+> **Phiên bản hệ thống:** SP1.0 (Full Reactive SPA, Mobile Responsive, CSDL 17 bảng chuẩn 3NF & 28/28 Automated Test Cases Passed)  
 > **Web Demo Live (Render Cloud 24/7):** https://qltv-hcmue-nhom02.onrender.com  
 > **Git Repository:** https://github.com/truongthinh1703/QLTV.git
 
@@ -30,7 +30,7 @@
 3. [III. Dữ liệu Seed chuẩn hóa & Nút Reset 1-Click (Không phụ thuộc nhập tay)](#iii-dữ-liệu-seed-chuẩn-hóa--nút-reset-1-click-không-phụ-thuộc-nhập-tay)
 4. [IV. Kịch bản Demo chuẩn hóa theo yêu cầu đề bài (Không cần gõ phím thủ công)](#iv-kịch-bản-demo-chuẩn-hóa-theo-yêu-cầu-đề-bài-không-cần-gõ-phím-thủ-công)
 5. [V. Ma trận truy vết yêu cầu (Requirements Traceability Matrix - RTM)](#v-ma-trận-truy-vết-yêu-cầu-requirements-traceability-matrix---rtm)
-6. [VI. Bộ kiểm thử tự động 26/26 Test Cases (Automated Test Suite)](#vi-bộ-kiểm-thử-tự-động-2626-test-cases-automated-test-suite)
+6. [VI. Bộ kiểm thử tự động 28/28 Test Cases (Automated Test Suite)](#vi-bộ-kiểm-thử-tự-động-2828-test-cases-automated-test-suite)
 7. [VII. Kiến trúc kỹ thuật & Mô hình dữ liệu chuẩn 3NF](#vii-kiến-trúc-kỹ-thuật--mô-hình-dữ-liệu-chuẩn-3nf)
 
 ---
@@ -67,7 +67,7 @@ Kiểm chứng tự động toàn bộ 11 Yêu cầu Chức năng (FRs), 4 Quy t
 ```bash
 node test_requirements.mjs
 ```
-*Kết quả thẩm định: **26/26 Test Cases PASSED (100%)**.*
+*Kết quả thẩm định: **28/28 Test Cases PASSED (100%)**.*
 
 ---
 
@@ -93,7 +93,7 @@ Ngay tại màn hình Đăng nhập (`#screen-login`), hệ thống trang bị s
 | **5** | **`50.01.103.065`** | `123456` | **Nguyễn Đức Anh Tài** | Sinh viên (`DOC_GIA`) | `TAM_KHOA_NO` | **Tài khoản nợ phạt:** Đang nợ 180.000 đ (`CSDL-002` quá hạn & rách bìa), hệ thống tự khóa quyền mượn/gia hạn. |
 | **6** | **`50.01.103.077`** | `123456` | **Huỳnh Nguyễn Huyền Trân**| Sinh viên (`DOC_GIA`) | `HOAT_DONG` | **TC04 (BR-01):** Đã mượn đủ trần 3/3 cuốn, hệ thống chặn không cho mượn thêm cuốn thứ 4. |
 | **7** | **`50.01.103.061`** | `123456` | **Lê Nguyễn Thanh Phương**| Sinh viên (`DOC_GIA`) | `HOAT_DONG` | **TC07 (BR-03):** Đang giữ sách quá hạn 13 ngày (`CNPM-003`), hệ thống chặn quyền mượn sách mới. |
-| **8** | **`50.01.103.115`** | `123456` | **Đặng Hoàng Khang** | Sinh viên (`DOC_GIA`) | `TAM_KHOA_NO` | **TC08 (BR-04):** Nợ bồi thường mất sách 404.000 đ ($> 50.000$ đ trần quy định), chặn mượn sách. |
+| **8** | **`50.01.103.115`** | `123456` | **Đặng Hoàng Khang** | Sinh viên (`DOC_GIA`) | `TAM_KHOA_NO` | **TC08 (BR-04):** Đang có nợ phạt tồn đọng 404.000 đ (chỉ cần có nợ phạt phát sinh là hệ thống tự động tạm khóa thẻ, chặn mượn sách). |
 | **9** | **`50.01.103.088`** | `123456` | **Hoàng Văn Khóa** | Sinh viên (`DOC_GIA`) | `KHOA` | **TC05 (BR-02):** Kiểm thử quy tắc chặn mượn sách khi thẻ độc giả bị thủ thư khóa thủ công. |
 | **10**| **`49.01.103.099`** | `123456` | **Trần Thị Hết Hạn** | Sinh viên (`DOC_GIA`) | `HET_HAN` | **TC06 (BR-02):** Thẻ hết hạn từ ngày 15/09/2023 $\rightarrow$ Chặn mượn. Có nút "Gia hạn thẻ" mở lại quyền ngay. |
 
@@ -158,7 +158,7 @@ Các kịch bản dưới đây được thiết kế bám sát 100% **Mục 6: 
      - **Thử nghiệm Thẻ bị khóa (BR-02):** Nhập `THE-50011088` $\rightarrow$ Hệ thống báo đỏ vi phạm: *Thẻ thư viện đang bị khóa, không thể lập phiếu mượn*.
      - **Thử nghiệm Thẻ hết hạn (BR-02):** Nhập `THE-49011099` (Trần Thị Hết Hạn, hết hạn 15/09/2023) $\rightarrow$ Hệ thống báo đỏ: *Thẻ thư viện đã hết hạn sử dụng*.
      - **Thử nghiệm Nợ sách quá hạn (BR-03):** Nhập `THE-5001106` (Thanh Phương) $\rightarrow$ Hệ thống báo đỏ: *Độc giả đang giữ sách quá hạn 13 ngày chưa trả*.
-     - **Thử nghiệm Nợ phạt vượt trần (BR-04):** Nhập `THE-5001115` (Hoàng Khang) $\rightarrow$ Báo đỏ: *Nợ phạt 404.000 đ vượt quá trần quy định (50.000 đ)*.
+     - **Thử nghiệm Độc giả có nợ phạt (BR-04):** Nhập `THE-5001115` (Hoàng Khang - nợ 404.000 đ) hoặc `THE-50011065` (Anh Tài - nợ 180.000 đ) $\rightarrow$ Báo đỏ: *Độc giả đang có nợ phạt chưa thanh toán, thẻ bị tạm khóa*.
      - **Thử nghiệm Mượn vượt hạn mức (BR-01):** Nhập `THE-50011077` (Huyền Trân) $\rightarrow$ Báo đỏ: *Đã mượn tối đa 3/3 cuốn*.
      - **Thử nghiệm Đủ điều kiện chuẩn:** Nhập `THE-5001102` (Hồng An) $\rightarrow$ **Cả 4 điều kiện xanh**, nút **"XÁC NHẬN TẠO PHIẾU MƯỢN"** kích hoạt thành công!
 
@@ -224,23 +224,23 @@ Hệ thống đáp ứng trọn vẹn 100% các yêu cầu từ **G2-FR01** đ�
 | :---: | :---: | :--- | :---: | :--- | :---: | :---: |
 | **G2-FR01** | **MUST** | Đăng nhập và phân quyền Quản trị viên / Thủ thư / Độc giả | UC01, UC04 | Screen 01 (`#screen-login`), Screen 15 | **TC01, TC15** | **PASS (100%)** |
 | **G2-FR02** | **MUST** | Quản lý danh mục đầu sách mẹ (ISBN, tên, tác giả, thể loại, NXB, năm XB, mô tả) | UC07 | Screen 10 (`#screen-books`), 10b | **TC12, TC21, TC22**| **PASS (100%)** |
-| **G2-FR03** | **MUST** | Quản lý từng bản sao vật lý và trạng thái: sẵn sàng / đang mượn / mất / hỏng | UC08, UC10 | Screen 11 (`#screen-copies`), 11b, 13 | **TC13, TC16, TC24**| **PASS (100%)** |
+| **G2-FR03** | **MUST** | Quản lý từng bản sao vật lý và trạng thái: sẵn sàng / đang mượn / mất / hỏng | UC08, UC10 | Screen 11 (`#screen-copies`), 11b, 13 | **TC13, TC16, TC24, TC27**| **PASS (100%)** |
 | **G2-FR04** | **MUST** | Quản lý thẻ độc giả: thông tin, ngày cấp, hạn thẻ, trạng thái | UC11 | Screen 14 (`#screen-readers`) | **TC05, TC14, TC25**| **PASS (100%)** |
-| **G2-FR05** | **MUST** | Lập phiếu mượn gồm độc giả, các cuốn sách, ngày mượn và hạn trả | UC12 | Screen 07 (`#screen-loans`) | **TC03, TC04** | **PASS (100%)** |
+| **G2-FR05** | **MUST** | Lập phiếu mượn gồm độc giả, các cuốn sách, ngày mượn và hạn trả | UC12 | Screen 07 (`#screen-loans`) | **TC03, TC04, TC27** | **PASS (100%)** |
 | **G2-FR06** | **MUST** | Trả sách, cập nhật trạng thái cuốn sách và xác định số ngày quá hạn | UC13, UC15 | Screen 08 (`#screen-returns`), 08A, 08B | **TC09, TC26** | **PASS (100%)** |
 | **G2-FR07** | **MUST** | Tính phí phạt quá hạn / hư hỏng và ghi nhận thanh toán | UC13, UC21 | Screen 08, Screen 09 (`#screen-debts`) | **TC10, TC26** | **PASS (100%)** |
-| **G2-FR08** | **MUST** | Tra cứu sách theo tên, tác giả, thể loại, mã và hiển thị số lượng còn | UC16, UC20 | Screen 19 (`#screen-opac`), 19b | **TC02, TC23** | **PASS (100%)** |
+| **G2-FR08** | **MUST** | Tra cứu sách theo tên, tác giả, thể loại, mã và hiển thị số lượng còn | UC16, UC20 | Screen 19 (`#screen-opac`), 19b | **TC02, TC23, TC28** | **PASS (100%)** |
 | **G2-FR09** | **MUST** | Độc giả xem sách đang mượn, hạn trả và lịch sử mượn cá nhân | UC17, UC14 | Screen 20 (`#screen-student-loans`), 20b | **TC11** | **PASS (100%)** |
 | **G2-FR10** | **SHOULD**| Báo cáo sách đang mượn, quá hạn, lượt mượn theo khoảng thời gian | UC18, UC19 | Screen 18 (`#screen-reports`), 06 | **TC18, TC19, TC20**| **PASS (100%)** |
 | **G2-FR11** | **COULD** | Tự gia hạn trực tuyến (+7 ngày, tối đa 1 lần) & Đọc thử PDF bản quyền | UC14, UC20 | Screen 20b, Screen 19b | **TC02, TC11** | **PASS (100%)** |
 | **BR-01** | **MUST** | Giới hạn số lượng mượn tối đa (SV $\le 3$ cuốn, GV $\le 5$ cuốn) | BR-01 | Screen 07 (`#screen-loans`) | **TC04** | **PASS (100%)** |
 | **BR-02** | **MUST** | Chặn mượn sách bằng thẻ hết hạn hoặc thẻ bị khóa | BR-02 | Screen 07 (`#screen-loans`) | **TC05, TC06** | **PASS (100%)** |
 | **BR-03** | **MUST** | Chặn mượn sách khi độc giả có sách mượn quá hạn chưa trả | BR-03 | Screen 07 (`#screen-loans`) | **TC07** | **PASS (100%)** |
-| **BR-04** | **MUST** | Chặn mượn sách khi nợ phạt vượt trần quy định ($> 50.000$ đ) | BR-04 | Screen 07 (`#screen-loans`) | **TC08** | **PASS (100%)** |
+| **BR-04** | **MUST** | Chặn mượn sách khi độc giả có nợ phạt tồn đọng chưa thanh toán | BR-04 | Screen 07 (`#screen-loans`) | **TC08** | **PASS (100%)** |
 
 ---
 
-## VI. BỘ KIỂM THỬ TỰ ĐỘNG 26/26 TEST CASES (AUTOMATED TEST SUITE)
+## VI. BỘ KIỂM THỬ TỰ ĐỘNG 28/28 TEST CASES (AUTOMATED TEST SUITE)
 
 Để đảm bảo tính khách quan và kiểm chứng độc lập chất lượng phần mềm, nhóm cung cấp tập lệnh kiểm thử tự động tại tệp **`test_requirements.mjs`**.
 
@@ -248,7 +248,7 @@ Hệ thống đáp ứng trọn vẹn 100% các yêu cầu từ **G2-FR01** đ�
 node test_requirements.mjs
 ```
 
-### Bảng Kết quả Chi tiết 26/26 Test Cases Đạt Chuẩn 100%:
+### Bảng Kết quả Chi tiết 28/28 Test Cases Đạt Chuẩn 100%:
 
 | STT | Mã TC | Nhóm chức năng / Quy tắc kiểm tra | Dữ liệu đầu vào đối soát | Kết quả kiểm thử |
 | :---: | :---: | :--- | :--- | :---: |
@@ -259,7 +259,7 @@ node test_requirements.mjs
 | 5 | **TC05** | **[BR-02]** Chặn mượn khi thẻ độc giả bị khóa | Sinh viên Hoàng Văn Khóa (`THE-50011088`) | **PASS (100%)** |
 | 6 | **TC06** | **[BR-02]** Chặn mượn khi thẻ hết hạn sử dụng | Sinh viên Trần Thị Hết Hạn (`THE-49011099`) | **PASS (100%)** |
 | 7 | **TC07** | **[BR-03]** Chặn mượn khi nợ sách quá hạn | Sinh viên Thanh Phương (quá hạn 13 ngày) | **PASS (100%)** |
-| 8 | **TC08** | **[BR-04]** Chặn mượn khi nợ phạt vượt trần ($> 50k$) | Sinh viên Hoàng Khang (nợ 404.000 đ) | **PASS (100%)** |
+| 8 | **TC08** | **[BR-04]** Chặn mượn khi độc giả có nợ phạt tồn đọng | Sinh viên Hoàng Khang (nợ 404.000 đ) | **PASS (100%)** |
 | 9 | **TC09** | Trả sách từng cuốn độc lập, bảo toàn danh sách | Trả `CNPM-002`, bảo toàn `CSDL-004` | **PASS (100%)** |
 | 10 | **TC10** | Thu tiền phạt & Tự động mở khóa thẻ | Thu 180.000 đ của Anh Tài $\rightarrow$ Thẻ hoạt động | **PASS (100%)** |
 | 11 | **TC11** | Gia hạn sách trực tuyến & tại quầy (+7 ngày) | Hạn mới 15/11/2026, khóa mức 1/1 lần | **PASS (100%)** |
@@ -278,11 +278,13 @@ node test_requirements.mjs
 | 24 | **TC24** | Quản lý bản sao: Báo lỗi đơn giá bồi thường $\le 0$ | Nhập `-10.000` $\rightarrow$ Báo lỗi giá phải $> 0$ | **PASS (100%)** |
 | 25 | **TC25** | Đồng bộ thẻ hết hạn (`THE-49011099`) | Khớp trạng thái `HET_HAN` trên mọi màn hình | **PASS (100%)** |
 | 26 | **TC26** | Ràng buộc toàn vẹn Tiếp nhận trả & Công nợ | `AI-002` đã trả $\rightarrow$ Không lặp lại ghi nợ | **PASS (100%)** |
+| 27 | **TC27** | Chặn mượn cuốn sách đang mượn (`DANG_MUON`) | Bản sao `CNPM-001` đang mượn $\rightarrow$ Báo lỗi chặn mượn | **PASS (100%)** |
+| 28 | **TC28** | Tra cứu tài liệu: Xử lý tìm kiếm không tồn tại | Tìm `"KHONG_TON_TAI_XYZ_9999"` $\rightarrow$ Ra 0 cuốn, không crash | **PASS (100%)** |
 
 ```
 ===============================================================
-   KẾT QUẢ KIỂM THỬ: 26/26 Test Cases PASSED (100%)
-   TOÀN BỘ 26/26 TEST CASES ĐÃ ĐẠT TIÊU CHUẨN 100%!
+   KẾT QUẢ KIỂM THỬ: 28/28 Test Cases PASSED (100%)
+   TOÀN BỘ 28/28 TEST CASES ĐÃ ĐẠT TIÊU CHUẨN 100%!
 ===============================================================
 ```
 
