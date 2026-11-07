@@ -714,6 +714,23 @@ export function openModal(modalId) {
 
   }
 
+  if (modalId === 'modal-add-title') {
+    const errAlert = document.getElementById('add-title-error-msg');
+    if (errAlert) errAlert.style.display = 'none';
+    const form = document.querySelector('#modal-add-title form');
+    if (form) form.reset();
+    const yearInp = document.getElementById('add-title-year');
+    if (yearInp) {
+      const curYear = new Date().getFullYear();
+      yearInp.value = curYear;
+      yearInp.max = curYear;
+    }
+    ['add-title-isbn', 'add-title-name', 'add-title-author', 'add-title-publisher', 'add-title-year'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.borderColor = '';
+    });
+  }
+
   const todayVN = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   if (modalId === 'modal-add-copy') {
@@ -2322,41 +2339,114 @@ function registerGlobalEvents() {
   };
 
   window.handleSaveNewMasterTitle = function (e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
 
-    const isbn = document.getElementById('add-title-isbn')?.value;
-    const title = document.getElementById('add-title-name')?.value;
-    const author = document.getElementById('add-title-author')?.value;
+    const isbnEl = document.getElementById('add-title-isbn');
+    const nameEl = document.getElementById('add-title-name');
+    const authorEl = document.getElementById('add-title-author');
+    const pubEl = document.getElementById('add-title-publisher');
+    const yearEl = document.getElementById('add-title-year');
+    const errEl = document.getElementById('add-title-error-msg');
+
+    const isbn = isbnEl?.value?.trim() || '';
+    const title = nameEl?.value?.trim() || '';
+    const author = authorEl?.value?.trim() || '';
     const category = document.getElementById('add-title-category')?.value;
-    const publisher = document.getElementById('add-title-publisher')?.value;
-    const year = document.getElementById('add-title-year')?.value;
-    const summary = document.getElementById('add-title-summary')?.value;
+    const publisher = pubEl?.value?.trim() || '';
+    const year = yearEl?.value?.trim() || '';
+    const summary = document.getElementById('add-title-summary')?.value?.trim() || '';
 
-    if (!isbn || !title || !author) {
-      showToast("Vui lòng điền các trường bắt buộc (*)", "warning");
+    const showError = (msg, elementToFocus) => {
+      if (errEl) {
+        errEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Báo lỗi: ${msg}`;
+        errEl.style.display = 'block';
+      }
+      if (elementToFocus) {
+        elementToFocus.style.borderColor = '#ef4444';
+        elementToFocus.focus();
+      }
+      showToast(`⛔ ${msg}`, "error");
+    };
+
+    if (errEl) errEl.style.display = 'none';
+
+    // 1. Kiểm tra bắt buộc các trường cơ bản
+    if (!isbn) {
+      showError("Mã ISBN không được để trống!", isbnEl);
+      return;
+    }
+    if (!title) {
+      showError("Tên đầu sách không được để trống!", nameEl);
+      return;
+    }
+    if (!author) {
+      showError("Tên tác giả không được để trống!", authorEl);
+      return;
+    }
+    if (!publisher) {
+      showError("Nhà xuất bản không được để trống!", pubEl);
+      return;
+    }
+    if (!year) {
+      showError("Năm xuất bản không được để trống!", yearEl);
+      return;
+    }
+
+    // 2. Kiểm tra tính duy nhất (UNIQUE) của mã ISBN (chuẩn hóa loại bỏ khoảng trắng và dấu gạch nối)
+    const cleanIsbn = isbn.replace(/[\s-]/g, '').toUpperCase();
+    const db = getDB();
+    const dupTitle = (db.titles || []).find(t => t.isbn && String(t.isbn).replace(/[\s-]/g, '').toUpperCase() === cleanIsbn);
+    if (dupTitle) {
+      showError(`Mã ISBN "${isbn}" đã tồn tại trên hệ thống (thuộc đầu sách: "${dupTitle.title}")! Mỗi đầu sách phải có mã ISBN duy nhất.`, isbnEl);
+      return;
+    }
+
+    // 3. Kiểm tra Năm xuất bản không được lớn hơn năm hiện tại
+    const currentYear = new Date().getFullYear();
+    let yearNum = parseInt(year, 10);
+    if (typeof year === 'string' && year.includes('/')) {
+      const parts = year.split('/');
+      if (parts.length === 3 && parts[2]) yearNum = parseInt(parts[2], 10);
+    } else if (typeof year === 'string' && year.includes('-') && year.length > 5) {
+      const parts = year.split('-');
+      if (parts.length === 3 && parts[0]) yearNum = parseInt(parts[0], 10);
+    }
+
+    if (isNaN(yearNum) || yearNum < 1900) {
+      showError("Năm xuất bản không hợp lệ (phải từ năm 1900 trở lên)!", yearEl);
+      return;
+    }
+
+    if (yearNum > currentYear) {
+      showError(`Năm xuất bản (${yearNum}) không được lớn hơn năm hiện tại (${currentYear})!`, yearEl);
       return;
     }
 
     const pendingPdf = (typeof getPendingPdfFile === 'function') ? getPendingPdfFile() : null;
 
-    addMasterTitle({
+    const result = addMasterTitle({
       isbn,
       title,
       author,
       category,
       publisher,
-      year,
+      year: yearNum,
       summary,
       pdfUrl: pendingPdf ? pendingPdf.url : null,
       pdfFileName: pendingPdf ? pendingPdf.fileName : null
     });
+
+    if (result && result.success === false) {
+      showError(result.message);
+      return;
+    }
 
     // Reset dropzone sau khi lưu thành công
     if (typeof setPendingPdfFile === 'function') setPendingPdfFile(null);
     resetPdfDropzoneUI();
 
     // Reset form fields
-    const form = e.target;
+    const form = e?.target || document.querySelector('#modal-add-title form');
     if (form && typeof form.reset === 'function') {
       form.reset();
     }

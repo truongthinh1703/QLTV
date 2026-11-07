@@ -2146,18 +2146,21 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
               <div class="floating-input-wrap">
                 <span class="floating-label">ISBN-13 (*)</span>
-                <input type="text" id="add-title-isbn" class="floating-input" placeholder="Nhập mã ISBN-13" required>
+                <input type="text" id="add-title-isbn" class="floating-input" placeholder="Nhập mã ISBN-13" required
+                  oninput="if(this.value.trim()){ this.style.borderColor=''; const err = document.getElementById('add-title-error-msg'); if(err) err.style.display='none'; }">
               </div>
               <div class="floating-input-wrap">
                 <span class="floating-label">Tựa sách (*)</span>
-                <input type="text" id="add-title-name" class="floating-input" placeholder="Nhập tựa sách" required>
+                <input type="text" id="add-title-name" class="floating-input" placeholder="Nhập tựa sách" required
+                  oninput="if(this.value.trim()){ this.style.borderColor=''; const err = document.getElementById('add-title-error-msg'); if(err) err.style.display='none'; }">
               </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
               <div class="floating-input-wrap">
                 <span class="floating-label">Tác giả (*)</span>
-                <input type="text" id="add-title-author" class="floating-input" placeholder="Nhập tên tác giả" required>
+                <input type="text" id="add-title-author" class="floating-input" placeholder="Nhập tên tác giả" required
+                  oninput="if(this.value.trim()){ this.style.borderColor=''; const err = document.getElementById('add-title-error-msg'); if(err) err.style.display='none'; }">
               </div>
               <div class="floating-input-wrap">
                 <span class="floating-label">Thể loại</span>
@@ -2175,12 +2178,14 @@
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
               <div class="floating-input-wrap">
-                <span class="floating-label">Nhà xuất bản</span>
-                <input type="text" id="add-title-publisher" class="floating-input" placeholder="Nhập nhà xuất bản">
+                <span class="floating-label">Nhà xuất bản (*)</span>
+                <input type="text" id="add-title-publisher" class="floating-input" placeholder="Ví dụ: NXB Giáo Dục, NXB ĐH Sư Phạm..." required
+                  oninput="if(this.value.trim()){ this.style.borderColor=''; const err = document.getElementById('add-title-error-msg'); if(err) err.style.display='none'; }">
               </div>
               <div class="floating-input-wrap">
-                <span class="floating-label">Năm xuất bản</span>
-                <input type="text" id="add-title-year" class="floating-input" placeholder="Ví dụ: 2026">
+                <span class="floating-label">Năm xuất bản (*)</span>
+                <input type="number" id="add-title-year" class="floating-input" placeholder="Ví dụ: 2026" min="1900" max="2026" required
+                  oninput="if(this.value.trim()){ this.style.borderColor=''; const err = document.getElementById('add-title-error-msg'); if(err) err.style.display='none'; }">
               </div>
             </div>
 
@@ -2216,6 +2221,9 @@
                 </button>
               </div>
             </div>
+
+            <div id="add-title-error-msg" style="display: none; padding: 10px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; color: #dc2626; font-size: 13px; font-weight: 600; margin-top: 10px;">
+            </div>
           </div>
 
           <div class="modal-footer">
@@ -2243,7 +2251,8 @@
               </div>
               <div class="floating-input-wrap">
                 <span class="floating-label">Mã ISBN-13</span>
-                <input type="text" id="edit-title-isbn" class="floating-input" placeholder="Mã ISBN-13">
+                <input type="text" id="edit-title-isbn" class="floating-input" placeholder="Mã ISBN-13"
+                  oninput="if(this.value.trim()){ this.style.borderColor=''; const err = document.getElementById('edit-title-error-msg'); if(err) err.style.display='none'; }">
               </div>
             </div>
 
@@ -2275,14 +2284,16 @@
               </div>
               <div class="floating-input-wrap">
                 <span class="floating-label">Nhà xuất bản (NXB) (*)</span>
-                <input type="text" id="edit-title-publisher" class="floating-input" placeholder="Ví dụ: NXB Giáo Dục, NXB ĐH Sư Phạm...">
+                <input type="text" id="edit-title-publisher" class="floating-input" placeholder="Ví dụ: NXB Giáo Dục, NXB ĐH Sư Phạm..."
+                  oninput="if(this.value.trim()){ this.style.borderColor=''; const err = document.getElementById('edit-title-error-msg'); if(err) err.style.display='none'; }">
               </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
               <div class="floating-input-wrap">
                 <span class="floating-label">Năm xuất bản (*)</span>
-                <input type="number" id="edit-title-year" class="floating-input" placeholder="Ví dụ: 2026" min="1900" max="2099">
+                <input type="number" id="edit-title-year" class="floating-input" placeholder="Ví dụ: 2026" min="1900" max="2026"
+                  oninput="if(this.value.trim()){ this.style.borderColor=''; const err = document.getElementById('edit-title-error-msg'); if(err) err.style.display='none'; }">
               </div>
               <div class="floating-input-wrap">
                 <span class="floating-label">Vị trí lưu trữ lý thuyết</span>

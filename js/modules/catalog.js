@@ -112,6 +112,39 @@ export function getPendingPdfFile() {
  * Screen 10b: Thêm đầu sách mẹ
  */
 export function addMasterTitle(newTitleData) {
+  const db = getDB();
+  const cleanIsbn = String(newTitleData.isbn || '').trim().replace(/[\s-]/g, '').toUpperCase();
+  if (cleanIsbn) {
+    const dup = (db.titles || []).find(t => t.isbn && String(t.isbn).trim().replace(/[\s-]/g, '').toUpperCase() === cleanIsbn);
+    if (dup) {
+      const msg = `Mã ISBN "${newTitleData.isbn}" đã tồn tại trên hệ thống (thuộc đầu sách: "${dup.title}")! Mỗi đầu sách phải có mã ISBN duy nhất.`;
+      if (typeof window !== 'undefined' && window.showToast) window.showToast(`⛔ ${msg}`, "error");
+      return { success: false, message: msg };
+    }
+  }
+
+  const currentYear = new Date().getFullYear();
+  let yearNum = parseInt(newTitleData.year, 10);
+  if (typeof newTitleData.year === 'string' && newTitleData.year.includes('/')) {
+    const parts = newTitleData.year.split('/');
+    if (parts.length === 3 && parts[2]) yearNum = parseInt(parts[2], 10);
+  } else if (typeof newTitleData.year === 'string' && newTitleData.year.includes('-') && newTitleData.year.length > 5) {
+    const parts = newTitleData.year.split('-');
+    if (parts.length === 3 && parts[0]) yearNum = parseInt(parts[0], 10);
+  }
+
+  if (isNaN(yearNum) || yearNum < 1900) {
+    const msg = "Năm xuất bản không hợp lệ (phải từ năm 1900 trở lên)!";
+    if (typeof window !== 'undefined' && window.showToast) window.showToast(`⛔ ${msg}`, "error");
+    return { success: false, message: msg };
+  }
+
+  if (yearNum > currentYear) {
+    const msg = `Năm xuất bản (${yearNum}) không được lớn hơn năm hiện tại (${currentYear})!`;
+    if (typeof window !== 'undefined' && window.showToast) window.showToast(`⛔ ${msg}`, "error");
+    return { success: false, message: msg };
+  }
+
   mutateDB(draft => {
     const id = `DS-${(draft.titles.length + 1).toString().padStart(2, '0')}`;
     draft.titles.push({
@@ -122,19 +155,21 @@ export function addMasterTitle(newTitleData) {
       category: newTitleData.category,
       categoryId: newTitleData.categoryId || 'TL-CNTT',
       publisher: newTitleData.publisher || 'NXB Giáo Dục',
-      year: Number(newTitleData.year) || 2026,
+      year: yearNum || currentYear,
       totalCopies: 0,
       availableCopies: 0,
       shelfLocation: "Kho tiếp nhận mới",
       coverTag: "GIÁO TRÌNH ĐẠI HỌC",
       coverTitle: newTitleData.title.toUpperCase(),
-      coverSub: `${newTitleData.year || 2026}`,
+      coverSub: `${yearNum || currentYear}`,
       pdfFile: newTitleData.pdfUrl || "assets/sample.pdf",
       pdfUrl: newTitleData.pdfUrl || null,
       pdfFileName: newTitleData.pdfFileName || null,
       summary: newTitleData.summary || "Đang cập nhật nội dung trích yếu của sách."
     });
   }, 'ADD_MASTER_TITLE');
+
+  return { success: true };
 }
 
 /**
@@ -160,7 +195,10 @@ export function handleEditTitle(titleId) {
   const errEl = document.getElementById('edit-title-error-msg');
 
   if (idEl) idEl.value = titleObj.id || '';
-  if (isbnEl) isbnEl.value = titleObj.isbn || '';
+  if (isbnEl) {
+    isbnEl.value = titleObj.isbn || '';
+    isbnEl.style.borderColor = '';
+  }
   if (nameEl) {
     nameEl.value = titleObj.title || '';
     nameEl.style.borderColor = '';
@@ -169,8 +207,15 @@ export function handleEditTitle(titleId) {
     authorEl.value = titleObj.author || '';
     authorEl.style.borderColor = '';
   }
-  if (pubEl) pubEl.value = titleObj.publisher || '';
-  if (yearEl) yearEl.value = titleObj.year || '';
+  if (pubEl) {
+    pubEl.value = titleObj.publisher || '';
+    pubEl.style.borderColor = '';
+  }
+  if (yearEl) {
+    yearEl.value = titleObj.year || '';
+    yearEl.style.borderColor = '';
+    yearEl.max = new Date().getFullYear();
+  }
   if (shelfEl) shelfEl.value = titleObj.shelfLocation || '';
   if (sumEl) sumEl.value = titleObj.summary || '';
   if (errEl) errEl.style.display = 'none';
@@ -194,42 +239,73 @@ export function handleSaveEditTitle(e) {
   const authorEl = document.getElementById('edit-title-author');
   const author = authorEl ? authorEl.value.trim() : '';
   const category = document.getElementById('edit-title-category')?.value;
-  const publisher = document.getElementById('edit-title-publisher')?.value?.trim();
-  const yearVal = document.getElementById('edit-title-year')?.value?.trim();
+  const pubEl = document.getElementById('edit-title-publisher');
+  const publisher = pubEl ? pubEl.value.trim() : '';
+  const yearEl = document.getElementById('edit-title-year');
+  const yearVal = yearEl ? yearEl.value.trim() : '';
   const shelf = document.getElementById('edit-title-shelf')?.value?.trim();
   const summary = document.getElementById('edit-title-summary')?.value?.trim();
-  const isbn = document.getElementById('edit-title-isbn')?.value?.trim();
+  const isbnEl = document.getElementById('edit-title-isbn');
+  const isbn = isbnEl ? isbnEl.value.trim() : '';
   const errEl = document.getElementById('edit-title-error-msg');
+
+  const showEditError = (msg, el) => {
+    if (errEl) {
+      errEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Báo lỗi: ${msg}`;
+      errEl.style.display = 'block';
+    }
+    if (el) {
+      el.style.borderColor = '#ef4444';
+      el.focus();
+    }
+    if (window.showToast) window.showToast(`⛔ Báo lỗi: ${msg}`, "error");
+  };
 
   // Test Case 1 (Bảng 6.5): Xóa trống trường tên sách khi đang sửa -> Báo lỗi tên sách không được để trống
   if (!titleName) {
-    if (errEl) {
-      errEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Báo lỗi: Tên sách không được để trống!';
-      errEl.style.display = 'block';
-    }
-    if (nameEl) {
-      nameEl.style.borderColor = '#ef4444';
-      nameEl.focus();
-    }
-    if (window.showToast) {
-      window.showToast("⛔ Báo lỗi: Tên sách không được để trống!", "error");
-    }
+    showEditError("Tên sách không được để trống!", nameEl);
     return;
   }
 
   if (!author) {
-    if (errEl) {
-      errEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Báo lỗi: Tên tác giả không được để trống!';
-      errEl.style.display = 'block';
-    }
-    if (authorEl) {
-      authorEl.style.borderColor = '#ef4444';
-      authorEl.focus();
-    }
-    if (window.showToast) {
-      window.showToast("⛔ Báo lỗi: Tên tác giả không được để trống!", "warning");
-    }
+    showEditError("Tên tác giả không được để trống!", authorEl);
     return;
+  }
+
+  if (!publisher) {
+    showEditError("Nhà xuất bản không được để trống!", pubEl);
+    return;
+  }
+
+  const currentYear = new Date().getFullYear();
+  let yearNum = parseInt(yearVal, 10);
+  if (typeof yearVal === 'string' && yearVal.includes('/')) {
+    const parts = yearVal.split('/');
+    if (parts.length === 3 && parts[2]) yearNum = parseInt(parts[2], 10);
+  } else if (typeof yearVal === 'string' && yearVal.includes('-') && yearVal.length > 5) {
+    const parts = yearVal.split('-');
+    if (parts.length === 3 && parts[0]) yearNum = parseInt(parts[0], 10);
+  }
+
+  if (!yearVal || isNaN(yearNum) || yearNum < 1900) {
+    showEditError("Năm xuất bản không hợp lệ (phải từ năm 1900 trở lên)!", yearEl);
+    return;
+  }
+
+  if (yearNum > currentYear) {
+    showEditError(`Năm xuất bản (${yearNum}) không được lớn hơn năm hiện tại (${currentYear})!`, yearEl);
+    return;
+  }
+
+  // Kiểm tra trùng ISBN với các đầu sách khác
+  if (isbn) {
+    const cleanIsbn = isbn.replace(/[\s-]/g, '').toUpperCase();
+    const db = getDB();
+    const dup = (db.titles || []).find(item => item.id !== id && item.isbn && String(item.isbn).replace(/[\s-]/g, '').toUpperCase() === cleanIsbn);
+    if (dup) {
+      showEditError(`Mã ISBN "${isbn}" đã tồn tại trên đầu sách khác ("${dup.title}")! Mỗi đầu sách phải có mã ISBN duy nhất.`, isbnEl);
+      return;
+    }
   }
 
   if (errEl) errEl.style.display = 'none';
@@ -249,14 +325,12 @@ export function handleSaveEditTitle(e) {
         }
       }
       if (publisher) t.publisher = publisher;
-      if (yearVal) {
-        const parsedYear = parseInt(yearVal, 10);
-        t.year = !isNaN(parsedYear) ? parsedYear : yearVal;
-      }
+      t.year = yearNum;
       if (shelf) t.shelfLocation = shelf;
       if (summary !== undefined) t.summary = summary;
       if (isbn) t.isbn = isbn;
       t.coverTitle = titleName.toUpperCase();
+      t.coverSub = `${yearNum}`;
     }
 
     // Đồng bộ tên sách sang các bản sao copies
