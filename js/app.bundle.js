@@ -8214,8 +8214,8 @@ function saveSystemParams(formData) {
     draft.parameters.overdueFinePerDay = parseInt(formData.fine, 10) || 2000;
     draft.parameters.maxOnlineRenewals = parseInt(formData.renewals, 10) || 1;
     draft.parameters.renewalDays = parseInt(formData.renewalDays, 10) || 7;
-    draft.parameters.reservationHoldHours = parseInt(formData.holdHours, 10) || 24;
-    draft.parameters.maxAllowedDebt = parseInt(formData.maxDebt, 10) || 50000;
+    draft.parameters.reservationHoldHours = formData.holdHours !== undefined ? (parseInt(formData.holdHours, 10) || 24) : (draft.parameters.reservationHoldHours || 24);
+    draft.parameters.maxAllowedDebt = formData.maxDebt !== undefined ? (parseInt(formData.maxDebt, 10) || 50000) : (draft.parameters.maxAllowedDebt || 50000);
   }, 'UPDATE_SYSTEM_PARAMS');
 }
 
@@ -12942,27 +12942,14 @@ function registerGlobalEvents() {
   // Window handlers cho Admin
 
   window.handleSaveParamsForm = function () {
-
     const loanDays = document.getElementById('param-loan-days')?.value;
-
     const maxBooks = document.getElementById('param-max-books')?.value;
-
     const fine = document.getElementById('param-fine-per-day')?.value;
-
     const renewals = document.getElementById('param-max-renewals')?.value;
-
     const renewalDays = document.getElementById('param-renewal-days')?.value;
 
-    const holdHours = document.getElementById('param-hold-hours')?.value;
-
-    const maxDebt = document.getElementById('param-max-debt')?.value;
-
-
-
-    saveSystemParams({ loanDays, maxBooks, fine, renewals, renewalDays, holdHours, maxDebt });
-
+    saveSystemParams({ loanDays, maxBooks, fine, renewals, renewalDays });
     showToast("✅ Đã lưu cấu hình tham số vận hành thư viện thành công!", "success");
-
   };
 
 
