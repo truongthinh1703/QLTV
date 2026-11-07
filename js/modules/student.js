@@ -241,57 +241,202 @@ if (typeof window !== 'undefined') {
 
 
 
-/**
+let cachedPdfDoc = null;
+let cachedPdfUrl = null;
+let currentPdfZoom = 'fit';
 
- * Screen 19b: Mở Modal đọc thử PDF UC20
+export function handlePdfZoom(action) {
+  if (action === 'fit') {
+    currentPdfZoom = 'fit';
+  } else if (typeof action === 'number') {
+    let base = currentPdfZoom === 'fit' ? 0.85 : currentPdfZoom;
+    base = Math.min(2.0, Math.max(0.6, Number((base + action).toFixed(2))));
+    currentPdfZoom = base;
+  }
+  const zoomLabel = document.getElementById('pdf-zoom-level');
+  if (zoomLabel) {
+    zoomLabel.textContent = currentPdfZoom === 'fit' ? 'Vừa trang' : `${Math.round(currentPdfZoom * 100)}%`;
+  }
+  renderPdfViewer();
+}
 
- */
+async function renderPdfWithPdfJs(url, pageNum) {
+  const scrollWrapper = document.getElementById('pdf-canvas-scroll-wrapper');
+  if (!scrollWrapper) return;
 
-export function openPdfPreviewModal(titleId = 'DS-01') {
+  if (pageNum > totalPdfPages) {
+    showPdfLimitWarning();
+    return;
+  }
+
+  try {
+    if (!cachedPdfDoc || cachedPdfUrl !== url) {
+      cachedPdfUrl = url;
+      scrollWrapper.innerHTML = `
+        <div style="color: #ffffff; margin-top: 180px; text-align: center; font-size: 14px;">
+          <i class="fa-solid fa-spinner fa-spin" style="font-size: 28px; color: var(--hcmue-orange); margin-bottom: 12px; display: block;"></i>
+          Đang tải trang đọc thử ${pageNum}...
+        </div>
+      `;
+      cachedPdfDoc = await window.pdfjsLib.getDocument(url).promise;
+    }
+
+    const page = await cachedPdfDoc.getPage(pageNum);
+    const unscaled = page.getViewport({ scale: 1.0 });
+
+    // Tính toán tỷ lệ để VỪA KHÍT TRỌN VẸN TOÀN TRANG (Fit to Height/Width)
+    const availHeight = 590; 
+    const availWidth = 780;
+    let autoScale = availHeight / unscaled.height;
+    if (unscaled.width * autoScale > availWidth) {
+      autoScale = availWidth / unscaled.width;
+    }
+
+    let activeScale = autoScale;
+    if (currentPdfZoom !== 'fit') {
+      activeScale = currentPdfZoom;
+    }
+
+    const viewport = page.getViewport({ scale: activeScale });
+
+    scrollWrapper.innerHTML = `
+      <div style="position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: #ffffff; border-radius: 4px; overflow: hidden; margin: 0 auto; width: ${viewport.width}px; height: ${viewport.height}px;">
+        <canvas id="pdf-page-canvas" width="${viewport.width}" height="${viewport.height}" style="display: block; width: ${viewport.width}px; height: ${viewport.height}px;"></canvas>
+        <div class="pdf-watermark-overlay" style="z-index: 5; pointer-events: none;">
+          THƯ VIỆN ĐH SƯ PHẠM TP.HCM<br>BẢN ĐỌC THỬ TRỰC TUYẾN · CẤM TẢI VỀ
+        </div>
+      </div>
+    `;
+
+    const canvas = document.getElementById('pdf-page-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+    }
+
+    // Cuộn lên đầu trang mỗi khi chuyển trang
+    scrollWrapper.scrollTop = 0;
+
+  } catch (err) {
+    console.warn('Lỗi nạp PDF Canvas:', err);
+    renderFallbackPageSheet(pageNum);
+  }
+}
+
+function renderFallbackPageSheet(pageNum) {
+  const sheetContainer = document.getElementById('pdf-page-content-sheet');
+  if (!sheetContainer) return;
+
+  sheetContainer.className = 'pdf-page-sheet';
+  sheetContainer.style.padding = '';
+  sheetContainer.style.width = '';
+  sheetContainer.style.maxWidth = '';
+  sheetContainer.style.height = '';
+  sheetContainer.style.minHeight = '';
+  sheetContainer.style.background = '';
+  sheetContainer.style.boxShadow = '';
 
   const db = getDB();
+  const currentTitle = (db.titles || []).find(t => t.id === currentPreviewBookId || t.title === currentPreviewBookTitle) || {};
+  const bookAuthor = currentTitle.author || 'Tác giả chuyên ngành';
+  const bookPublisher = `${currentTitle.publisher || 'Nhà xuất bản Giáo Dục'} · ${currentTitle.year || '2024'}`;
+  const bookTitleDisplay = (currentTitle.title || currentPreviewBookTitle || 'TÀI LIỆU THƯ VIỆN').toUpperCase();
+  const bookSub = currentTitle.coverSub || `Ấn bản năm ${currentTitle.year || '2024'}`;
+  const bookSummary = currentTitle.summary || 'Tài liệu đọc thử dành cho học tập và nghiên cứu của sinh viên Trường Đại học Sư phạm TP.HCM. Bản xem trước minh họa được giới hạn trong 10 trang đầu của tài liệu theo đúng bản quyền sở hữu trí tuệ.';
 
+  sheetContainer.innerHTML = `
+    <div class="pdf-watermark-overlay">
+      THƯ VIỆN ĐH SƯ PHẠM TP.HCM<br>BẢN ĐỌC THỬ TRỰC TUYẾN · CẤM TẢI VỀ
+    </div>
+    <div style="position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column;">
+      <div style="font-size: 11px; font-weight: 700; color: var(--text-subtle); letter-spacing: 1px; text-transform: uppercase;">
+        ${escapeHTML(bookAuthor)}
+      </div>
+      <div style="font-size: 26px; font-weight: 800; color: var(--hcmue-navy); margin-top: 12px; line-height: 1.2;">
+        ${escapeHTML(bookTitleDisplay)}
+      </div>
+      <div style="font-size: 16px; font-weight: 600; color: var(--text-muted); margin-top: 6px;">
+        ${escapeHTML(bookSub)}
+      </div>
+      <div style="width: 48px; height: 3px; background-color: var(--hcmue-crimson); margin: 20px 0;"></div>
+      
+      <div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">
+        Giới thiệu tài liệu & Mục lục tóm tắt
+      </div>
+      <div style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;">
+        ${escapeHTML(bookSummary)}
+      </div>
+      
+      <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: auto;">
+        <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Nội dung trang ${pageNum} / ${totalPdfPages}:</div>
+        <p style="font-size: 12px; color: var(--text-main); line-height: 1.6;">
+          - Trích đoạn chương mục lý thuyết chuyên ngành: ${escapeHTML(bookTitleDisplay)}.<br>
+          - Phân tích và đặc tả hệ thống theo tiêu chuẩn đào tạo Trường Đại học Sư phạm TP.HCM.<br>
+          - Bài tập ứng dụng thực hành và hướng dẫn giải mẫu chi tiết.<br>
+          - Tài liệu tham khảo và câu hỏi thảo luận cuối chương.
+        </p>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-subtle); border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 24px;">
+        <span>${escapeHTML(bookPublisher)}</span>
+        <span style="font-weight: 700; color: var(--hcmue-crimson);"><i class="fa-solid fa-shield-halved"></i> BẢN XEM TRƯỚC TĨNH · TRANG ${pageNum} / ${totalPdfPages}</span>
+      </div>
+    </div>
+  `;
+}
+
+export function openPdfPreviewModal(titleId = 'DS-01') {
+  const db = getDB();
   const title = (db.titles || []).find(t => t.id === titleId || t.title === titleId) || db.titles[0];
-
   currentPreviewBookId = title ? title.id : titleId;
-
   currentPreviewBookTitle = title ? title.title : "Kỹ nghệ phần mềm (Tập 1)";
-
   currentPdfPage = 1;
+  cachedPdfDoc = null;
+  cachedPdfUrl = null;
 
-
+  hidePdfLimitWarning();
 
   const titleHeader = document.getElementById('pdf-modal-book-title');
-
   if (titleHeader) titleHeader.textContent = currentPreviewBookTitle;
 
-
-
   renderPdfViewer();
-
 }
 
+export function showPdfLimitWarning() {
+  const overlay = document.getElementById('pdf-limit-warning-overlay');
+  if (overlay) {
+    overlay.style.display = 'flex';
+  }
+}
 
+export function hidePdfLimitWarning() {
+  const overlay = document.getElementById('pdf-limit-warning-overlay');
+  if (overlay) {
+    overlay.style.display = 'none';
+  }
+}
 
 export function setPdfPage(pageNum) {
+  if (pageNum > totalPdfPages) {
+    showPdfLimitWarning();
+    return;
+  }
+  if (pageNum < 1) return;
 
-  if (pageNum < 1 || pageNum > totalPdfPages) return;
-
+  hidePdfLimitWarning();
   currentPdfPage = pageNum;
-
   renderPdfViewer();
-
 }
-
-
 
 export function changePdfPage(delta) {
-
-  setPdfPage(currentPdfPage + delta);
-
+  const target = currentPdfPage + delta;
+  if (target > totalPdfPages) {
+    showPdfLimitWarning();
+    return;
+  }
+  if (target < 1) return;
+  setPdfPage(target);
 }
-
-
 
 function renderPdfViewer() {
   const pageIndicator = document.getElementById('pdf-page-indicator');
@@ -301,24 +446,29 @@ function renderPdfViewer() {
   const db = getDB();
   const currentTitle = (db.titles || []).find(t => t.id === currentPreviewBookId || t.title === currentPreviewBookTitle) || {};
 
-  // TRƯỜNG HỢP 1: Sách có file PDF thực tế được Thủ thư tải lên (Screen 10b -> Screen 19b)
+  // Luôn ghim cố định thanh hiển thị tối đa 10 trang đọc thử
+  if (pageIndicator) {
+    pageIndicator.innerHTML = `<span style="font-weight: 700; color: var(--hcmue-navy);"><i class="fa-solid fa-book-open"></i> Trang ${currentPdfPage} / ${totalPdfPages} trang</span>`;
+  }
+
+  // Thumbnails bên trái: 10 trang đầu + 1 ô khóa các trang còn lại
+  if (thumbsContainer) {
+    let thumbsHtml = Array.from({ length: totalPdfPages }, (_, i) => i + 1).map(p => `
+      <div class="pdf-thumb-item ${currentPdfPage === p ? 'active' : ''}" onclick="window.handleSelectPdfPage(${p})">
+        Trang ${p}
+      </div>
+    `).join('');
+
+    thumbsHtml += `
+      <div class="pdf-thumb-item locked" onclick="window.showPdfLimitWarning()" title="Các trang từ 11 trở đi đã bị khóa theo bản quyền">
+        <i class="fa-solid fa-lock" style="font-size: 11px;"></i> Trang 11+
+      </div>
+    `;
+    thumbsContainer.innerHTML = thumbsHtml;
+  }
+
+  // TRƯỜNG HỢP 1: Sách có file PDF thực tế được tải lên -> Dùng PDF.js render Canvas (KHÔNG DÙNG IFRAME)
   if (currentTitle && currentTitle.pdfUrl) {
-    if (pageIndicator) {
-      pageIndicator.innerHTML = '<span style="color: #16a34a; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;"><i class="fa-solid fa-file-pdf"></i> Tệp PDF thực tế</span>';
-    }
-
-    if (thumbsContainer) {
-      thumbsContainer.innerHTML = `
-        <div class="pdf-thumb-item active" style="height: auto; padding: 12px 8px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px;">
-          <i class="fa-solid fa-file-pdf" style="color: #dc2626; font-size: 26px;"></i>
-          <div style="font-size: 11px; font-weight: 700; color: var(--text-main); word-break: break-word; line-height: 1.3;">
-            ${escapeHTML(currentTitle.pdfFileName || 'Tài liệu PDF gốc')}
-          </div>
-          <span class="badge badge-green" style="font-size: 10px; padding: 2px 6px;">Toàn văn</span>
-        </div>
-      `;
-    }
-
     if (sheetContainer) {
       sheetContainer.className = 'pdf-page-sheet pdf-page-sheet-real';
       sheetContainer.style.padding = '0';
@@ -329,92 +479,35 @@ function renderPdfViewer() {
       sheetContainer.style.background = 'transparent';
       sheetContainer.style.boxShadow = 'none';
       sheetContainer.innerHTML = `
-        <iframe src="${currentTitle.pdfUrl}" 
-                title="${escapeHTML(currentTitle.title || 'Tài liệu đọc thử')}"
-                style="width: 100%; height: 680px; border: none; border-radius: 8px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); background: #ffffff;">
-        </iframe>
+        <div class="pdf-secure-viewer-container" oncontextmenu="return false;">
+          <div class="pdf-secure-top-mask">
+            <div class="pdf-secure-badge">
+              <i class="fa-solid fa-shield-halved"></i> BẢN ĐỌC THỬ BẢO VỆ BẢN QUYỀN (GIỚI HẠN 10 TRANG) · VÔ HIỆU HÓA TẢI XUỐNG
+            </div>
+            <div class="pdf-secure-page-tag">
+              Trang ${currentPdfPage} / ${totalPdfPages}
+            </div>
+          </div>
+          <div id="pdf-canvas-scroll-wrapper" style="width: 100%; height: 680px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding-top: 54px; padding-bottom: 30px; background: #374151;">
+          </div>
+        </div>
       `;
+
+      if (typeof window !== 'undefined' && window.pdfjsLib) {
+        renderPdfWithPdfJs(currentTitle.pdfUrl, currentPdfPage);
+      } else {
+        renderFallbackPageSheet(currentPdfPage);
+      }
     }
     return;
   }
 
-  // TRƯỜNG HỢP 2: Sách mẫu mặc định của thư viện (chưa có file upload riêng)
-  if (pageIndicator) {
-    pageIndicator.textContent = `${currentPdfPage} / ${totalPdfPages} trang`;
-  }
-
-  if (thumbsContainer) {
-    thumbsContainer.innerHTML = Array.from({ length: totalPdfPages }, (_, i) => i + 1).map(p => `
-      <div class="pdf-thumb-item ${currentPdfPage === p ? 'active' : ''}" onclick="window.handleSelectPdfPage(${p})">
-        Trang ${p}
-      </div>
-    `).join('');
-  }
-
-  if (sheetContainer) {
-    sheetContainer.className = 'pdf-page-sheet';
-    sheetContainer.style.padding = '';
-    sheetContainer.style.width = '';
-    sheetContainer.style.maxWidth = '';
-    sheetContainer.style.height = '';
-    sheetContainer.style.minHeight = '';
-    sheetContainer.style.background = '';
-    sheetContainer.style.boxShadow = '';
-
-    const bookAuthor = currentTitle.author || 'Tác giả chuyên ngành';
-    const bookPublisher = `${currentTitle.publisher || 'Nhà xuất bản Giáo Dục'} · ${currentTitle.year || '2024'}`;
-    const bookTitleDisplay = (currentTitle.title || currentPreviewBookTitle || 'TÀI LIỆU THƯ VIỆN').toUpperCase();
-    const bookSub = currentTitle.coverSub || `Ấn bản năm ${currentTitle.year || '2024'}`;
-    const bookSummary = currentTitle.summary || 'Tài liệu đọc thử dành cho học tập và nghiên cứu của sinh viên Trường Đại học Sư phạm TP.HCM. Bản xem trước minh họa được giới hạn trong 10 trang đầu của tài liệu theo đúng bản quyền sở hữu trí tuệ.';
-
-    sheetContainer.innerHTML = `
-      <div class="pdf-watermark-overlay">
-        THƯ VIỆN ĐH SƯ PHẠM TP.HCM<br>BẢN ĐỌC THỬ TRỰC TUYẾN
-      </div>
-      <div style="position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column;">
-        <div style="font-size: 11px; font-weight: 700; color: var(--text-subtle); letter-spacing: 1px; text-transform: uppercase;">
-          ${escapeHTML(bookAuthor)}
-        </div>
-        <div style="font-size: 26px; font-weight: 800; color: var(--hcmue-navy); margin-top: 12px; line-height: 1.2;">
-          ${escapeHTML(bookTitleDisplay)}
-        </div>
-        <div style="font-size: 16px; font-weight: 600; color: var(--text-muted); margin-top: 6px;">
-          ${escapeHTML(bookSub)}
-        </div>
-        <div style="width: 48px; height: 3px; background-color: var(--hcmue-crimson); margin: 20px 0;"></div>
-        
-        <div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">
-          Giới thiệu tài liệu & Mục lục tóm tắt
-        </div>
-        <div style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;">
-          ${escapeHTML(bookSummary)}
-        </div>
-        
-        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: auto;">
-          <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Nội dung trang ${currentPdfPage}:</div>
-          <p style="font-size: 12px; color: var(--text-main); line-height: 1.6;">
-            - Trích đoạn chương mục lý thuyết chuyên ngành: ${escapeHTML(bookTitleDisplay)}.<br>
-            - Phân tích và đặc tả hệ thống theo tiêu chuẩn đào tạo Trường Đại học Sư phạm TP.HCM.<br>
-            - Bài tập ứng dụng thực hành và hướng dẫn giải mẫu chi tiết.<br>
-            - Tài liệu tham khảo và câu hỏi thảo luận cuối chương.
-          </p>
-        </div>
-
-        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-subtle); border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 24px;">
-          <span>${escapeHTML(bookPublisher)}</span>
-          <span>BẢN XEM TRƯỚC TĨNH · TRANG ${currentPdfPage} / ${totalPdfPages}</span>
-        </div>
-      </div>
-    `;
-  }
+  // TRƯỜNG HỢP 2: Sách mẫu mặc định của thư viện
+  renderFallbackPageSheet(currentPdfPage);
 }
 
-
-
 /**
-
  * Screen 20 & 20b: Sách đang mượn & Lịch sử cá nhân UC14 UC17
-
  */
 
 export function renderStudentLoansScreen() {

@@ -102,7 +102,7 @@ import {
 
 import {
 
-  renderStudentSearchScreen, handleStudentSearchInput, handleSelectStudentBookSuggestion, handleFilterStudentCategory, openPdfPreviewModal, setPdfPage, changePdfPage, renderStudentLoansScreen,
+  renderStudentSearchScreen, handleStudentSearchInput, handleSelectStudentBookSuggestion, handleFilterStudentCategory, openPdfPreviewModal, setPdfPage, changePdfPage, showPdfLimitWarning, hidePdfLimitWarning, handlePdfZoom, renderStudentLoansScreen,
 
   executeStudentRenew, handleAiQuery
 
@@ -3442,10 +3442,33 @@ function registerGlobalEvents() {
 
 
   window.handlePdfPageDelta = function (delta) {
-
     changePdfPage(delta);
-
   };
+
+  window.handlePdfZoom = function (action) {
+    handlePdfZoom(action);
+  };
+
+  window.showPdfLimitWarning = function () {
+    showPdfLimitWarning();
+  };
+
+  window.hidePdfLimitWarning = function () {
+    hidePdfLimitWarning();
+  };
+
+  // Vô hiệu hóa phím tắt tải xuống và in ấn (Ctrl+S, Ctrl+P) để bảo vệ bản quyền tài liệu đọc thử
+  window.addEventListener('keydown', function (e) {
+    const modal = document.getElementById('modal-pdf-preview');
+    if (modal && modal.classList.contains('active')) {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S' || e.key === 'p' || e.key === 'P')) {
+        e.preventDefault();
+        if (window.showToast) {
+          window.showToast('🛡️ Tính năng tải xuống và in ấn tài liệu đã bị vô hiệu hóa để bảo vệ bản quyền sách.', 'warning');
+        }
+      }
+    }
+  });
 
 
 

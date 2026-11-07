@@ -18,14 +18,22 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- Custom Stylesheets (CSS3 pure variables) -->
-  <link rel="stylesheet" href="css/hcmue-variables.css?v=3.2">
-  <link rel="stylesheet" href="css/layout.css?v=3.2">
-  <link rel="stylesheet" href="css/components.css?v=3.2">
-  <link rel="stylesheet" href="css/modals.css?v=3.2">
-  <link rel="stylesheet" href="css/screens.css?v=3.2">
+  <link rel="stylesheet" href="css/hcmue-variables.css?v=3.5">
+  <link rel="stylesheet" href="css/layout.css?v=3.5">
+  <link rel="stylesheet" href="css/components.css?v=3.5">
+  <link rel="stylesheet" href="css/modals.css?v=3.5">
+  <link rel="stylesheet" href="css/screens.css?v=3.5">
 
   <!-- Canvas Confetti CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <!-- PDF.js CDN (Mozilla) - Render Canvas độc lập 10 trang & chống tải xuống -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    if (typeof window !== 'undefined' && window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+  </script>
 </head>
 
 <body>
@@ -2562,26 +2570,63 @@
 
         <div class="pdf-toolbar">
           <span id="pdf-modal-book-title">Kỹ nghệ phần mềm (Tập 1)</span>
-          <div style="display: flex; align-items: center; gap: 16px;">
-            <button class="btn-link" onclick="window.handlePdfPageDelta(-1)">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <button class="btn-link" onclick="window.handlePdfPageDelta(-1)" title="Trang trước">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <span id="pdf-page-indicator">1 / 10 trang</span>
-            <button class="btn-link" onclick="window.handlePdfPageDelta(1)">
+            <span id="pdf-page-indicator" style="font-weight: 700; color: var(--hcmue-navy); min-width: 140px; text-align: center;">1 / 10 trang</span>
+            <button class="btn-link" onclick="window.handlePdfPageDelta(1)" title="Trang sau">
               <i class="fa-solid fa-chevron-right"></i>
             </button>
             <span style="color: var(--text-subtle);">|</span>
-            <span>100%</span>
+            <div style="display: inline-flex; align-items: center; gap: 6px;">
+              <button class="btn-link" onclick="window.handlePdfZoom(-0.15)" title="Thu nhỏ">
+                <i class="fa-solid fa-magnifying-glass-minus"></i>
+              </button>
+              <button class="btn btn-sm btn-outline" onclick="window.handlePdfZoom('fit')" style="padding: 2px 8px; font-size: 11px;" title="Vừa vặn toàn bộ trang">
+                <span id="pdf-zoom-level">Vừa trang</span>
+              </button>
+              <button class="btn-link" onclick="window.handlePdfZoom(0.15)" title="Phóng to">
+                <i class="fa-solid fa-magnifying-glass-plus"></i>
+              </button>
+            </div>
+            <span style="color: var(--text-subtle);">|</span>
+            <span class="badge badge-blue" style="font-size: 11px; padding: 3px 8px; display: inline-flex; align-items: center; gap: 5px;">
+              <i class="fa-solid fa-shield-halved" style="color: #f59e0b;"></i> Khóa tải xuống
+            </span>
           </div>
         </div>
 
-        <div class="modal-body pdf-viewer-modal-body">
+        <div class="modal-body pdf-viewer-modal-body" style="position: relative;">
           <!-- Left Thumbnails Sidebar -->
           <div class="pdf-thumbs-sidebar" id="pdf-thumbs-container"></div>
 
           <!-- Main Page Sheet -->
-          <div class="pdf-main-view">
+          <div class="pdf-main-view" oncontextmenu="return false;">
             <div class="pdf-page-sheet" id="pdf-page-content-sheet"></div>
+          </div>
+
+          <!-- Hộp cảnh báo giới hạn 10 trang đọc thử -->
+          <div id="pdf-limit-warning-overlay" class="pdf-limit-warning-overlay" style="display: none;">
+            <div class="pdf-limit-card">
+              <div class="pdf-limit-icon"><i class="fa-solid fa-shield-halved"></i></div>
+              <h3 class="pdf-limit-title">ĐÃ HẾT 10 TRANG ĐỌC THỬ</h3>
+              <p class="pdf-limit-desc">
+                Theo Quy chế Bản quyền & Sở hữu trí tuệ của <strong>Thư viện Trường ĐH Sư phạm TP.HCM</strong>, tài liệu xem trước trực tuyến chỉ trích đoạn tối đa <strong>10 trang đầu</strong>.
+              </p>
+              <div class="pdf-limit-instruction">
+                <i class="fa-solid fa-circle-exclamation" style="font-size: 18px;"></i>
+                <span>Đã hết 10 trang đọc thử. Vui lòng mượn sách giấy tại quầy để đọc tiếp.</span>
+              </div>
+              <div class="pdf-limit-actions">
+                <button type="button" class="btn btn-primary" onclick="window.handleSelectPdfPage(1); window.hidePdfLimitWarning();">
+                  <i class="fa-solid fa-arrow-rotate-left"></i> Đọc lại từ Trang 1
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="window.closeModal('modal-pdf-preview'); window.hidePdfLimitWarning();">
+                  Đóng cửa sổ
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -3108,7 +3153,7 @@
       document.write('<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"><\\/script>');
     }
   </script>
-  <script src="js/app.bundle.js?v=3.2"></script>
+  <script src="js/app.bundle.js?v=3.5"></script>
 </body>
 
 </html>

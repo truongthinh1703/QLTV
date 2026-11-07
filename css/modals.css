@@ -288,6 +288,149 @@
   font-weight: 700;
 }
 
+.pdf-thumb-item.locked {
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.pdf-thumb-item.locked:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: #fef2f2;
+}
+
+/* Khung bảo vệ PDF thực tế chống tải xuống */
+.pdf-secure-viewer-container {
+  position: relative;
+  width: 100%;
+  max-width: 920px;
+  height: 680px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Thanh che giấu Toolbar của trình duyệt để triệt tiêu nút Tải xuống & In */
+.pdf-secure-top-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  background: linear-gradient(180deg, #0e233d 0%, #1e3a5f 100%);
+  color: #ffffff;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.pdf-secure-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #f1f5f9;
+}
+
+.pdf-secure-badge i {
+  color: #f59e0b;
+}
+
+.pdf-secure-page-tag {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Cảnh báo giới hạn 10 trang đọc thử */
+.pdf-limit-warning-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.pdf-limit-card {
+  background: #ffffff;
+  border-radius: var(--radius-xl);
+  padding: 32px 28px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color);
+}
+
+.pdf-limit-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #fef2f2;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  margin: 0 auto 16px auto;
+}
+
+.pdf-limit-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #dc2626;
+  margin-bottom: 8px;
+  letter-spacing: -0.3px;
+}
+
+.pdf-limit-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.pdf-limit-instruction {
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #b45309;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.pdf-limit-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
 .pdf-main-view {
   flex: 1;
   background-color: #64748b;
