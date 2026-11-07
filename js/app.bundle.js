@@ -10247,13 +10247,15 @@ let activeScreenId = 'screen-login';
 
 // RBAC Permissions Map
 
-const ADMIN_SCREENS = ['screen-accounts', 'screen-config', 'screen-backup', 'screen-reports'];
+const ADMIN_SCREENS = ['screen-accounts', 'screen-config', 'screen-backup'];
 
 const LIBRARIAN_SCREENS = [
 
   'screen-dashboard', 'screen-borrow', 'screen-return', 'screen-debts',
 
-  'screen-titles', 'screen-copies', 'screen-categories', 'screen-inventory', 'screen-readers'
+  'screen-titles', 'screen-copies', 'screen-categories', 'screen-inventory', 'screen-readers',
+
+  'screen-reports'
 
 ];
 
