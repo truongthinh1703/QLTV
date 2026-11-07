@@ -3,49 +3,52 @@
 /* --- Screen 01 & 02: Login & Forgot Password --- */
 .login-card-container {
   background: #ffffff;
-  border-radius: var(--radius-xl);
-  padding: 40px;
+  border-radius: var(--radius-lg);
+  padding: 18px 24px;
   width: 100%;
   max-width: 440px;
-  box-shadow: var(--shadow-xl);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
   border: 1px solid var(--border-color);
+  box-sizing: border-box;
 }
 
 .login-card-title {
-  font-size: 24px;
+  font-size: 19px;
   font-weight: 800;
   color: var(--hcmue-crimson);
-  margin-bottom: 6px;
-  letter-spacing: -0.5px;
+  margin-bottom: 3px;
+  letter-spacing: -0.3px;
 }
 
 .login-card-desc {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-muted);
-  margin-bottom: 24px;
+  margin-bottom: 14px;
 }
 
 .login-extra-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 13px;
-  margin-top: 14px;
-  margin-bottom: 24px;
+  font-size: 12px;
+  margin-top: 8px;
+  margin-bottom: 14px;
 }
 
 .checkbox-label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
   color: var(--text-muted);
+  font-size: 12px;
 }
 
 .forgot-link {
   color: var(--hcmue-navy);
   font-weight: 600;
   text-decoration: none;
+  font-size: 12px;
 }
 
 .forgot-link:hover {
@@ -53,35 +56,36 @@
 }
 
 .quick-login-chips {
-  margin-top: 24px;
-  padding-top: 20px;
+  margin-top: 12px;
+  padding-top: 10px;
   border-top: 1px dashed var(--border-color);
 }
 
 .quick-login-title {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
   color: var(--text-subtle);
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .chips-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
 }
 
 .quick-chip {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
+  padding: 5px 10px;
   background-color: #f8fafc;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  font-size: 12px;
+  border-radius: var(--radius-sm);
+  font-size: 11.5px;
+  line-height: 1.3;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -92,11 +96,11 @@
 }
 
 .auth-footer-text {
-  margin-top: 30px;
+  margin-top: 10px;
   text-align: center;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-subtle);
-  line-height: 1.6;
+  line-height: 1.4;
 }
 
 /* --- Screen 07: Lập phiếu mượn UC12 --- */
